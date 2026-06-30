@@ -1,5 +1,5 @@
 # Work Insight - Digital Activity Intelligence Platform
-
+Version 1.0
 A daily activity intelligence platform designed to track workloads, productivity, and activity analytics for medical digital teams.
 
 ## Tech Stack
