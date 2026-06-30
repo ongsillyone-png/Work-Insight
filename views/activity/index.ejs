@@ -1,116 +1,174 @@
-<div class="row mb-4">
-  <div class="col-12 d-flex align-items-center justify-content-between flex-wrap gap-2">
-    <div>
-      <h2 class="fw-bold text-dark mb-0">Daily Activity Logs</h2>
-      <p class="text-secondary mb-0">Review, search, and manage your logged daily digital activities.</p>
+<!-- Facebook / Git Timeline Style View for Activity History -->
+<div class="row g-4">
+  
+  <!-- Left Side: Timeline Feed -->
+  <div class="col-lg-8">
+    
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+      <div>
+        <h3 class="fw-bold text-dark mb-1">ประวัติการปฏิบัติงาน (Timeline)</h3>
+        <p class="text-secondary small">ตรวจสอบบันทึกภาระงานและลำดับขั้นตอนกิจกรรมย้อนหลัง</p>
+      </div>
+      <div>
+        <a href="/activity/create" class="btn btn-hospital shadow-sm">
+          <i class="bi bi-plus-lg me-2"></i>บันทึกกิจกรรมใหม่
+        </a>
+      </div>
     </div>
-    <div>
-      <a href="/activity/create" class="btn btn-hospital px-4 py-2 rounded-3 fw-medium shadow-sm">
-        <i class="bi bi-plus-lg me-2"></i>Log New Activity
-      </a>
-    </div>
-  </div>
-</div>
 
-<!-- Filters Card -->
-<div class="card rounded-card border-0 shadow-sm mb-4">
-  <div class="card-body py-3">
-    <form class="row g-3 align-items-end">
-      <div class="col-md-3">
-        <label for="filterDate" class="form-label text-secondary small fw-semibold">Log Date</label>
-        <input type="date" class="form-control rounded-3" id="filterDate">
-      </div>
-      <div class="col-md-3">
-        <label for="filterSession" class="form-label text-secondary small fw-semibold">Session</label>
-        <select class="form-select rounded-3" id="filterSession">
-          <option value="">All Sessions</option>
-          <option value="Morning">Morning</option>
-          <option value="Afternoon">Afternoon</option>
-          <option value="Night">Night</option>
-        </select>
-      </div>
-      <div class="col-md-4">
-        <label for="filterSearch" class="form-label text-secondary small fw-semibold">Search keyword</label>
-        <input type="text" class="form-control rounded-3" id="filterSearch" placeholder="Search by activity name or output...">
-      </div>
-      <div class="col-md-2 d-grid">
-        <button type="submit" class="btn btn-hospital rounded-3">
-          <i class="bi bi-filter me-2"></i>Apply Filters
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
+    <!-- Timeline Container -->
+    <div class="position-relative ps-4" style="border-left: 2px solid var(--border-color); margin-left: 20px;">
+      
+      <% if (logs && logs.length > 0) { %>
+        <!-- Group logs by date (in EJS or JS dynamically, but here we can iterate through them directly) -->
+        <% 
+          let currentDate = ""; 
+          logs.forEach(function(log) { 
+            if (log.date !== currentDate) {
+              currentDate = log.date;
+        %>
+              <!-- Date Node Header -->
+              <div class="position-relative my-4" style="margin-left: -32px;">
+                <div class="bg-hospital-light text-teal border border-teal rounded-pill px-3 py-1 d-inline-block fw-bold shadow-sm" style="font-size: 0.85rem; border-color: var(--hospital-teal) !important;">
+                  <i class="bi bi-calendar-check me-2"></i><%= log.date %>
+                </div>
+              </div>
+        <% 
+            } 
+        %>
 
-<!-- Logs List -->
-<div class="card rounded-card border-0 shadow-sm">
-  <div class="card-body p-0">
-    <div class="table-responsive">
-      <table class="table table-hover align-middle mb-0">
-        <thead class="table-light">
-          <tr>
-            <th class="ps-4">Activity Name</th>
-            <th>Log Date</th>
-            <th>Session</th>
-            <th>Duration</th>
-            <th>Location</th>
-            <th>Outputs / Deliverables</th>
-            <th class="pe-4 text-end">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% if (logs && logs.length > 0) { %>
-            <% logs.forEach(function(log) { %>
-              <tr>
-                <td class="ps-4 fw-semibold text-dark"><%= log.activityName %></td>
-                <td><%= log.date %></td>
-                <td><span class="badge bg-light text-dark"><%= log.session %></span></td>
-                <td><%= log.duration %> Min</td>
-                <td><%= log.location || 'N/A' %></td>
-                <td><span class="text-truncate d-inline-block" style="max-width: 250px;"><%= log.output %></span></td>
-                <td class="pe-4 text-end">
-                  <a href="/activity/edit/<%= log.id %>" class="btn btn-sm btn-outline-secondary rounded-2 me-1">
-                    <i class="bi bi-pencil"></i>
-                  </a>
-                  <button class="btn btn-sm btn-outline-danger rounded-2 btn-delete" data-id="<%= log.id %>">
-                    <i class="bi bi-trash"></i>
-                  </button>
-                </td>
-              </tr>
-            <% }); %>
-          <% } else { %>
-            <tr>
-              <td colspan="7" class="text-center py-5 text-muted">
-                <i class="bi bi-journal-x fs-3 d-block mb-2"></i>
-                No activity logs found for your account. Click 'Log New Activity' above to log your first activity!
-              </td>
-            </tr>
-          <% } %>
-        </tbody>
-      </table>
+            <!-- Timeline Activity Card -->
+            <div class="position-relative mb-4">
+              <!-- Timeline Marker Icon -->
+              <span class="position-absolute bg-teal rounded-circle d-flex align-items-center justify-content-center text-white" style="width: 24px; height: 24px; left: -33px; top: 12px; border: 3px solid #F8FAFC; z-index: 2;">
+                <i class="bi bi-dot" style="font-size: 1.25rem;"></i>
+              </span>
+
+              <!-- Content Card -->
+              <div class="card card-hospital p-3 border-0 bg-white shadow-sm">
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+                  <div>
+                    <h6 class="fw-bold text-dark mb-1"><%= log.activityName %></h6>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                      <span class="badge bg-hospital-light"><%= log.session %></span>
+                      <span class="text-secondary text-xs"><i class="bi bi-clock me-1"></i><%= log.duration %> นาที</span>
+                      <% if (log.location) { %>
+                        <span class="text-secondary text-xs"><i class="bi bi-geo-alt me-1"></i><%= log.location %></span>
+                      <% } %>
+                    </div>
+                  </div>
+                  
+                  <!-- Actions Button Group -->
+                  <div class="d-flex gap-1">
+                    <a href="/activity/edit/<%= log.id %>" class="btn btn-light btn-sm rounded-circle p-1.5" title="แก้ไข">
+                      <i class="bi bi-pencil text-secondary" style="font-size: 0.9rem;"></i>
+                    </a>
+                    <button class="btn btn-light btn-sm rounded-circle p-1.5 btn-delete" data-id="<%= log.id %>" title="ลบ">
+                      <i class="bi bi-trash text-danger" style="font-size: 0.9rem;"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Deliverable / Outcome details -->
+                <% if (log.output) { %>
+                  <div class="p-2 bg-light rounded-card text-sm text-dark mb-2">
+                    <strong class="text-xs text-secondary d-block mb-1">ผลงาน / ผลลัพธ์:</strong>
+                    <%= log.output %>
+                  </div>
+                <% } %>
+
+                <!-- Additional Remarks -->
+                <% if (log.remark) { %>
+                  <p class="text-xs text-secondary mb-0 italic">
+                    <i class="bi bi-chat-left-dots me-1"></i>หมายเหตุ: <%= log.remark %>
+                  </p>
+                <% } %>
+              </div>
+            </div>
+
+        <% }); %>
+      <% } else { %>
+        <!-- Empty State Container -->
+        <div class="text-center py-5 text-muted bg-white rounded-card shadow-sm border p-4" style="margin-left: -20px;">
+          <i class="bi bi-journal-x fs-1 text-secondary d-block mb-3"></i>
+          <h5 class="fw-bold text-dark">ยังไม่มีบันทึกประวัติการทำงาน</h5>
+          <p class="text-secondary small mb-3">เริ่มต้นบันทึกกิจกรรมแรกของคุณเพื่อสร้างไทม์ไลน์ประวัติการทำงาน!</p>
+          <a href="/activity/create" class="btn btn-hospital px-4">
+            <i class="bi bi-plus-lg me-1"></i>บันทึกงานแรก
+          </a>
+        </div>
+      <% } %>
+
     </div>
   </div>
+
+  <!-- Right Side: Sidebar Filters (Todoist-style Filters) -->
+  <div class="col-lg-4">
+    <div class="card card-hospital border-0 p-4 bg-white shadow-sm position-sticky" style="top: 84px;">
+      <h5 class="fw-bold text-dark mb-3">ค้นหาและกรองประวัติ</h5>
+      
+      <form class="d-flex flex-column gap-3" action="/activity" method="GET">
+        <!-- Date -->
+        <div>
+          <label for="filterDate" class="form-label text-secondary small fw-semibold">เลือกวันที่</label>
+          <input type="date" class="form-control rounded-3" id="filterDate" name="date">
+        </div>
+
+        <!-- Session selection -->
+        <div>
+          <label for="filterSession" class="form-label text-secondary small fw-semibold">ช่วงเวลาทำงาน</label>
+          <select class="form-select rounded-3" id="filterSession" name="session">
+            <option value="">ทุกช่วงเวลา</option>
+            <option value="Morning">เช้า</option>
+            <option value="Afternoon">บ่าย</option>
+            <option value="Night">ค่ำ</option>
+          </select>
+        </div>
+
+        <!-- Search input query -->
+        <div>
+          <label for="filterSearch" class="form-label text-secondary small fw-semibold">คำค้นหา</label>
+          <div class="input-group input-group-sm border rounded-3 overflow-hidden">
+            <span class="input-group-text bg-light border-0"><i class="bi bi-search text-secondary"></i></span>
+            <input type="text" class="form-control border-0" id="filterSearch" name="search" placeholder="ค้นหาชื่อผลงาน, กิจกรรม...">
+          </div>
+        </div>
+
+        <!-- Submission buttons -->
+        <div class="d-grid gap-2 pt-2">
+          <button type="submit" class="btn btn-hospital">
+            <i class="bi bi-filter me-1"></i>กรองข้อมูล
+          </button>
+          <a href="/activity" class="btn btn-light border rounded-3 text-center">
+            ล้างตัวกรอง
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Delete validation flow with SweetAlert2
+  document.addEventListener('DOMContentLoaded', () => {
+    // Delete validation using SweetAlert2
     const deleteButtons = document.querySelectorAll('.btn-delete');
     deleteButtons.forEach(btn => {
       btn.addEventListener('click', function() {
         const id = this.getAttribute('data-id');
         Swal.fire({
-          title: 'Are you sure?',
-          text: "Do you want to delete this activity log record?",
+          title: 'คุณแน่ใจหรือ?',
+          text: 'คุณต้องการลบบันทึกประวัติกิจกรรมการทำงานนี้หรือไม่?',
           icon: 'warning',
           showCancelButton: true,
-          confirmButtonColor: '#0d8a72',
-          cancelButtonColor: '#dc3545',
-          confirmButtonText: 'Yes, delete it!'
+          confirmButtonColor: '#0D9488',
+          cancelButtonColor: '#EF4444',
+          confirmButtonText: 'ใช่ ลบเลย!',
+          cancelButtonText: 'ยกเลิก'
         }).then((result) => {
           if (result.isConfirmed) {
-            Swal.fire('Deleted!', 'Activity log has been deleted.', 'success');
-            // Complete deletion implementation in actual backend integration phase
+            Swal.fire('ลบแล้ว!', 'บันทึกประวัติการทำงานถูกลบเรียบร้อยแล้ว', 'success');
+            // actual request can be made to endpoint here: `/activity/delete/${id}`
           }
         });
       });

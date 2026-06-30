@@ -1,113 +1,294 @@
-<div class="row mb-4">
-  <div class="col-12">
-    <h2 class="fw-bold text-dark mb-0">Log New Activity</h2>
-    <p class="text-secondary mb-0">Record your daily work activity workload details.</p>
+<!-- Notion & Todoist style Quick Capture Interface -->
+<div class="row">
+  <div class="col-lg-8 mx-auto">
+    
+    <!-- Header -->
+    <div class="mb-4 text-center">
+      <h3 class="fw-bold text-dark mb-1">บันทึกกิจกรรมประจำวัน</h3>
+      <p class="text-secondary small">ป้อนงานและระยะเวลาปฏิบัติงานของวันนี้อย่างรวดเร็ว</p>
+    </div>
+
+    <!-- Search Input Autocomplete Box (Notion Quick Find style) -->
+    <div class="card card-hospital border-0 p-4 mb-4">
+      <label class="form-label text-secondary small fw-semibold mb-2">ค้นหากิจกรรมที่ต้องการบันทึก</label>
+      <div class="input-group input-group-lg shadow-sm rounded-3 overflow-hidden border">
+        <span class="input-group-text bg-white border-0 text-secondary pe-0"><i class="bi bi-search"></i></span>
+        <input type="text" id="activitySearchInput" class="form-control border-0 ps-3" style="font-size: 1rem;" placeholder="พิมพ์ค้นหากิจกรรม เช่น ซ่อมคอม, database, backup, HOSxP, ประชุม..." autocomplete="off">
+        <button class="btn btn-light border-0 px-3" type="button" onclick="clearSearch()"><i class="bi bi-x-lg"></i></button>
+      </div>
+
+      <!-- Autocomplete Dropdown List -->
+      <div id="searchAutocompleteList" class="search-autocomplete-list mt-2 d-none">
+        <!-- Matching items rendered via JavaScript -->
+      </div>
+    </div>
+
+    <!-- Quick Actions Section -->
+    <div class="mb-4">
+      <h6 class="text-secondary text-uppercase tracking-wider small fw-semibold mb-3">บันทึกด่วน (Quick Actions)</h6>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="card card-hospital p-3 cursor-pointer d-flex flex-row align-items-center justify-content-between border" onclick="selectActivityQuick(1, 'ซ่อมและแก้ไขอุปกรณ์คอมพิวเตอร์')">
+            <div class="d-flex align-items-center gap-3">
+              <div class="bg-hospital-light text-teal rounded p-2 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;"><i class="bi bi-pc-display fs-5"></i></div>
+              <div>
+                <h6 class="fw-bold text-dark mb-0">ซ่อมเครื่องคอมพิวเตอร์</h6>
+                <span class="text-secondary text-xs">ล่าสุดเมื่อวาน</span>
+              </div>
+            </div>
+            <i class="bi bi-chevron-right text-muted"></i>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="card card-hospital p-3 cursor-pointer d-flex flex-row align-items-center justify-content-between border" onclick="selectActivityQuick(2, 'ตรวจสอบการสำรองข้อมูล MariaDB')">
+            <div class="d-flex align-items-center gap-3">
+              <div class="bg-hospital-light text-teal rounded p-2 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;"><i class="bi bi-database-check fs-5"></i></div>
+              <div>
+                <h6 class="fw-bold text-dark mb-0">สำรองข้อมูลประจำวัน</h6>
+                <span class="text-secondary text-xs">ล่าสุดวันนี้</span>
+              </div>
+            </div>
+            <i class="bi bi-chevron-right text-muted"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Browse Category Section (Todoist style navigation) -->
+    <div class="mb-4">
+      <h6 class="text-secondary text-uppercase tracking-wider small fw-semibold mb-3">เลือกหมวดหมู่กิจกรรม (Browse Category)</h6>
+      <div class="d-flex flex-wrap gap-2">
+        <button type="button" class="chip-btn active filter-category-btn" onclick="filterByCategory('all', this)">ทั้งหมด</button>
+        <button type="button" class="chip-btn filter-category-btn" onclick="filterByCategory('IT', this)">ไอที (IT)</button>
+        <button type="button" class="chip-btn filter-category-btn" onclick="filterByCategory('Meeting', this)">การประชุม</button>
+        <button type="button" class="chip-btn filter-category-btn" onclick="filterByCategory('Administration', this)">บริหาร/เอกสาร</button>
+        <button type="button" class="chip-btn filter-category-btn" onclick="filterByCategory('Network', this)">ระบบเครือข่าย</button>
+      </div>
+    </div>
+
+    <!-- Active List of Activities -->
+    <div class="card card-hospital border-0 p-3">
+      <div class="d-flex flex-column gap-2" id="activitiesListContainer">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
   </div>
 </div>
 
-<div class="row">
-  <div class="col-lg-8 mx-auto">
-    <div class="card rounded-card border-0 shadow-sm">
-      <div class="card-body p-4 p-md-5">
-        <form action="/activity/create" method="POST" class="needs-validation" novalidate>
-          
-          <div class="mb-4">
-            <label for="activityMasterId" class="form-label text-secondary small fw-semibold">Activity Master Definition</label>
-            <select class="form-select rounded-3" id="activityMasterId" name="activityMasterId" placeholder="Search or select activity..." required>
-              <option value="">Select an activity definition...</option>
-              <!-- Boilerplate placeholder activities -->
-              <option value="1">ACT-001: Hardware repair & troubleshooting</option>
-              <option value="2">ACT-002: MariaDB Database backup validation</option>
-              <option value="3">ACT-003: Server room temperature control inspection</option>
-              <option value="4">ACT-004: Network bandwidth analysis and configurations</option>
-            </select>
-            <div class="invalid-feedback">Please select an activity definition.</div>
-          </div>
-
-          <div class="row g-3 mb-4">
-            <div class="col-md-6">
-              <label for="logDate" class="form-label text-secondary small fw-semibold">Activity Date</label>
-              <input type="date" class="form-control rounded-3" id="logDate" name="logDate" required value="<%= new Date().toISOString().split('T')[0] %>">
-              <div class="invalid-feedback">Please select a valid date.</div>
-            </div>
-            
-            <div class="col-md-6">
-              <label for="session" class="form-label text-secondary small fw-semibold">Working Session Block</label>
-              <select class="form-select rounded-3" id="session" name="session" required>
-                <option value="Morning" selected>Morning Shift (08:30 - 12:00)</option>
-                <option value="Afternoon">Afternoon Shift (13:00 - 16:30)</option>
-                <option value="Night">Night/OT Shift (16:30 onwards)</option>
-              </select>
-              <div class="invalid-feedback">Please select a session shift.</div>
-            </div>
-          </div>
-
-          <div class="row g-3 mb-4">
-            <div class="col-md-6">
-              <label for="duration" class="form-label text-secondary small fw-semibold">Actual Spent Duration (Minutes)</label>
-              <div class="input-group">
-                <input type="number" class="form-control rounded-start-3" id="duration" name="duration" min="1" placeholder="e.g. 60" required>
-                <span class="input-group-text rounded-end-3 text-secondary">minutes</span>
-                <div class="invalid-feedback">Please enter a valid positive duration in minutes.</div>
-              </div>
-            </div>
-            
-            <div class="col-md-6">
-              <label for="locationId" class="form-label text-secondary small fw-semibold">Physical / Virtual Location</label>
-              <select class="form-select rounded-3" id="locationId" name="locationId">
-                <option value="">Select a location (Optional)...</option>
-                <option value="1">OPD (Outpatient Department)</option>
-                <option value="2">ER (Emergency Room)</option>
-                <option value="3">IPD (Inpatient Department)</option>
-                <option value="4">LAB (Laboratory Services)</option>
-                <option value="5">Server Room</option>
-                <option value="6">Meeting Room</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="mb-4">
-            <label for="output" class="form-label text-secondary small fw-semibold">Outcome / Deliverables Result</label>
-            <textarea class="form-control rounded-3" id="output" name="output" rows="3" placeholder="Describe the physical/digital results or outcomes of this activity..."></textarea>
-          </div>
-
-          <div class="mb-4">
-            <label for="remark" class="form-label text-secondary small fw-semibold">Additional Remarks</label>
-            <textarea class="form-control rounded-3" id="remark" name="remark" rows="2" placeholder="Any additional notes or comments..."></textarea>
-          </div>
-
-          <div class="d-flex align-items-center justify-content-end gap-2 mt-5">
-            <a href="/activity" class="btn btn-outline-secondary px-4 py-2 rounded-3">Cancel</a>
-            <button type="submit" class="btn btn-hospital px-4 py-2 rounded-3 fw-medium">Save Record</button>
-          </div>
-
-        </form>
+<!-- Modal Quick Entry Form (Google Keep style popup) -->
+<div class="modal fade" id="recordFormModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
+    <div class="modal-content border-0 rounded-card shadow-lg">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="fw-bold text-dark" id="modalActivityTitle">บันทึกกิจกรรม</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+      
+      <form action="/activity/create" method="POST" class="needs-validation" novalidate>
+        <div class="modal-body py-3">
+          <input type="hidden" id="modalActivityId" name="activityMasterId" required>
+          
+          <div class="mb-3">
+            <label class="form-label text-secondary small fw-semibold">กิจกรรมหลัก</label>
+            <input type="text" class="form-control rounded-3 bg-light border-0 fw-semibold" id="modalActivityNameDisplay" readonly>
+          </div>
+
+          <!-- Session selection (เช้า / บ่าย / ทั้งวัน) -->
+          <div class="mb-3">
+            <label class="form-label text-secondary small fw-semibold">ช่วงเวลาปฏิบัติงาน</label>
+            <div class="segmented-control" id="formSessionGroup">
+              <button type="button" class="chip-btn active" onclick="setFormSession('Morning', this)">เช้า</button>
+              <button type="button" class="chip-btn" onclick="setFormSession('Afternoon', this)">บ่าย</button>
+              <button type="button" class="chip-btn" onclick="setFormSession('Night', this)">ค่ำ/OT</button>
+            </div>
+            <input type="hidden" name="session" id="formSelectedSession" value="Morning">
+          </div>
+
+          <!-- Duration spent quick chips (15, 30, 60, 120 นาที) -->
+          <div class="mb-3">
+            <label class="form-label text-secondary small fw-semibold">ระยะเวลาที่ใช้งาน (นาที)</label>
+            <div class="segmented-control mb-2" id="formDurationGroup">
+              <button type="button" class="chip-btn" onclick="setFormDuration(15, this)">15 นาที</button>
+              <button type="button" class="chip-btn active" onclick="setFormDuration(30, this)">30 นาที</button>
+              <button type="button" class="chip-btn" onclick="setFormDuration(60, this)">60 นาที</button>
+              <button type="button" class="chip-btn" onclick="setFormDuration(120, this)">120 นาที</button>
+            </div>
+            <div class="input-group input-group-sm mt-2">
+              <span class="input-group-text bg-light text-secondary border-0">ระยะเวลาอื่น</span>
+              <input type="number" name="duration" id="formSelectedDuration" class="form-control" value="30" min="1" required placeholder="ระบุนาที">
+            </div>
+          </div>
+
+          <!-- Location dropdown selector -->
+          <div class="mb-3">
+            <label for="formLocation" class="form-label text-secondary small fw-semibold">สถานที่ปฏิบัติงาน</label>
+            <select class="form-select rounded-3" id="formLocation" name="locationId">
+              <option value="">เลือกสถานที่...</option>
+              <option value="1">OPD (แผนกผู้ป่วยนอก)</option>
+              <option value="2">ER (ห้องฉุกเฉิน)</option>
+              <option value="3">IPD (แผนกผู้ป่วยใน)</option>
+              <option value="4">LAB (ห้องปฏิบัติการ)</option>
+              <option value="5">ห้องเซิร์ฟเวอร์</option>
+              <option value="6">ห้องประชุม</option>
+            </select>
+          </div>
+
+          <!-- Outcome / Deliverables results -->
+          <div class="mb-3">
+            <label for="formOutput" class="form-label text-secondary small fw-semibold">ผลงาน / สิ่งที่ส่งมอบ</label>
+            <textarea class="form-control rounded-3" id="formOutput" name="output" rows="2" placeholder="อธิบายผลงานการปฏิบัติงาน..."></textarea>
+          </div>
+
+          <!-- Remarks -->
+          <div class="mb-3">
+            <label for="formRemark" class="form-label text-secondary small fw-semibold">หมายเหตุ</label>
+            <textarea class="form-control rounded-3" id="formRemark" name="remark" rows="1" placeholder="ความเห็นเพิ่มเติม..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">ยกเลิก</button>
+          <button type="submit" class="btn btn-hospital rounded-3 px-4">บันทึกภาระงาน</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Tom Select for searching activity definitions
-    new TomSelect('#activityMasterId', {
-      create: false,
-      sortField: {
-        field: 'text',
-        direction: 'asc'
+  // All system activities defined for mock search filtering
+  const allActivities = [
+    { id: 1, name: 'ACT-001: ซ่อมและแก้ไขอุปกรณ์คอมพิวเตอร์ (Hardware Repair)', category: 'IT' },
+    { id: 2, name: 'ACT-002: ตรวจสอบการสำรองข้อมูล MariaDB (Database Backup)', category: 'IT' },
+    { id: 3, name: 'ACT-003: ตรวจสอบอุณหภูมิห้องเซิร์ฟเวอร์ (Server Monitoring)', category: 'IT' },
+    { id: 4, name: 'ACT-004: วิเคราะห์และตั้งค่าเครือข่าย (Network Setup)', category: 'Network' },
+    { id: 5, name: 'ACT-005: ออกแบบแบนเนอร์ประชาสัมพันธ์โรงพยาบาล (PR Graphic Design)', category: 'Administration' },
+    { id: 6, name: 'ACT-006: ประชุมวางแผนเทคโนโลยีสารสนเทศกลุ่มงานดิจิทัล (Meeting)', category: 'Meeting' },
+    { id: 7, name: 'ACT-007: ติดตั้งเครื่องพิมพ์สำหรับจุดคัดกรอง OPD (Printer setup)', category: 'IT' },
+    { id: 8, name: 'ACT-008: จัดทำเอกสารคู่มือการใช้งานระบบ HOSxP (Documentation)', category: 'Administration' }
+  ];
+
+  let recordModal;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof bootstrap !== 'undefined') {
+      recordModal = new bootstrap.Modal(document.getElementById('recordFormModal'));
+    }
+    
+    // Render initial activity list
+    renderActivityList(allActivities);
+
+    // Search and autocomplete logic
+    const searchInput = document.getElementById('activitySearchInput');
+    const autocompleteList = document.getElementById('searchAutocompleteList');
+
+    searchInput.addEventListener('input', () => {
+      const value = searchInput.value.toLowerCase().trim();
+      if (!value) {
+        autocompleteList.classList.add('d-none');
+        renderActivityList(allActivities);
+        return;
       }
+
+      // Filter matches
+      const matches = allActivities.filter(act => act.name.toLowerCase().includes(value));
+      
+      // Render Autocomplete Dropdown
+      if (matches.length > 0) {
+        autocompleteList.innerHTML = matches.map(match => `
+          <div class="search-autocomplete-item" onclick="selectActivityQuick(${match.id}, '${match.name.replace(/'/g, "\\'")}')">
+            <span class="fw-semibold text-dark">${match.name}</span>
+          </div>
+        `).join('');
+        autocompleteList.classList.remove('d-none');
+      } else {
+        autocompleteList.innerHTML = `<div class="p-3 text-muted small text-center">ไม่พบกิจกรรมหลัก กรุณาลองคำค้นอื่น</div>`;
+        autocompleteList.classList.remove('d-none');
+      }
+
+      // Update the main container below too
+      renderActivityList(matches);
     });
 
-    // Form validation check
-    var forms = document.querySelectorAll('.needs-validation')
-    Array.prototype.slice.call(forms).forEach(function (form) {
-      form.addEventListener('submit', function (event) {
-        if (!form.checkValidity()) {
-          event.preventDefault()
-          event.stopPropagation()
-        }
-        form.classList.add('was-validated')
-      }, false)
+    // Close autocomplete on click outside
+    document.addEventListener('click', (e) => {
+      if (!searchInput.contains(e.target) && !autocompleteList.contains(e.target)) {
+        autocompleteList.classList.add('d-none');
+      }
     });
   });
+
+  function renderActivityList(items) {
+    const container = document.getElementById('activitiesListContainer');
+    if (items.length === 0) {
+      container.innerHTML = `<div class="text-center py-4 text-secondary small">ไม่พบรายการกิจกรรม</div>`;
+      return;
+    }
+
+    container.innerHTML = items.map(act => `
+      <div class="d-flex align-items-center justify-content-between p-2.5 rounded-card hover-bg-light-subtle cursor-pointer border" onclick="selectActivityQuick(${act.id}, '${act.name.replace(/'/g, "\\'")}')">
+        <div class="d-flex align-items-center gap-3">
+          <div class="bg-hospital-light text-teal rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+            <i class="bi bi-clipboard2-check"></i>
+          </div>
+          <div>
+            <span class="fw-semibold text-dark text-sm d-block">${act.name}</span>
+            <span class="badge bg-light text-secondary border text-xs">${act.category}</span>
+          </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-light border rounded-circle"><i class="bi bi-plus-lg"></i></button>
+      </div>
+    `).join('');
+  }
+
+  function filterByCategory(category, element) {
+    // Update active chip state
+    document.querySelectorAll('.filter-category-btn').forEach(btn => btn.classList.remove('active'));
+    element.classList.add('active');
+
+    // Filter and render
+    if (category === 'all') {
+      renderActivityList(allActivities);
+    } else {
+      const filtered = allActivities.filter(act => act.category === category);
+      renderActivityList(filtered);
+    }
+  }
+
+  function clearSearch() {
+    const searchInput = document.getElementById('activitySearchInput');
+    searchInput.value = '';
+    document.getElementById('searchAutocompleteList').classList.add('d-none');
+    renderActivityList(allActivities);
+  }
+
+  function selectActivityQuick(id, name) {
+    document.getElementById('modalActivityId').value = id;
+    document.getElementById('modalActivityNameDisplay').value = name;
+    
+    // Reset values to defaults
+    setFormSession('Morning', document.querySelector('#formSessionGroup .chip-btn:first-child'));
+    setFormDuration(30, document.querySelector('#formDurationGroup .chip-btn:nth-child(2)'));
+    
+    // Hide autocomplete drop
+    document.getElementById('searchAutocompleteList').classList.add('d-none');
+    
+    recordModal.show();
+  }
+
+  function setFormSession(value, element) {
+    document.getElementById('formSelectedSession').value = value;
+    const btns = document.querySelectorAll('#formSessionGroup .chip-btn');
+    btns.forEach(btn => btn.classList.remove('active'));
+    element.classList.add('active');
+  }
+
+  function setFormDuration(value, element) {
+    document.getElementById('formSelectedDuration').value = value;
+    const btns = document.querySelectorAll('#formDurationGroup .chip-btn');
+    btns.forEach(btn => btn.classList.remove('active'));
+    element.classList.add('active');
+  }
 </script>

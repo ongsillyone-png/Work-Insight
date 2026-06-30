@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,8 +10,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Bootstrap 5.3 CSS -->
+  <!-- Bootstrap 5.3 CSS & JS Bundle -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
   
   <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
@@ -28,58 +29,247 @@
   <style>
     :root {
       --bs-font-sans-serif: 'Sarabun', 'Inter', system-ui, -apple-system, sans-serif;
-      --hospital-teal: #0d8a72;
-      --hospital-teal-dark: #0a6b58;
-      --hospital-teal-light: #e6f3f0;
+      --hospital-teal: #0D9488;
+      --hospital-teal-dark: #0F766E;
+      --hospital-teal-light: #CCFBF1;
+      --hospital-teal-light-bg: #F0FDF4;
+      --slate-bg: #F8FAFC;
+      --border-color: #E2E8F0;
+      --text-main: #0F172A;
+      --text-secondary: #475569;
+      
+      /* AdminLTE 4 native variables override */
+      --lte-sidebar-width: 240px;
+      --lte-sidebar-bg: #1F2937;
     }
     body {
       font-family: var(--bs-font-sans-serif);
-      background-color: #f4f6f9;
+      background-color: var(--slate-bg);
+      color: var(--text-main);
       font-size: 0.95rem;
+      font-weight: 400;
+      -webkit-font-smoothing: antialiased;
     }
+    h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+      font-weight: 700 !important;
+      color: var(--text-main);
+    }
+    /* Sidebar styling matching spec */
+    .app-sidebar {
+      background-color: var(--lte-sidebar-bg) !important;
+      border-right: 1px solid var(--border-color);
+    }
+    /* Brand Link style */
     .brand-link {
-      background-color: var(--hospital-teal);
+      background-color: var(--hospital-teal) !important;
       color: white !important;
-      font-weight: 600;
+      font-weight: 700;
       border-bottom: 1px solid var(--hospital-teal-dark) !important;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
     }
     .brand-link:hover {
-      background-color: var(--hospital-teal-dark);
+      background-color: var(--hospital-teal-dark) !important;
     }
-    .sidebar-dark-primary {
-      background-color: #212529 !important;
+    /* Header (Navbar) Style - Height 60px, Glassmorphism */
+    .app-header {
+      height: 60px;
+      border-bottom: 1px solid var(--border-color) !important;
+      background-color: rgba(255, 255, 255, 0.8) !important;
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
     }
-    .sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link.active {
+    /* Sidebar link styling */
+    .app-sidebar .nav-link {
+      color: #D1D5DB !important;
+      border-radius: 8px;
+      margin: 2px 8px;
+      padding: 10px 12px;
+      transition: all 0.2s;
+    }
+    .app-sidebar .nav-link:hover {
+      background-color: rgba(255, 255, 255, 0.05) !important;
+      color: white !important;
+    }
+    .app-sidebar .nav-link.active {
       background-color: var(--hospital-teal) !important;
-      color: #fff !important;
+      color: white !important;
     }
-    .main-header {
-      border-bottom: 1px solid #dee2e6;
+    /* Chevron rotation helper for collapsible navigation */
+    .nav-arrow-icon {
+      transition: transform 0.2s ease-in-out;
     }
-    .navbar-light {
-      background-color: #ffffff !important;
+    a[aria-expanded="true"] .nav-arrow-icon,
+    .nav-arrow-icon.rotate-180 {
+      transform: rotate(180deg) !important;
     }
+    /* Modern minimal Card Design */
     .card-hospital {
-      border-top: 4px solid var(--hospital-teal) !important;
+      border: 1px solid var(--border-color) !important;
       border-radius: 12px !important;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      background-color: #ffffff;
+      padding: 24px !important;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05) !important;
+      transition: box-shadow 0.2s, transform 0.2s;
     }
+    .card-hospital:hover {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05) !important;
+    }
+    .rounded-card {
+      border-radius: 12px !important;
+      border: 1px solid var(--border-color) !important;
+    }
+    /* Hospital Buttons */
     .btn-hospital {
       background-color: var(--hospital-teal);
       color: white;
       border: none;
+      font-weight: 500;
+      border-radius: 8px;
+      padding: 10px 20px;
       transition: all 0.2s;
     }
     .btn-hospital:hover {
       background-color: var(--hospital-teal-dark);
       color: white;
     }
-    .rounded-card {
-      border-radius: 12px !important;
+    .btn-hospital-outline {
+      background-color: transparent;
+      color: var(--hospital-teal);
+      border: 1px solid var(--hospital-teal);
+      font-weight: 500;
+      border-radius: 8px;
+      padding: 10px 20px;
+      transition: all 0.2s;
+    }
+    .btn-hospital-outline:hover {
+      background-color: var(--hospital-teal-light);
+      color: var(--hospital-teal-dark);
+    }
+    /* Segmented Controls / Chips */
+    .segmented-control {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .chip-btn {
+      background-color: #F1F5F9;
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .chip-btn:hover {
+      border-color: var(--hospital-teal);
+      color: var(--hospital-teal);
+    }
+    .chip-btn.active {
+      background-color: var(--hospital-teal);
+      border-color: var(--hospital-teal);
+      color: white;
     }
     .bg-hospital-light {
       background-color: var(--hospital-teal-light) !important;
       color: var(--hospital-teal-dark) !important;
     }
+    /* Floating Action Button (FAB) */
+    .fab {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background-color: var(--hospital-teal);
+      color: white;
+      box-shadow: 0 4px 10px rgba(15, 118, 110, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      z-index: 1050;
+      text-decoration: none;
+      transition: all 0.2s ease-in-out;
+      border: none;
+    }
+    .fab:hover {
+      background-color: var(--hospital-teal-dark);
+      transform: scale(1.05);
+      color: white;
+    }
+    /* Hide scrollbar on search autocomplete */
+    .search-autocomplete-list {
+      max-height: 250px;
+      overflow-y: auto;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background: white;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    }
+    .search-autocomplete-item {
+      padding: 10px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid #F1F5F9;
+      transition: background 0.15s;
+    }
+    .search-autocomplete-item:hover {
+      background-color: var(--hospital-teal-light);
+    }
+    
+    /* Mobile Responsive Sidebar Drawer & Backdrop Overlay */
+    @media (max-width: 991.98px) {
+      .app-sidebar {
+        position: fixed !important;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1045 !important;
+        width: 240px !important;
+        transform: translateX(-240px) !important;
+        transition: transform 0.25s ease-in-out !important;
+      }
+      body.sidebar-open .app-sidebar {
+        transform: translateX(0) !important;
+      }
+      body.sidebar-open::after {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(15, 23, 42, 0.4);
+        backdrop-filter: blur(2px);
+        z-index: 1040;
+      }
+    }
   </style>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Global click handler for mobile sidebar drawer toggle and close-outside behavior
+      document.addEventListener('click', (e) => {
+        const toggleBtn = e.target.closest('[onclick*="sidebar-open"]') || e.target.closest('.btn-teal-light') || e.target.closest('.bi-list');
+        if (toggleBtn) {
+          e.preventDefault();
+          document.body.classList.toggle('sidebar-open');
+          return;
+        }
+
+        if (document.body.classList.contains('sidebar-open')) {
+          const sidebar = document.querySelector('.app-sidebar');
+          if (sidebar && !sidebar.contains(e.target)) {
+            document.body.classList.remove('sidebar-open');
+          }
+        }
+      });
+    });
+  </script>
 </head>

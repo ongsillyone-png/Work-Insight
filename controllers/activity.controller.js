@@ -22,7 +22,7 @@ class ActivityController {
         body: '../activity/create',
         title: 'Log New Activity | Work Insight',
         activities,
-        activeMenu: 'activity'
+        activeMenu: 'record_activity'
       });
     } catch (err) {
       next(err);

@@ -5,7 +5,7 @@
       <i class="bi bi-exclamation-triangle text-danger" style="font-size: 5rem;"></i>
     </div>
     <h1 class="fw-bold text-dark mb-2"><%= typeof statusCode !== 'undefined' ? statusCode : '500' %></h1>
-    <h4 class="text-secondary mb-4"><%= typeof message !== 'undefined' ? message : 'Something went wrong.' %></h4>
+    <h4 class="text-secondary mb-4"><%= typeof message !== 'undefined' ? message : 'เกิดข้อผิดพลาดบางอย่าง' %></h4>
     
     <% if (typeof error !== 'undefined' && error.stack) { %>
       <div class="text-start mx-auto p-3 bg-dark text-light rounded-3 mb-4" style="max-width: 600px; font-size: 0.8rem; overflow-x: auto;">
@@ -14,7 +14,7 @@
     <% } %>
 
     <a href="/dashboard" class="btn btn-hospital px-4 py-2 rounded-3">
-      Back to Dashboard
+      กลับสู่แดชบอร์ด
     </a>
   </div>
   <%- include('../partials/scripts') %>

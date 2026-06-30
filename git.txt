@@ -1,0 +1,12 @@
+Workflow จริงในอนาคต
+เช้า (ที่ทำงาน)
+git pull
+
+ทำงาน...
+
+เย็น
+git add .
+git commit -m "เพิ่มระบบ Dashboard"
+git push
+
+git status

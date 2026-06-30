@@ -1,110 +1,131 @@
-<div class="row mb-4">
-  <div class="col-12">
-    <h2 class="fw-bold text-dark mb-0">Edit Activity Log</h2>
-    <p class="text-secondary mb-0">Update your previously logged work activity workload details.</p>
-  </div>
-</div>
-
+<!-- Premium minimal edit layout -->
 <div class="row">
-  <div class="col-lg-8 mx-auto">
-    <div class="card rounded-card border-0 shadow-sm">
-      <div class="card-body p-4 p-md-5">
-        <form action="/activity/edit/<%= log ? log.id : '' %>" method="POST" class="needs-validation" novalidate>
-          
-          <div class="mb-4">
-            <label for="activityMasterId" class="form-label text-secondary small fw-semibold">Activity Master Definition</label>
-            <select class="form-select rounded-3" id="activityMasterId" name="activityMasterId" placeholder="Search or select activity..." required>
-              <option value="">Select an activity definition...</option>
-              <option value="1" <%= log && log.activityMasterId === '1' ? 'selected' : '' %>>ACT-001: Hardware repair & troubleshooting</option>
-              <option value="2" <%= log && log.activityMasterId === '2' ? 'selected' : '' %>>ACT-002: MariaDB Database backup validation</option>
-              <option value="3" <%= log && log.activityMasterId === '3' ? 'selected' : '' %>>ACT-003: Server room temperature control inspection</option>
-              <option value="4" <%= log && log.activityMasterId === '4' ? 'selected' : '' %>>ACT-004: Network bandwidth analysis and configurations</option>
-            </select>
-            <div class="invalid-feedback">Please select an activity definition.</div>
-          </div>
-
-          <div class="row g-3 mb-4">
-            <div class="col-md-6">
-              <label for="logDate" class="form-label text-secondary small fw-semibold">Activity Date</label>
-              <input type="date" class="form-control rounded-3" id="logDate" name="logDate" required value="<%= log ? log.logDate : new Date().toISOString().split('T')[0] %>">
-              <div class="invalid-feedback">Please select a valid date.</div>
-            </div>
-            
-            <div class="col-md-6">
-              <label for="session" class="form-label text-secondary small fw-semibold">Working Session Block</label>
-              <select class="form-select rounded-3" id="session" name="session" required>
-                <option value="Morning" <%= log && log.session === 'Morning' ? 'selected' : '' %>>Morning Shift (08:30 - 12:00)</option>
-                <option value="Afternoon" <%= log && log.session === 'Afternoon' ? 'selected' : '' %>>Afternoon Shift (13:00 - 16:30)</option>
-                <option value="Night" <%= log && log.session === 'Night' ? 'selected' : '' %>>Night/OT Shift (16:30 onwards)</option>
-              </select>
-              <div class="invalid-feedback">Please select a session shift.</div>
-            </div>
-          </div>
-
-          <div class="row g-3 mb-4">
-            <div class="col-md-6">
-              <label for="duration" class="form-label text-secondary small fw-semibold">Actual Spent Duration (Minutes)</label>
-              <div class="input-group">
-                <input type="number" class="form-control rounded-start-3" id="duration" name="duration" min="1" placeholder="e.g. 60" required value="<%= log ? log.duration : '' %>">
-                <span class="input-group-text rounded-end-3 text-secondary">minutes</span>
-                <div class="invalid-feedback">Please enter a valid positive duration in minutes.</div>
-              </div>
-            </div>
-            
-            <div class="col-md-6">
-              <label for="locationId" class="form-label text-secondary small fw-semibold">Physical / Virtual Location</label>
-              <select class="form-select rounded-3" id="locationId" name="locationId">
-                <option value="">Select a location (Optional)...</option>
-                <option value="1" <%= log && log.locationId === '1' ? 'selected' : '' %>>OPD (Outpatient Department)</option>
-                <option value="2" <%= log && log.locationId === '2' ? 'selected' : '' %>>ER (Emergency Room)</option>
-                <option value="3" <%= log && log.locationId === '3' ? 'selected' : '' %>>IPD (Inpatient Department)</option>
-                <option value="4" <%= log && log.locationId === '4' ? 'selected' : '' %>>LAB (Laboratory Services)</option>
-                <option value="5" <%= log && log.locationId === '5' ? 'selected' : '' %>>Server Room</option>
-                <option value="6" <%= log && log.locationId === '6' ? 'selected' : '' %>>Meeting Room</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="mb-4">
-            <label for="output" class="form-label text-secondary small fw-semibold">Outcome / Deliverables Result</label>
-            <textarea class="form-control rounded-3" id="output" name="output" rows="3" placeholder="Describe the physical/digital results or outcomes..."><%= log ? log.output : '' %></textarea>
-          </div>
-
-          <div class="mb-4">
-            <label for="remark" class="form-label text-secondary small fw-semibold">Additional Remarks</label>
-            <textarea class="form-control rounded-3" id="remark" name="remark" rows="2" placeholder="Any additional notes or comments..."><%= log ? log.remark : '' %></textarea>
-          </div>
-
-          <div class="d-flex align-items-center justify-content-end gap-2 mt-5">
-            <a href="/activity" class="btn btn-outline-secondary px-4 py-2 rounded-3">Cancel</a>
-            <button type="submit" class="btn btn-hospital px-4 py-2 rounded-3 fw-medium">Update Record</button>
-          </div>
-
-        </form>
+  <div class="col-lg-7 mx-auto">
+    
+    <!-- Title Header -->
+    <div class="mb-4 d-flex align-items-center gap-3">
+      <a href="/activity" class="btn btn-light rounded-circle p-2" title="ย้อนกลับ">
+        <i class="bi bi-arrow-left fs-5 text-secondary"></i>
+      </a>
+      <div>
+        <h3 class="fw-bold text-dark mb-0">แก้ไขบันทึกกิจกรรม</h3>
+        <p class="text-secondary small mb-0">ปรับปรุงข้อมูลประวัติการทำงานของคุณ</p>
       </div>
     </div>
+
+    <!-- Edit Form Card -->
+    <div class="card card-hospital border-0 p-4 p-md-5 bg-white shadow-sm">
+      <form action="/activity/edit/<%= log ? log.id : '' %>" method="POST" class="needs-validation" novalidate>
+        
+        <!-- Activity master description (ReadOnly) -->
+        <div class="mb-4">
+          <label class="form-label text-secondary small fw-semibold">กิจกรรมหลัก (Master Activity)</label>
+          <input type="text" class="form-control rounded-3 bg-light border-0 fw-bold" value="<%= log ? (log.activityName || 'ซ่อมและแก้ไขอุปกรณ์คอมพิวเตอร์') : '' %>" readonly>
+          <input type="hidden" name="activityMasterId" value="<%= log ? log.activityMasterId : '1' %>">
+        </div>
+
+        <!-- Activity date selection -->
+        <div class="mb-4">
+          <label for="logDate" class="form-label text-secondary small fw-semibold">วันที่ปฏิบัติงาน</label>
+          <input type="date" class="form-control rounded-3" id="logDate" name="logDate" required value="<%= log ? log.logDate : new Date().toISOString().split('T')[0] %>">
+          <div class="invalid-feedback">กรุณาเลือกวันที่ปฏิบัติงาน</div>
+        </div>
+
+        <!-- Working Session selection (เช้า / บ่าย / ค่ำ) -->
+        <div class="mb-4">
+          <label class="form-label text-secondary small fw-semibold">ช่วงเวลาทำงาน</label>
+          <div class="segmented-control" id="editSessionGroup">
+            <button type="button" class="chip-btn <%= log && log.session === 'Morning' ? 'active' : '' %>" onclick="setEditSession('Morning', this)">เช้า</button>
+            <button type="button" class="chip-btn <%= log && log.session === 'Afternoon' ? 'active' : '' %>" onclick="setEditSession('Afternoon', this)">บ่าย</button>
+            <button type="button" class="chip-btn <%= log && log.session === 'Night' ? 'active' : '' %>" onclick="setEditSession('Night', this)">ค่ำ/OT</button>
+          </div>
+          <input type="hidden" name="session" id="editSelectedSession" value="<%= log ? log.session : 'Morning' %>">
+        </div>
+
+        <!-- Duration selection chips -->
+        <div class="mb-4">
+          <label class="form-label text-secondary small fw-semibold">ระยะเวลาที่ใช้ (นาที)</label>
+          <% 
+            const duration = log ? parseInt(log.duration) : 30;
+            const standardDurations = [15, 30, 60, 120];
+            const isCustom = !standardDurations.includes(duration);
+          %>
+          <div class="segmented-control mb-2" id="editDurationGroup">
+            <button type="button" class="chip-btn <%= duration === 15 ? 'active' : '' %>" onclick="setEditDuration(15, this)">15 นาที</button>
+            <button type="button" class="chip-btn <%= duration === 30 ? 'active' : '' %>" onclick="setEditDuration(30, this)">30 นาที</button>
+            <button type="button" class="chip-btn <%= duration === 60 ? 'active' : '' %>" onclick="setEditDuration(60, this)">60 นาที</button>
+            <button type="button" class="chip-btn <%= duration === 120 ? 'active' : '' %>" onclick="setEditDuration(120, this)">120 นาที</button>
+          </div>
+          <div class="input-group input-group-sm mt-2">
+            <span class="input-group-text bg-light text-secondary border-0">ระยะเวลาอื่น</span>
+            <input type="number" name="duration" id="editSelectedDuration" class="form-control" value="<%= duration %>" min="1" required placeholder="ระบุนาที">
+          </div>
+        </div>
+
+        <!-- Physical / Virtual Location Selection -->
+        <div class="mb-4">
+          <label for="locationId" class="form-label text-secondary small fw-semibold">สถานที่ปฏิบัติงาน</label>
+          <select class="form-select rounded-3" id="locationId" name="locationId">
+            <option value="">เลือกสถานที่...</option>
+            <option value="1" <%= log && log.locationId === '1' ? 'selected' : '' %>>OPD (แผนกผู้ป่วยนอก)</option>
+            <option value="2" <%= log && log.locationId === '2' ? 'selected' : '' %>>ER (ห้องฉุกเฉิน)</option>
+            <option value="3" <%= log && log.locationId === '3' ? 'selected' : '' %>>IPD (แผนกผู้ป่วยใน)</option>
+            <option value="4" <%= log && log.locationId === '4' ? 'selected' : '' %>>LAB (ห้องปฏิบัติการ)</option>
+            <option value="5" <%= log && log.locationId === '5' ? 'selected' : '' %>>ห้องเซิร์ฟเวอร์</option>
+            <option value="6" <%= log && log.locationId === '6' ? 'selected' : '' %>>ห้องประชุม</option>
+          </select>
+        </div>
+
+        <!-- Outcome / Deliverables -->
+        <div class="mb-4">
+          <label for="output" class="form-label text-secondary small fw-semibold">ผลงาน / สิ่งที่ส่งมอบ</label>
+          <textarea class="form-control rounded-3" id="output" name="output" rows="3" placeholder="อธิบายงานที่สำเร็จ..."><%= log ? log.output : '' %></textarea>
+        </div>
+
+        <!-- Remarks -->
+        <div class="mb-4">
+          <label for="remark" class="form-label text-secondary small fw-semibold">หมายเหตุเพิ่มเติม</label>
+          <textarea class="form-control rounded-3" id="remark" name="remark" rows="2" placeholder="หมายเหตุอื่น ๆ..."><%= log ? log.remark : '' %></textarea>
+        </div>
+
+        <!-- Button Actions -->
+        <div class="d-flex align-items-center justify-content-end gap-2 mt-5">
+          <a href="/activity" class="btn btn-light rounded-3 px-4 py-2 border">ยกเลิก</a>
+          <button type="submit" class="btn btn-hospital rounded-3 px-4 py-2">บันทึกการแก้ไข</button>
+        </div>
+
+      </form>
+    </div>
+
   </div>
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    new TomSelect('#activityMasterId', {
-      create: false,
-      sortField: {
-        field: 'text',
-        direction: 'asc'
-      }
-    });
+  function setEditSession(value, element) {
+    document.getElementById('editSelectedSession').value = value;
+    const btns = document.querySelectorAll('#editSessionGroup .chip-btn');
+    btns.forEach(btn => btn.classList.remove('active'));
+    element.classList.add('active');
+  }
 
-    var forms = document.querySelectorAll('.needs-validation')
+  function setEditDuration(value, element) {
+    document.getElementById('editSelectedDuration').value = value;
+    const btns = document.querySelectorAll('#editDurationGroup .chip-btn');
+    btns.forEach(btn => btn.classList.remove('active'));
+    element.classList.add('active');
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    // Basic form validations
+    const forms = document.querySelectorAll('.needs-validation');
     Array.prototype.slice.call(forms).forEach(function (form) {
       form.addEventListener('submit', function (event) {
         if (!form.checkValidity()) {
-          event.preventDefault()
-          event.stopPropagation()
+          event.preventDefault();
+          event.stopPropagation();
         }
-        form.classList.add('was-validated')
-      }, false)
+        form.classList.add('was-validated');
+      }, false);
     });
   });
 </script>

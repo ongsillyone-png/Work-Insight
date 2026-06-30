@@ -1,0 +1,372 @@
+<!-- Home: Quick Action & Record Screen -->
+<div class="row g-4">
+  
+  <!-- Left Side: Capture First Quick Actions -->
+  <div class="col-lg-8">
+    
+    <!-- Greeting Header -->
+    <div class="card card-hospital border-0 p-4 mb-4" style="background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%); color: white;">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div>
+          <h3 class="fw-bold mb-1" style="font-weight: 700;">สวัสดี, <%= typeof user !== 'undefined' ? user.fullName : 'คุณผู้ใช้งาน' %> 👋</h3>
+          <p class="mb-0 opacity-90 small">
+            <i class="bi bi-calendar3 me-1"></i>
+            <%= new Date().toLocaleDateString('th-TH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>
+          </p>
+        </div>
+        <div class="bg-white bg-opacity-20 px-3 py-2 rounded-card backdrop-blur-md">
+          <span class="small fw-semibold">ระบบบันทึกความดีและภาระงาน</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Search & Main Log Button -->
+    <div class="card card-hospital border-0 p-4 mb-4 bg-white position-relative">
+      <div class="row align-items-center g-3">
+        <div class="col-md-8 position-relative">
+          <label class="form-label text-secondary small fw-semibold mb-2">🔍 พิมพ์ค้นหากิจกรรมหลักเพื่อบันทึกด่วน</label>
+          <div class="input-group border rounded-3 overflow-hidden">
+            <span class="input-group-text bg-white border-0 text-secondary pe-0"><i class="bi bi-search"></i></span>
+            <input type="text" id="homeSearchInput" class="form-control border-0 ps-3" placeholder="เช่น แก้ไข HOSxP, ตรวจสอบ Backup, ซ่อมคอม..." autocomplete="off">
+            <button class="btn btn-light border-0" type="button" onclick="clearHomeSearch()"><i class="bi bi-x-lg"></i></button>
+          </div>
+          <!-- Autocomplete Dropdown List -->
+          <div id="homeAutocompleteList" class="search-autocomplete-list mt-2 d-none position-absolute w-100" style="z-index: 1000; left: 0;">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+        <div class="col-md-4 text-md-end d-flex align-items-end h-100" style="margin-top: auto;">
+          <a href="/activity/create" class="btn btn-hospital w-100 py-2.5 shadow-sm">
+            <i class="bi bi-plus-lg me-2"></i>บันทึกกิจกรรมใหม่
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions (บันทึกด่วน) -->
+    <div class="mb-4">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h5 class="fw-bold text-dark mb-0">บันทึกด่วน (Quick Actions)</h5>
+        <span class="text-muted small">แตะครั้งเดียวเพื่อบันทึก</span>
+      </div>
+      
+      <div class="row g-3">
+        <% 
+          // Icon mapping helper for mock favorites
+          const icons = {
+            1: 'bi-pc-display',
+            2: 'bi-printer',
+            3: 'bi-database',
+            4: 'bi-people',
+            5: 'bi-hdd-network'
+          };
+          favorites.forEach(function(fav) { 
+        %>
+          <div class="col-md-4 col-sm-6">
+            <div class="card card-hospital p-3 h-100 cursor-pointer border hover-shadow" onclick="openHomeQuickLog('<%= fav.id %>', '<%= fav.name %>')">
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <div class="bg-hospital-light text-teal rounded p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                  <i class="bi <%= icons[fav.id] || 'bi-clipboard-check' %> fs-5"></i>
+                </div>
+                <i class="bi bi-star-fill text-warning"></i>
+              </div>
+              <h6 class="fw-bold text-dark mb-1"><%= fav.name %></h6>
+              <p class="text-secondary text-xs mb-0">ล่าสุดเมื่อวาน</p>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+    </div>
+
+    <!-- Recent Activity Timeline (Not Data Grid) -->
+    <div>
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h5 class="fw-bold text-dark mb-0">ประวัติกิจกรรมวันนี้ (Recent Activity)</h5>
+        <a href="/activity" class="text-teal text-decoration-none small fw-semibold">ดูไทม์ไลน์ทั้งหมด</a>
+      </div>
+      
+      <div class="card card-hospital border-0 p-4">
+        <!-- Vertical timeline graphic line -->
+        <div class="position-relative ps-4" style="border-left: 2px solid var(--border-color); margin-left: 10px;">
+          <% if (recents && recents.length > 0) { %>
+            <% recents.forEach(function(log, index) { %>
+              <div class="position-relative mb-4">
+                <!-- Timeline Dot Indicator -->
+                <span class="position-absolute bg-teal rounded-circle border border-white" style="width: 12px; height: 12px; left: -31px; top: 6px; z-index: 2;"></span>
+                
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                  <div>
+                    <h6 class="fw-bold text-dark mb-1"><%= log.name %></h6>
+                    <div class="d-flex align-items-center gap-2 flex-wrap text-secondary text-xs">
+                      <span><i class="bi bi-clock me-1"></i><%= log.time %> น.</span>
+                      <span>•</span>
+                      <span><i class="bi bi-geo-alt me-1"></i><%= log.location %></span>
+                    </div>
+                  </div>
+                  <div>
+                    <span class="badge bg-hospital-light text-teal"><%= log.duration %> นาที</span>
+                  </div>
+                </div>
+              </div>
+            <% }); %>
+          <% } else { %>
+            <div class="text-center py-4 text-muted" style="margin-left: -20px;">
+              <i class="bi bi-inbox fs-4 d-block mb-2"></i>
+              วันนี้ยังไม่มีรายการกิจกรรมที่ถูกบันทึก
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Right Side: Today's Summary & Dashboard Snapshot -->
+  <div class="col-lg-4">
+    
+    <!-- Today's Summary -->
+    <div class="card card-hospital border-0 p-4 mb-4 bg-white">
+      <h5 class="fw-bold text-dark mb-3">สรุปผลงานวันนี้ (Today's Summary)</h5>
+      
+      <div class="row g-2 mb-3">
+        <div class="col-6">
+          <div class="p-3 bg-light rounded-card text-center">
+            <span class="text-secondary text-xs d-block mb-1">กิจกรรมวันนี้</span>
+            <span class="fs-2 fw-bold text-dark"><%= summary.activityCount %></span>
+            <span class="text-secondary text-xs d-block">งาน</span>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="p-3 bg-light rounded-card text-center">
+            <span class="text-secondary text-xs d-block mb-1">เวลารวม</span>
+            <span class="fs-2 fw-bold text-teal"><%= summary.totalHours %></span>
+            <span class="text-secondary text-xs d-block">ชั่วโมง</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-2.5 bg-success-subtle text-success text-xs rounded-card d-flex align-items-center gap-2">
+        <i class="bi bi-lightning-fill"></i>
+        <span>วันนี้ภาระงานผ่านเป้าหมายเฉลี่ยรายวันแล้ว!</span>
+      </div>
+    </div>
+
+    <!-- Dashboard Snapshot -->
+    <div class="card card-hospital border-0 p-4">
+      <h5 class="fw-bold text-dark mb-3">สัดส่วนหมวดหมู่ดิจิทัล (Snapshot)</h5>
+      
+      <!-- Progress Bar Breakdown -->
+      <div class="d-flex flex-column gap-3">
+        <div>
+          <div class="d-flex justify-content-between text-xs mb-1">
+            <span class="text-secondary">งานสนับสนุนแก้ปัญหาคอมพิวเตอร์</span>
+            <span class="fw-bold text-dark">60%</span>
+          </div>
+          <div class="progress rounded-pill" style="height: 6px;">
+            <div class="progress-bar bg-teal" style="width: 60%;"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="d-flex justify-content-between text-xs mb-1">
+            <span class="text-secondary">บำรุงรักษาฐานข้อมูลระบบ HOSxP</span>
+            <span class="fw-bold text-dark">25%</span>
+          </div>
+          <div class="progress rounded-pill" style="height: 6px;">
+            <div class="progress-bar bg-teal" style="width: 25%;"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="d-flex justify-content-between text-xs mb-1">
+            <span class="text-secondary">งานประชุมกลุ่มงานไอที</span>
+            <span class="fw-bold text-dark">15%</span>
+          </div>
+          <div class="progress rounded-pill" style="height: 6px;">
+            <div class="progress-bar bg-teal" style="width: 15%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 pt-3 border-top text-center">
+        <a href="/dashboard" class="text-teal text-decoration-none small fw-semibold">
+          เปิดสถิติวิเคราะห์โดยละเอียด <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Floating Action Button (FAB - Mobile Only) -->
+<a href="#" class="fab d-lg-none shadow" onclick="triggerMobileQuickLog()">
+  <i class="bi bi-plus-lg"></i>
+</a>
+
+<!-- Home Quick Log Modal (Google Keep style) -->
+<div class="modal fade" id="homeQuickLogModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
+    <div class="modal-content border-0 rounded-card shadow-lg">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="fw-bold text-dark">บันทึกกิจกรรมด่วน</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      
+      <form action="/activity/create" method="POST" class="needs-validation" novalidate>
+        <div class="modal-body py-3">
+          <input type="hidden" id="homeQuickActivityId" name="activityMasterId" required>
+          
+          <div class="mb-3">
+            <label class="form-label text-secondary small fw-semibold">กิจกรรม</label>
+            <input type="text" class="form-control rounded-3 bg-light border-0 fw-bold" id="homeQuickActivityName" readonly>
+          </div>
+
+          <!-- Session selection -->
+          <div class="mb-3">
+            <label class="form-label text-secondary small fw-semibold">ช่วงเวลาทำงาน</label>
+            <div class="segmented-control" id="homeSessionGroup">
+              <button type="button" class="chip-btn active" onclick="setHomeSession('Morning', this)">เช้า</button>
+              <button type="button" class="chip-btn" onclick="setHomeSession('Afternoon', this)">บ่าย</button>
+              <button type="button" class="chip-btn" onclick="setHomeSession('Night', this)">ค่ำ/OT</button>
+            </div>
+            <input type="hidden" name="session" id="homeSelectedSession" value="Morning">
+          </div>
+
+          <!-- Duration selection chips -->
+          <div class="mb-3">
+            <label class="form-label text-secondary small fw-semibold">ระยะเวลาที่ใช้ (นาที)</label>
+            <div class="segmented-control mb-2" id="homeDurationGroup">
+              <button type="button" class="chip-btn" onclick="setHomeDuration(15, this)">15 นาที</button>
+              <button type="button" class="chip-btn active" onclick="setHomeDuration(30, this)">30 นาที</button>
+              <button type="button" class="chip-btn" onclick="setHomeDuration(60, this)">60 นาที</button>
+              <button type="button" class="chip-btn" onclick="setHomeDuration(120, this)">120 นาที</button>
+            </div>
+            <div class="input-group input-group-sm mt-2">
+              <span class="input-group-text bg-light text-secondary border-0">ระบุเอง</span>
+              <input type="number" name="duration" id="homeSelectedDuration" class="form-control" value="30" min="1" required placeholder="นาที">
+            </div>
+          </div>
+
+          <!-- Location selection -->
+          <div class="mb-3">
+            <label for="homeLocation" class="form-label text-secondary small fw-semibold">สถานที่</label>
+            <select class="form-select rounded-3" id="homeLocation" name="locationId">
+              <option value="">เลือกสถานที่...</option>
+              <option value="1">OPD (แผนกผู้ป่วยนอก)</option>
+              <option value="2">ER (ห้องฉุกเฉิน)</option>
+              <option value="3">IPD (แผนกผู้ป่วยใน)</option>
+              <option value="4">LAB (ห้องปฏิบัติการ)</option>
+              <option value="5">ห้องเซิร์ฟเวอร์</option>
+              <option value="6">ห้องประชุม</option>
+            </select>
+          </div>
+
+          <!-- Output -->
+          <div class="mb-3">
+            <label for="homeOutput" class="form-label text-secondary small fw-semibold">ผลงาน / ผลลัพธ์</label>
+            <textarea class="form-control rounded-3" id="homeOutput" name="output" rows="2" placeholder="อธิบายผลงาน..."></textarea>
+          </div>
+
+          <!-- Remark -->
+          <div class="mb-3">
+            <label for="homeRemark" class="form-label text-secondary small fw-semibold">หมายเหตุ</label>
+            <textarea class="form-control rounded-3" id="homeRemark" name="remark" rows="1" placeholder="ความเห็นเพิ่มเติม..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">ยกเลิก</button>
+          <button type="submit" class="btn btn-hospital rounded-3 px-4">บันทึกทันที</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  let homeQuickModal;
+  const masterActivities = [
+    { id: 1, name: 'ACT-001: ซ่อมและแก้ไขอุปกรณ์คอมพิวเตอร์ (Hardware Repair)' },
+    { id: 2, name: 'ACT-002: ตรวจสอบการสำรองข้อมูล MariaDB (Database Backup)' },
+    { id: 3, name: 'ACT-003: ตรวจสอบอุณหภูมิห้องเซิร์ฟเวอร์ (Server Monitoring)' },
+    { id: 4, name: 'ACT-004: วิเคราะห์และตั้งค่าเครือข่าย (Network Setup)' },
+    { id: 5, name: 'ACT-005: ออกแบบแบนเนอร์ประชาสัมพันธ์โรงพยาบาล (PR Graphic Design)' },
+    { id: 6, name: 'ACT-006: ประชุมวางแผนเทคโนโลยีสารสนเทศกลุ่มงานดิจิทัล (Meeting)' }
+  ];
+
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof bootstrap !== 'undefined') {
+      homeQuickModal = new bootstrap.Modal(document.getElementById('homeQuickLogModal'));
+    }
+    
+    // Autocomplete logic for Home search bar
+    const searchInput = document.getElementById('homeSearchInput');
+    const autocompleteList = document.getElementById('homeAutocompleteList');
+
+    searchInput.addEventListener('input', () => {
+      const value = searchInput.value.toLowerCase().trim();
+      if (!value) {
+        autocompleteList.classList.add('d-none');
+        return;
+      }
+
+      const matches = masterActivities.filter(act => act.name.toLowerCase().includes(value));
+      
+      if (matches.length > 0) {
+        autocompleteList.innerHTML = matches.map(match => `
+          <div class="search-autocomplete-item" onclick="openHomeQuickLog(${match.id}, '${match.name.replace(/'/g, "\\'")}')">
+            <span class="fw-semibold text-dark">${match.name}</span>
+          </div>
+        `).join('');
+        autocompleteList.classList.remove('d-none');
+      } else {
+        autocompleteList.innerHTML = `<div class="p-3 text-muted small text-center">ไม่พบกิจกรรมหลัก กรุณาลองคำค้นอื่น</div>`;
+        autocompleteList.classList.remove('d-none');
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!searchInput.contains(e.target) && !autocompleteList.contains(e.target)) {
+        autocompleteList.classList.add('d-none');
+      }
+    });
+  });
+
+  function clearHomeSearch() {
+    document.getElementById('homeSearchInput').value = '';
+    document.getElementById('homeAutocompleteList').classList.add('d-none');
+  }
+
+  function openHomeQuickLog(id, name) {
+    document.getElementById('homeQuickActivityId').value = id;
+    document.getElementById('homeQuickActivityName').value = name;
+    
+    // Set defaults
+    setHomeSession('Morning', document.querySelector('#homeSessionGroup .chip-btn:first-child'));
+    setHomeDuration(30, document.querySelector('#homeDurationGroup .chip-btn:nth-child(2)'));
+    
+    // Clear autocomplete list
+    document.getElementById('homeAutocompleteList').classList.add('d-none');
+    
+    homeQuickModal.show();
+  }
+
+  function triggerMobileQuickLog() {
+    // FAB tap default behavior is to select the first active item or trigger modal directly
+    openHomeQuickLog(1, 'ACT-001: ซ่อมและแก้ไขอุปกรณ์คอมพิวเตอร์ (Hardware Repair)');
+  }
+
+  function setHomeSession(value, element) {
+    document.getElementById('homeSelectedSession').value = value;
+    const btns = document.querySelectorAll('#homeSessionGroup .chip-btn');
+    btns.forEach(btn => btn.classList.remove('active'));
+    element.classList.add('active');
+  }
+
+  function setHomeDuration(value, element) {
+    document.getElementById('homeSelectedDuration').value = value;
+    const btns = document.querySelectorAll('#homeDurationGroup .chip-btn');
+    btns.forEach(btn => btn.classList.remove('active'));
+    element.classList.add('active');
+  }
+</script>

@@ -1,45 +1,52 @@
 <%- include('../partials/head') %>
-<body class="bg-light d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+<body class="d-flex align-items-center justify-content-center" style="min-height: 100vh; background-color: var(--slate-bg);">
 
-  <div class="card border-0 shadow-lg rounded-card" style="width: 100%; max-width: 420px; border-top: 5px solid var(--hospital-teal) !important;">
-    <div class="card-body p-5">
+  <div class="card border-0 shadow-lg rounded-card p-4" style="width: 100%; max-width: 400px; background-color: #ffffff;">
+    <div class="card-body p-3">
+      <!-- Title -->
       <div class="text-center mb-4">
+        <div class="bg-hospital-light text-teal rounded-circle d-inline-flex align-items-center justify-content-center p-3 mb-3">
+          <i class="bi bi-shield-check fs-2"></i>
+        </div>
         <h3 class="fw-bold text-dark mb-1">Work Insight</h3>
-        <p class="text-secondary small text-uppercase tracking-wider">Digital Activity Intelligence Platform</p>
+        <p class="text-secondary small">Digital Activity Intelligence Platform</p>
       </div>
 
+      <!-- Error Toast/Message -->
       <% if (error) { %>
-        <div class="alert alert-danger alert-dismissible fade show rounded-3 border-0 small py-2 mb-4" role="alert">
+        <div class="alert alert-danger alert-dismissible fade show rounded-3 border-0 small py-2.5 mb-4" role="alert">
           <i class="bi bi-exclamation-triangle-fill me-2"></i><%= error %>
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="padding: 0.75rem 1rem;"></button>
         </div>
       <% } %>
 
+      <!-- Form -->
       <form action="/auth/login" method="POST" autocomplete="off">
         <div class="mb-3">
-          <label for="username" class="form-label text-secondary small fw-semibold">Username</label>
-          <div class="input-group">
-            <span class="input-group-text bg-white border-end-0 text-secondary"><i class="bi bi-person"></i></span>
-            <input type="text" class="form-control border-start-0 ps-0" id="username" name="username" placeholder="Enter username" required value="admin">
+          <label for="username" class="form-label text-secondary small fw-semibold">ชื่อผู้ใช้งาน</label>
+          <div class="input-group border rounded-3 overflow-hidden">
+            <span class="input-group-text bg-white border-0 text-secondary pe-0"><i class="bi bi-person"></i></span>
+            <input type="text" class="form-control border-0 ps-3 py-2.5" id="username" name="username" placeholder="กรอกชื่อผู้ใช้" required value="admin">
           </div>
         </div>
 
         <div class="mb-4">
-          <label for="password" class="form-label text-secondary small fw-semibold">Password</label>
-          <div class="input-group">
-            <span class="input-group-text bg-white border-end-0 text-secondary"><i class="bi bi-lock"></i></span>
-            <input type="password" class="form-control border-start-0 ps-0" id="password" name="password" placeholder="Enter password" required value="admin123">
+          <label for="password" class="form-label text-secondary small fw-semibold">รหัสผ่าน</label>
+          <div class="input-group border rounded-3 overflow-hidden">
+            <span class="input-group-text bg-white border-0 text-secondary pe-0"><i class="bi bi-lock"></i></span>
+            <input type="password" class="form-control border-0 ps-3 py-2.5" id="password" name="password" placeholder="กรอกรหัสผ่าน" required value="admin123">
           </div>
         </div>
 
         <button type="submit" class="btn btn-hospital w-100 py-2.5 rounded-3 fw-medium">
-          Sign In
+          เข้าสู่ระบบ
         </button>
       </form>
 
-      <div class="text-center mt-4 pt-2">
-        <p class="text-muted small mb-0">Medical Digital Department</p>
-        <span class="text-secondary" style="font-size: 0.8rem;">Daily Log System</span>
+      <!-- Footer branding -->
+      <div class="text-center mt-4 pt-3 border-top">
+        <p class="text-muted small mb-0 fw-semibold">กลุ่มงานดิจิทัลทางการแพทย์</p>
+        <span class="text-secondary text-xs">ระบบบันทึกการปฏิบัติงานประจำวัน</span>
       </div>
     </div>
   </div>

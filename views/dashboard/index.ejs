@@ -1,13 +1,14 @@
+<!-- Analytical Dashboard View for Managers/Department Heads -->
 <div class="row mb-4">
   <div class="col-12">
     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
       <div>
-        <h2 class="fw-bold text-dark mb-0">Dashboard Overview</h2>
-        <p class="text-secondary mb-0">Analytics and Daily workload insights of medical digital activities.</p>
+        <h3 class="fw-bold text-dark mb-1">ภาพรวมการวิเคราะห์ (Dashboard)</h3>
+        <p class="text-secondary small mb-0">รายงานภาระงานดิจิทัลทางการแพทย์และตัวชี้วัดระดับแผนก</p>
       </div>
       <div>
         <span class="badge bg-hospital-light p-2.5 rounded-3 fw-semibold">
-          <i class="bi bi-calendar3 me-2"></i>Today's Log Session
+          <i class="bi bi-shield-check me-2"></i>สำหรับหัวหน้ากลุ่มงาน (Head View)
         </span>
       </div>
     </div>
@@ -16,109 +17,167 @@
 
 <!-- Stats Row -->
 <div class="row g-3 mb-4">
+  
   <div class="col-md-4">
-    <div class="card card-hospital rounded-card h-100">
-      <div class="card-body">
-        <div class="d-flex align-items-center justify-content-between">
-          <div>
-            <h6 class="text-secondary text-uppercase tracking-wider small fw-semibold">Workload logged</h6>
-            <h3 class="fw-bold text-dark mt-2 mb-0">0 Hours</h3>
-          </div>
-          <div class="bg-hospital-light p-3 rounded-circle">
-            <i class="bi bi-clock-history fs-3 text-success"></i>
-          </div>
+    <div class="card card-hospital p-4 border-0 bg-white h-100">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <span class="text-secondary text-xs fw-semibold uppercase tracking-wider">ภาระงานที่บันทึกรวม</span>
+          <h2 class="fw-bold text-dark mt-2 mb-0">32.5 ชม.</h2>
+          <span class="text-muted text-xs"><i class="bi bi-arrow-up-right text-success me-1"></i>+12% จากสัปดาห์ที่แล้ว</span>
+        </div>
+        <div class="bg-hospital-light p-3 rounded-circle text-teal">
+          <i class="bi bi-clock-history fs-3"></i>
         </div>
       </div>
     </div>
   </div>
   
   <div class="col-md-4">
-    <div class="card card-hospital rounded-card h-100">
-      <div class="card-body">
-        <div class="d-flex align-items-center justify-content-between">
-          <div>
-            <h6 class="text-secondary text-uppercase tracking-wider small fw-semibold">Active team members</h6>
-            <h3 class="fw-bold text-dark mt-2 mb-0">5 Active</h3>
-          </div>
-          <div class="bg-hospital-light p-3 rounded-circle">
-            <i class="bi bi-people-fill fs-3 text-success"></i>
-          </div>
+    <div class="card card-hospital p-4 border-0 bg-white h-100">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <span class="text-secondary text-xs fw-semibold uppercase tracking-wider">จำนวนผู้บันทึกงานวันนี้</span>
+          <h2 class="fw-bold text-dark mt-2 mb-0">5 / 5 คน</h2>
+          <span class="text-muted text-xs"><span class="text-success"><i class="bi bi-circle-fill me-1" style="font-size: 8px;"></i>ส่งครบทุกคนแล้ว</span></span>
+        </div>
+        <div class="bg-hospital-light p-3 rounded-circle text-teal">
+          <i class="bi bi-people-fill fs-3"></i>
         </div>
       </div>
     </div>
   </div>
 
   <div class="col-md-4">
-    <div class="card card-hospital rounded-card h-100">
-      <div class="card-body">
-        <div class="d-flex align-items-center justify-content-between">
-          <div>
-            <h6 class="text-secondary text-uppercase tracking-wider small fw-semibold">Activities recorded today</h6>
-            <h3 class="fw-bold text-dark mt-2 mb-0">0 Logs</h3>
-          </div>
-          <div class="bg-hospital-light p-3 rounded-circle">
-            <i class="bi bi-check2-circle fs-3 text-success"></i>
-          </div>
+    <div class="card card-hospital p-4 border-0 bg-white h-100">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <span class="text-secondary text-xs fw-semibold uppercase tracking-wider">บันทึกกิจกรรมวันนี้</span>
+          <h2 class="fw-bold text-dark mt-2 mb-0">14 กิจกรรม</h2>
+          <span class="text-muted text-xs">เฉลี่ย 2.8 กิจกรรม/คน</span>
+        </div>
+        <div class="bg-hospital-light p-3 rounded-circle text-teal">
+          <i class="bi bi-journal-check fs-3"></i>
         </div>
       </div>
     </div>
   </div>
+
 </div>
 
-<!-- Charts Row -->
+<!-- Charts Section Placeholder (As requested: Still no real charts until database integration is complete) -->
 <div class="row g-4 mb-4">
-  <div class="col-lg-8">
-    <div class="card rounded-card border-0 shadow-sm h-100">
-      <div class="card-header bg-white border-0 py-3">
-        <h5 class="fw-bold text-dark mb-0">Workload Productivity Timeline</h5>
-      </div>
-      <div class="card-body">
-        <!-- ECharts chart container -->
-        <div id="workload-timeline-chart" style="width: 100%; height: 350px;"></div>
-      </div>
-    </div>
-  </div>
   
-  <div class="col-lg-4">
-    <div class="card rounded-card border-0 shadow-sm h-100">
-      <div class="card-header bg-white border-0 py-3">
-        <h5 class="fw-bold text-dark mb-0">Activity Category Allocation</h5>
+  <div class="col-lg-7">
+    <div class="card card-hospital border-0 p-4 bg-white h-100 d-flex flex-column align-items-center justify-content-center text-center py-5">
+      <div class="bg-light rounded-circle p-4 mb-3 text-secondary">
+        <i class="bi bi-bar-chart-line fs-1"></i>
       </div>
-      <div class="card-body">
-        <!-- ECharts chart container -->
-        <div id="category-distribution-chart" style="width: 100%; height: 350px;"></div>
+      <h5 class="fw-bold text-dark mb-2">แผนภูมิแสดงผลผลิตการปฏิบัติงาน</h5>
+      <p class="text-secondary small mb-0" style="max-width: 400px;">
+        ระบบจะเปิดใช้งานแผนภูมิภาพวิเคราะห์เส้นไทม์ไลน์โดยละเอียด เมื่อมีการเชื่อมต่อฐานข้อมูลและบันทึกประวัติการทำงานจริงมากกว่า 5 วันขึ้นไป
+      </p>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card card-hospital border-0 p-4 bg-white h-100">
+      <h5 class="fw-bold text-dark mb-3">สัดส่วนหมวดหมู่กิจกรรม (Department Share)</h5>
+      
+      <!-- Progress Bar Breakdown -->
+      <div class="d-flex flex-column gap-3">
+        <div>
+          <div class="d-flex justify-content-between text-sm mb-1">
+            <span class="text-secondary">งานดูแลและบำรุงรักษาซอฟต์แวร์ HOSxP</span>
+            <span class="fw-bold text-dark">40%</span>
+          </div>
+          <div class="progress rounded-pill" style="height: 8px;">
+            <div class="progress-bar bg-teal" style="width: 40%;"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="d-flex justify-content-between text-sm mb-1">
+            <span class="text-secondary">แก้ไขปัญหาซ่อมอุปกรณ์ฮาร์ดแวร์</span>
+            <span class="fw-bold text-dark">30%</span>
+          </div>
+          <div class="progress rounded-pill" style="height: 8px;">
+            <div class="progress-bar bg-teal" style="width: 30%;"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="d-flex justify-content-between text-sm mb-1">
+            <span class="text-secondary">การประชุม และงานบริหารทั่วไป</span>
+            <span class="fw-bold text-dark">20%</span>
+          </div>
+          <div class="progress rounded-pill" style="height: 8px;">
+            <div class="progress-bar bg-teal" style="width: 20%;"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="d-flex justify-content-between text-sm mb-1">
+            <span class="text-secondary">บำรุงรักษาระบบฐานข้อมูลเครือข่าย</span>
+            <span class="fw-bold text-dark">10%</span>
+          </div>
+          <div class="progress rounded-pill" style="height: 8px;">
+            <div class="progress-bar bg-teal" style="width: 10%;"></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+
 </div>
 
-<!-- Recent Logs Table -->
+<!-- Team Active Work Status -->
 <div class="row">
   <div class="col-12">
-    <div class="card rounded-card border-0 shadow-sm">
-      <div class="card-header bg-white border-0 py-3 d-flex align-items-center justify-content-between">
-        <h5 class="fw-bold text-dark mb-0">Recent Activities Logged</h5>
-        <a href="/activity" class="btn btn-sm btn-hospital px-3 rounded-3">View All Logs</a>
+    <div class="card card-hospital border-0 bg-white">
+      <div class="card-header bg-white border-0 py-3">
+        <h5 class="fw-bold text-dark mb-0">สถานะบันทึกภาระงานของทีม</h5>
       </div>
       <div class="card-body p-0">
         <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
+          <table class="table table-hover align-middle mb-0 text-sm">
             <thead class="table-light">
               <tr>
-                <th class="ps-4">User</th>
-                <th>Activity</th>
-                <th>Session</th>
-                <th>Duration (Min)</th>
-                <th>Location</th>
-                <th class="pe-4">Log Date</th>
+                <th class="ps-4">ชื่อสมาชิก</th>
+                <th>ตำแหน่งงาน</th>
+                <th>จำนวนกิจกรรมที่ส่ง</th>
+                <th>ชั่วโมงรวมวันนี้</th>
+                <th class="pe-4">สถานะส่งงาน</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td colspan="6" class="text-center py-4 text-muted">
-                  <i class="bi bi-inbox fs-4 d-block mb-2"></i>
-                  No activities recorded yet. Start logging to populate the dashboard!
-                </td>
+                <td class="ps-4 fw-semibold text-dark">สมชาย เจริญสุข</td>
+                <td class="text-secondary">หัวหน้ากลุ่มงานดิจิทัล</td>
+                <td>3 กิจกรรม</td>
+                <td>4.5 ชั่วโมง</td>
+                <td class="pe-4"><span class="badge bg-success-subtle text-success border border-success-subtle rounded-2">บันทึกเรียบร้อย</span></td>
+              </tr>
+              <tr>
+                <td class="ps-4 fw-semibold text-dark">วันชัย มั่นคง</td>
+                <td class="text-secondary">นักวิชาการคอมพิวเตอร์</td>
+                <td>5 กิจกรรม</td>
+                <td>6 ชั่วโมง</td>
+                <td class="pe-4"><span class="badge bg-success-subtle text-success border border-success-subtle rounded-2">บันทึกเรียบร้อย</span></td>
+              </tr>
+              <tr>
+                <td class="ps-4 fw-semibold text-dark">เกียรติศักดิ์ รักดี</td>
+                <td class="text-secondary">นักวิชาการคอมพิวเตอร์</td>
+                <td>4 กิจกรรม</td>
+                <td>5.5 ชั่วโมง</td>
+                <td class="pe-4"><span class="badge bg-success-subtle text-success border border-success-subtle rounded-2">บันทึกเรียบร้อย</span></td>
+              </tr>
+              <tr>
+                <td class="ps-4 fw-semibold text-dark">พิมลวรรณ แสนสวย</td>
+                <td class="text-secondary">นักวิชาการสาธารณสุข</td>
+                <td>2 กิจกรรม</td>
+                <td>2.5 ชั่วโมง</td>
+                <td class="pe-4"><span class="badge bg-success-subtle text-success border border-success-subtle rounded-2">บันทึกเรียบร้อย</span></td>
               </tr>
             </tbody>
           </table>
@@ -127,68 +186,3 @@
     </div>
   </div>
 </div>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // ECharts - Workload Timeline Chart
-    const timelineDom = document.getElementById('workload-timeline-chart');
-    if (timelineDom) {
-      const timelineChart = echarts.init(timelineDom);
-      const timelineOption = {
-        tooltip: { trigger: 'axis' },
-        grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-        xAxis: {
-          type: 'category',
-          boundaryGap: false,
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-          axisLine: { lineStyle: { color: '#bbb' } }
-        },
-        yAxis: { type: 'value', name: 'Hours', axisLine: { lineStyle: { color: '#bbb' } } },
-        series: [{
-          name: 'Workload Hours',
-          type: 'line',
-          smooth: true,
-          data: [0, 0, 0, 0, 0, 0, 0],
-          itemStyle: { color: '#0d8a72' },
-          areaStyle: {
-            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: 'rgba(13, 138, 114, 0.4)' },
-              { offset: 1, color: 'rgba(13, 138, 114, 0.0)' }
-            ])
-          }
-        }]
-      };
-      timelineChart.setOption(timelineOption);
-      window.addEventListener('resize', () => timelineChart.resize());
-    }
-
-    // ECharts - Category Distribution Chart
-    const categoryDom = document.getElementById('category-distribution-chart');
-    if (categoryDom) {
-      const categoryChart = echarts.init(categoryDom);
-      const categoryOption = {
-        tooltip: { trigger: 'item' },
-        legend: { bottom: '5%', left: 'center' },
-        series: [{
-          name: 'Activity Category',
-          type: 'pie',
-          radius: ['40%', '70%'],
-          avoidLabelOverlap: false,
-          itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 },
-          label: { show: false, position: 'center' },
-          emphasis: { label: { show: true, fontSize: 16, fontWeight: 'bold' } },
-          labelLine: { show: false },
-          data: [
-            { value: 0, name: 'IT Support' },
-            { value: 0, name: 'Database' },
-            { value: 0, name: 'Meeting' },
-            { value: 0, name: 'Administration' }
-          ]
-        }],
-        color: ['#0d8a72', '#20c997', '#ffc107', '#17a2b8']
-      };
-      categoryChart.setOption(categoryOption);
-      window.addEventListener('resize', () => categoryChart.resize());
-    }
-  });
-</script>

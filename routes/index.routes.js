@@ -10,10 +10,14 @@ const userRoutes = require('./user.routes');
 const settingController = require('../controllers/setting.controller');
 const authMiddleware = require('../middlewares/auth.middleware');
 
-// Root Route - redirect to dashboard
+const homeController = require('../controllers/home.controller');
+
+// Root Route - redirect to home
 router.get('/', (req, res) => {
-  res.redirect('/dashboard');
+  res.redirect('/home');
 });
+
+router.get('/home', authMiddleware, homeController.renderHome);
 
 // Register Modules
 router.use('/auth', authRoutes);
