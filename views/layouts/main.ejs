@@ -1,0 +1,27 @@
+<%- include('../partials/head') %>
+<body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+  <div class="app-wrapper">
+    
+    <!-- Navbar (Header) -->
+    <%- include('../partials/navbar') %>
+    
+    <!-- Sidebar -->
+    <%- include('../partials/sidebar') %>
+    
+    <!-- Main Content Wrapper -->
+    <main class="app-main py-4">
+      <div class="container-fluid">
+        <!-- Dynamic Content Injected Here -->
+        <%- include(body) %>
+      </div>
+    </main>
+    
+    <!-- Footer -->
+    <%- include('../partials/footer') %>
+
+  </div>
+  
+  <!-- JavaScript Dependencies -->
+  <%- include('../partials/scripts') %>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<%- include('../partials/head') %>
+<body class="bg-light d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+
+  <div class="card border-0 shadow-lg rounded-card" style="width: 100%; max-width: 420px; border-top: 5px solid var(--hospital-teal) !important;">
+    <div class="card-body p-5">
+      <div class="text-center mb-4">
+        <h3 class="fw-bold text-dark mb-1">Work Insight</h3>
+        <p class="text-secondary small text-uppercase tracking-wider">Digital Activity Intelligence Platform</p>
+      </div>
+
+      <% if (error) { %>
+        <div class="alert alert-danger alert-dismissible fade show rounded-3 border-0 small py-2 mb-4" role="alert">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i><%= error %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="padding: 0.75rem 1rem;"></button>
+        </div>
+      <% } %>
+
+      <form action="/auth/login" method="POST" autocomplete="off">
+        <div class="mb-3">
+          <label for="username" class="form-label text-secondary small fw-semibold">Username</label>
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0 text-secondary"><i class="bi bi-person"></i></span>
+            <input type="text" class="form-control border-start-0 ps-0" id="username" name="username" placeholder="Enter username" required value="admin">
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label for="password" class="form-label text-secondary small fw-semibold">Password</label>
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0 text-secondary"><i class="bi bi-lock"></i></span>
+            <input type="password" class="form-control border-start-0 ps-0" id="password" name="password" placeholder="Enter password" required value="admin123">
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-hospital w-100 py-2.5 rounded-3 fw-medium">
+          Sign In
+        </button>
+      </form>
+
+      <div class="text-center mt-4 pt-2">
+        <p class="text-muted small mb-0">Medical Digital Department</p>
+        <span class="text-secondary" style="font-size: 0.8rem;">Daily Log System</span>
+      </div>
+    </div>
+  </div>
+
+  <%- include('../partials/scripts') %>
+</body>
+</html>

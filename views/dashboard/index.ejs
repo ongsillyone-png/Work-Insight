@@ -1,0 +1,194 @@
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+      <div>
+        <h2 class="fw-bold text-dark mb-0">Dashboard Overview</h2>
+        <p class="text-secondary mb-0">Analytics and Daily workload insights of medical digital activities.</p>
+      </div>
+      <div>
+        <span class="badge bg-hospital-light p-2.5 rounded-3 fw-semibold">
+          <i class="bi bi-calendar3 me-2"></i>Today's Log Session
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Stats Row -->
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card card-hospital rounded-card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <h6 class="text-secondary text-uppercase tracking-wider small fw-semibold">Workload logged</h6>
+            <h3 class="fw-bold text-dark mt-2 mb-0">0 Hours</h3>
+          </div>
+          <div class="bg-hospital-light p-3 rounded-circle">
+            <i class="bi bi-clock-history fs-3 text-success"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-4">
+    <div class="card card-hospital rounded-card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <h6 class="text-secondary text-uppercase tracking-wider small fw-semibold">Active team members</h6>
+            <h3 class="fw-bold text-dark mt-2 mb-0">5 Active</h3>
+          </div>
+          <div class="bg-hospital-light p-3 rounded-circle">
+            <i class="bi bi-people-fill fs-3 text-success"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card card-hospital rounded-card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <h6 class="text-secondary text-uppercase tracking-wider small fw-semibold">Activities recorded today</h6>
+            <h3 class="fw-bold text-dark mt-2 mb-0">0 Logs</h3>
+          </div>
+          <div class="bg-hospital-light p-3 rounded-circle">
+            <i class="bi bi-check2-circle fs-3 text-success"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row g-4 mb-4">
+  <div class="col-lg-8">
+    <div class="card rounded-card border-0 shadow-sm h-100">
+      <div class="card-header bg-white border-0 py-3">
+        <h5 class="fw-bold text-dark mb-0">Workload Productivity Timeline</h5>
+      </div>
+      <div class="card-body">
+        <!-- ECharts chart container -->
+        <div id="workload-timeline-chart" style="width: 100%; height: 350px;"></div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-lg-4">
+    <div class="card rounded-card border-0 shadow-sm h-100">
+      <div class="card-header bg-white border-0 py-3">
+        <h5 class="fw-bold text-dark mb-0">Activity Category Allocation</h5>
+      </div>
+      <div class="card-body">
+        <!-- ECharts chart container -->
+        <div id="category-distribution-chart" style="width: 100%; height: 350px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Logs Table -->
+<div class="row">
+  <div class="col-12">
+    <div class="card rounded-card border-0 shadow-sm">
+      <div class="card-header bg-white border-0 py-3 d-flex align-items-center justify-content-between">
+        <h5 class="fw-bold text-dark mb-0">Recent Activities Logged</h5>
+        <a href="/activity" class="btn btn-sm btn-hospital px-3 rounded-3">View All Logs</a>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th class="ps-4">User</th>
+                <th>Activity</th>
+                <th>Session</th>
+                <th>Duration (Min)</th>
+                <th>Location</th>
+                <th class="pe-4">Log Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="6" class="text-center py-4 text-muted">
+                  <i class="bi bi-inbox fs-4 d-block mb-2"></i>
+                  No activities recorded yet. Start logging to populate the dashboard!
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // ECharts - Workload Timeline Chart
+    const timelineDom = document.getElementById('workload-timeline-chart');
+    if (timelineDom) {
+      const timelineChart = echarts.init(timelineDom);
+      const timelineOption = {
+        tooltip: { trigger: 'axis' },
+        grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+        xAxis: {
+          type: 'category',
+          boundaryGap: false,
+          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          axisLine: { lineStyle: { color: '#bbb' } }
+        },
+        yAxis: { type: 'value', name: 'Hours', axisLine: { lineStyle: { color: '#bbb' } } },
+        series: [{
+          name: 'Workload Hours',
+          type: 'line',
+          smooth: true,
+          data: [0, 0, 0, 0, 0, 0, 0],
+          itemStyle: { color: '#0d8a72' },
+          areaStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: 'rgba(13, 138, 114, 0.4)' },
+              { offset: 1, color: 'rgba(13, 138, 114, 0.0)' }
+            ])
+          }
+        }]
+      };
+      timelineChart.setOption(timelineOption);
+      window.addEventListener('resize', () => timelineChart.resize());
+    }
+
+    // ECharts - Category Distribution Chart
+    const categoryDom = document.getElementById('category-distribution-chart');
+    if (categoryDom) {
+      const categoryChart = echarts.init(categoryDom);
+      const categoryOption = {
+        tooltip: { trigger: 'item' },
+        legend: { bottom: '5%', left: 'center' },
+        series: [{
+          name: 'Activity Category',
+          type: 'pie',
+          radius: ['40%', '70%'],
+          avoidLabelOverlap: false,
+          itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 },
+          label: { show: false, position: 'center' },
+          emphasis: { label: { show: true, fontSize: 16, fontWeight: 'bold' } },
+          labelLine: { show: false },
+          data: [
+            { value: 0, name: 'IT Support' },
+            { value: 0, name: 'Database' },
+            { value: 0, name: 'Meeting' },
+            { value: 0, name: 'Administration' }
+          ]
+        }],
+        color: ['#0d8a72', '#20c997', '#ffc107', '#17a2b8']
+      };
+      categoryChart.setOption(categoryOption);
+      window.addEventListener('resize', () => categoryChart.resize());
+    }
+  });
+</script>

@@ -1,0 +1,113 @@
+<div class="row mb-4">
+  <div class="col-12">
+    <h2 class="fw-bold text-dark mb-0">Log New Activity</h2>
+    <p class="text-secondary mb-0">Record your daily work activity workload details.</p>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-8 mx-auto">
+    <div class="card rounded-card border-0 shadow-sm">
+      <div class="card-body p-4 p-md-5">
+        <form action="/activity/create" method="POST" class="needs-validation" novalidate>
+          
+          <div class="mb-4">
+            <label for="activityMasterId" class="form-label text-secondary small fw-semibold">Activity Master Definition</label>
+            <select class="form-select rounded-3" id="activityMasterId" name="activityMasterId" placeholder="Search or select activity..." required>
+              <option value="">Select an activity definition...</option>
+              <!-- Boilerplate placeholder activities -->
+              <option value="1">ACT-001: Hardware repair & troubleshooting</option>
+              <option value="2">ACT-002: MariaDB Database backup validation</option>
+              <option value="3">ACT-003: Server room temperature control inspection</option>
+              <option value="4">ACT-004: Network bandwidth analysis and configurations</option>
+            </select>
+            <div class="invalid-feedback">Please select an activity definition.</div>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label for="logDate" class="form-label text-secondary small fw-semibold">Activity Date</label>
+              <input type="date" class="form-control rounded-3" id="logDate" name="logDate" required value="<%= new Date().toISOString().split('T')[0] %>">
+              <div class="invalid-feedback">Please select a valid date.</div>
+            </div>
+            
+            <div class="col-md-6">
+              <label for="session" class="form-label text-secondary small fw-semibold">Working Session Block</label>
+              <select class="form-select rounded-3" id="session" name="session" required>
+                <option value="Morning" selected>Morning Shift (08:30 - 12:00)</option>
+                <option value="Afternoon">Afternoon Shift (13:00 - 16:30)</option>
+                <option value="Night">Night/OT Shift (16:30 onwards)</option>
+              </select>
+              <div class="invalid-feedback">Please select a session shift.</div>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label for="duration" class="form-label text-secondary small fw-semibold">Actual Spent Duration (Minutes)</label>
+              <div class="input-group">
+                <input type="number" class="form-control rounded-start-3" id="duration" name="duration" min="1" placeholder="e.g. 60" required>
+                <span class="input-group-text rounded-end-3 text-secondary">minutes</span>
+                <div class="invalid-feedback">Please enter a valid positive duration in minutes.</div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <label for="locationId" class="form-label text-secondary small fw-semibold">Physical / Virtual Location</label>
+              <select class="form-select rounded-3" id="locationId" name="locationId">
+                <option value="">Select a location (Optional)...</option>
+                <option value="1">OPD (Outpatient Department)</option>
+                <option value="2">ER (Emergency Room)</option>
+                <option value="3">IPD (Inpatient Department)</option>
+                <option value="4">LAB (Laboratory Services)</option>
+                <option value="5">Server Room</option>
+                <option value="6">Meeting Room</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="output" class="form-label text-secondary small fw-semibold">Outcome / Deliverables Result</label>
+            <textarea class="form-control rounded-3" id="output" name="output" rows="3" placeholder="Describe the physical/digital results or outcomes of this activity..."></textarea>
+          </div>
+
+          <div class="mb-4">
+            <label for="remark" class="form-label text-secondary small fw-semibold">Additional Remarks</label>
+            <textarea class="form-control rounded-3" id="remark" name="remark" rows="2" placeholder="Any additional notes or comments..."></textarea>
+          </div>
+
+          <div class="d-flex align-items-center justify-content-end gap-2 mt-5">
+            <a href="/activity" class="btn btn-outline-secondary px-4 py-2 rounded-3">Cancel</a>
+            <button type="submit" class="btn btn-hospital px-4 py-2 rounded-3 fw-medium">Save Record</button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Tom Select for searching activity definitions
+    new TomSelect('#activityMasterId', {
+      create: false,
+      sortField: {
+        field: 'text',
+        direction: 'asc'
+      }
+    });
+
+    // Form validation check
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+        form.classList.add('was-validated')
+      }, false)
+    });
+  });
+</script>

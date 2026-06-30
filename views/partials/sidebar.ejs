@@ -1,0 +1,59 @@
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+  <!-- Brand Logo -->
+  <a href="/dashboard" class="brand-link text-center d-block text-decoration-none py-3">
+    <span class="brand-text fs-4">Work Insight</span>
+  </a>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <!-- Sidebar Menu -->
+    <nav class="mt-4">
+      <ul class="nav nav-pills nav-sidebar flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
+        <li class="nav-header text-uppercase text-muted small fw-bold px-3 mb-2">Workspace</li>
+        
+        <li class="nav-item">
+          <a href="/dashboard" class="nav-link <%= typeof activeMenu !== 'undefined' && activeMenu === 'dashboard' ? 'active' : '' %>">
+            <i class="nav-icon bi bi-speedometer2"></i>
+            <p>Dashboard</p>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a href="/activity" class="nav-link <%= typeof activeMenu !== 'undefined' && activeMenu === 'activity' ? 'active' : '' %>">
+            <i class="nav-icon bi bi-journal-text"></i>
+            <p>Activity Logs</p>
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a href="/category" class="nav-link <%= typeof activeMenu !== 'undefined' && activeMenu === 'category' ? 'active' : '' %>">
+            <i class="nav-icon bi bi-tags"></i>
+            <p>Categories</p>
+          </a>
+        </li>
+
+        <% if (typeof user !== 'undefined' && user.role === 'Admin') { %>
+          <li class="nav-header text-uppercase text-muted small fw-bold px-3 mt-4 mb-2">Administration</li>
+          
+          <li class="nav-item">
+            <a href="/users" class="nav-link <%= typeof activeMenu !== 'undefined' && activeMenu === 'user' ? 'active' : '' %>">
+              <i class="nav-icon bi bi-people"></i>
+              <p>User Management</p>
+            </a>
+          </li>
+        <% } %>
+
+        <li class="nav-header text-uppercase text-muted small fw-bold px-3 mt-4 mb-2">Preferences</li>
+        
+        <li class="nav-item">
+          <a href="/settings" class="nav-link <%= typeof activeMenu !== 'undefined' && activeMenu === 'setting' ? 'active' : '' %>">
+            <i class="nav-icon bi bi-gear"></i>
+            <p>System Settings</p>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <!-- /.sidebar-menu -->
+  </div>
+  <!-- /.sidebar -->
+</aside>

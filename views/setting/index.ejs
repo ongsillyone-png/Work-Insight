@@ -1,0 +1,37 @@
+<div class="row mb-4">
+  <div class="col-12">
+    <h2 class="fw-bold text-dark mb-0">System Settings</h2>
+    <p class="text-secondary mb-0">Configure digital activity platform options and metadata attributes.</p>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-8 mx-auto">
+    <div class="card rounded-card border-0 shadow-sm mb-4">
+      <div class="card-header bg-white border-0 py-3">
+        <h5 class="fw-bold text-dark mb-0">General Configurations</h5>
+      </div>
+      <div class="card-body">
+        <form>
+          <div class="mb-3">
+            <label for="appName" class="form-label text-secondary small fw-semibold">Application Title Name</label>
+            <input type="text" class="form-control rounded-3" id="appName" value="Work Insight" required>
+          </div>
+          <div class="mb-3">
+            <label for="orgName" class="form-label text-secondary small fw-semibold">Medical Department Group</label>
+            <input type="text" class="form-control rounded-3" id="orgName" value="กลุ่มงานดิจิทัลทางการแพทย์" disabled>
+            <div class="form-text">Department organization scope is locked to single organization.</div>
+          </div>
+          <div class="mb-4">
+            <label for="allowRegistration" class="form-label text-secondary small fw-semibold">New Account Sign-Ups</label>
+            <select class="form-select rounded-3" id="allowRegistration">
+              <option value="false" selected>Disabled (Users added by administrator only)</option>
+              <option value="true">Enabled (Public registration)</option>
+            </select>
+          </div>
+          <button type="button" class="btn btn-hospital px-4 py-2 rounded-3 fw-medium">Save Settings</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

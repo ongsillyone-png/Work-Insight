@@ -1,0 +1,119 @@
+<div class="row mb-4">
+  <div class="col-12 d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <div>
+      <h2 class="fw-bold text-dark mb-0">Daily Activity Logs</h2>
+      <p class="text-secondary mb-0">Review, search, and manage your logged daily digital activities.</p>
+    </div>
+    <div>
+      <a href="/activity/create" class="btn btn-hospital px-4 py-2 rounded-3 fw-medium shadow-sm">
+        <i class="bi bi-plus-lg me-2"></i>Log New Activity
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Filters Card -->
+<div class="card rounded-card border-0 shadow-sm mb-4">
+  <div class="card-body py-3">
+    <form class="row g-3 align-items-end">
+      <div class="col-md-3">
+        <label for="filterDate" class="form-label text-secondary small fw-semibold">Log Date</label>
+        <input type="date" class="form-control rounded-3" id="filterDate">
+      </div>
+      <div class="col-md-3">
+        <label for="filterSession" class="form-label text-secondary small fw-semibold">Session</label>
+        <select class="form-select rounded-3" id="filterSession">
+          <option value="">All Sessions</option>
+          <option value="Morning">Morning</option>
+          <option value="Afternoon">Afternoon</option>
+          <option value="Night">Night</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label for="filterSearch" class="form-label text-secondary small fw-semibold">Search keyword</label>
+        <input type="text" class="form-control rounded-3" id="filterSearch" placeholder="Search by activity name or output...">
+      </div>
+      <div class="col-md-2 d-grid">
+        <button type="submit" class="btn btn-hospital rounded-3">
+          <i class="bi bi-filter me-2"></i>Apply Filters
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Logs List -->
+<div class="card rounded-card border-0 shadow-sm">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th class="ps-4">Activity Name</th>
+            <th>Log Date</th>
+            <th>Session</th>
+            <th>Duration</th>
+            <th>Location</th>
+            <th>Outputs / Deliverables</th>
+            <th class="pe-4 text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (logs && logs.length > 0) { %>
+            <% logs.forEach(function(log) { %>
+              <tr>
+                <td class="ps-4 fw-semibold text-dark"><%= log.activityName %></td>
+                <td><%= log.date %></td>
+                <td><span class="badge bg-light text-dark"><%= log.session %></span></td>
+                <td><%= log.duration %> Min</td>
+                <td><%= log.location || 'N/A' %></td>
+                <td><span class="text-truncate d-inline-block" style="max-width: 250px;"><%= log.output %></span></td>
+                <td class="pe-4 text-end">
+                  <a href="/activity/edit/<%= log.id %>" class="btn btn-sm btn-outline-secondary rounded-2 me-1">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  <button class="btn btn-sm btn-outline-danger rounded-2 btn-delete" data-id="<%= log.id %>">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            <% }); %>
+          <% } else { %>
+            <tr>
+              <td colspan="7" class="text-center py-5 text-muted">
+                <i class="bi bi-journal-x fs-3 d-block mb-2"></i>
+                No activity logs found for your account. Click 'Log New Activity' above to log your first activity!
+              </td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Delete validation flow with SweetAlert2
+    const deleteButtons = document.querySelectorAll('.btn-delete');
+    deleteButtons.forEach(btn => {
+      btn.addEventListener('click', function() {
+        const id = this.getAttribute('data-id');
+        Swal.fire({
+          title: 'Are you sure?',
+          text: "Do you want to delete this activity log record?",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#0d8a72',
+          cancelButtonColor: '#dc3545',
+          confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Swal.fire('Deleted!', 'Activity log has been deleted.', 'success');
+            // Complete deletion implementation in actual backend integration phase
+          }
+        });
+      });
+    });
+  });
+</script>
