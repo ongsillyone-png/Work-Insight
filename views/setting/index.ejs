@@ -34,6 +34,17 @@
           </select>
         </div>
 
+        <!-- Max Quick Actions -->
+        <div class="mb-4">
+          <label for="maxQuickActions" class="form-label text-secondary small fw-semibold">จำนวนปักหมุดกิจกรรมบันทึกด่วนสูงสุด (Quick Actions Limit)</label>
+          <select class="form-select rounded-3" id="maxQuickActions">
+            <% for (let i = 1; i <= 10; i++) { %>
+              <option value="<%= i %>" <%= settings.max_quick_actions === i ? 'selected' : '' %>><%= i %> รายการ</option>
+            <% } %>
+          </select>
+          <div class="form-text text-secondary text-xs mt-1">กำหนดจำนวนรายการปักหมุดบันทึกด่วนสูงสุดที่จะแสดงผลบนหน้าแรก (ไม่เกิน 10 รายการ)</div>
+        </div>
+
         <!-- Actions -->
         <div class="d-flex align-items-center justify-content-end gap-2 mt-5">
           <button type="button" class="btn btn-light border rounded-3 px-4 py-2" onclick="window.location.reload()">ยกเลิก</button>
@@ -49,11 +60,12 @@
     event.preventDefault();
     const data = {
       appName: document.getElementById('appName').value,
-      allowRegistration: document.getElementById('allowRegistration').value
+      allowRegistration: document.getElementById('allowRegistration').value,
+      maxQuickActions: document.getElementById('maxQuickActions').value
     };
 
     try {
-      const response = await fetch('/settings/update', {
+      const response = await fetch('/system-settings/update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)

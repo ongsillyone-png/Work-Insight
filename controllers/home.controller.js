@@ -7,6 +7,9 @@ class HomeController {
     try {
       const userId = req.user?.id || 1;
 
+      // 1. Get quick actions limit from system settings
+      const limit = res.locals.systemSettings?.max_quick_actions || 6;
+
       const allMasters = await activityMasterService.getAllActivities();
       
       let favorites = [];
@@ -15,6 +18,7 @@ class HomeController {
         favorites = quickActionIds
           .map(id => allMasters.find(am => am.id.toString() === id))
           .filter(Boolean)
+          .slice(0, limit)
           .map(am => ({
             id: am.id,
             name: am.name,
@@ -23,9 +27,9 @@ class HomeController {
           }));
       }
 
-      // If user doesn't have any favorites yet, fall back to the first 5 active master activities
+      // If user doesn't have any favorites yet, fall back to the first active master activities up to the limit
       if (favorites.length === 0) {
-        favorites = allMasters.slice(0, 5).map(am => ({
+        favorites = allMasters.slice(0, limit).map(am => ({
           id: am.id,
           name: am.name,
           code: am.code,
@@ -45,7 +49,8 @@ class HomeController {
 
       const summary = {
         activityCount,
-        totalHours
+        totalHours,
+        totalMinutes
       };
 
       // 4. Fetch all active master activities for search autocomplete

@@ -28,11 +28,13 @@
       <h6 class="text-secondary text-uppercase tracking-wider small fw-semibold mb-3">บันทึกด่วน (Quick Actions)</h6>
       <div class="row g-3">
         <% 
+          const maxQuickActionsLimit = locals.systemSettings?.max_quick_actions || 6;
           let quickActionIds = typeof user !== 'undefined' && user.quick_actions ? user.quick_actions.split(',').map(s => s.trim()).filter(Boolean) : [];
           let quickActivities = [];
           if (typeof activities !== 'undefined' && activities.length > 0 && quickActionIds.length > 0) {
             quickActivities = quickActionIds.map(id => activities.find(a => a.id.toString() === id)).filter(Boolean);
           }
+          quickActivities = quickActivities.slice(0, maxQuickActionsLimit);
           if (quickActivities.length > 0) {
             quickActivities.forEach(function(act, index) {
         %>
@@ -98,7 +100,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       
-      <form action="/activity/create" method="POST" class="needs-validation" novalidate>
+      <form action="/activity/create" method="POST" class="needs-validation" novalidate id="createActivityForm">
         <div class="modal-body py-3">
           <input type="hidden" id="modalActivityId" name="activityMasterId" required>
           
@@ -114,6 +116,7 @@
               <button type="button" class="chip-btn active" onclick="setFormSession('Morning', this)">เช้า</button>
               <button type="button" class="chip-btn" onclick="setFormSession('Afternoon', this)">บ่าย</button>
               <button type="button" class="chip-btn" onclick="setFormSession('Night', this)">ค่ำ/OT</button>
+              <button type="button" class="chip-btn" onclick="setFormSession('AllDay', this)">ทั้งวัน</button>
             </div>
             <input type="hidden" name="session" id="formSelectedSession" value="Morning">
           </div>
@@ -140,7 +143,8 @@
               <option value="">เลือกสถานที่...</option>
               <% if (typeof locations !== 'undefined' && locations && locations.length > 0) { %>
                 <% locations.forEach(function(loc) { %>
-                  <option value="<%= loc.id %>"><%= loc.name %></option>
+                  <% const isDefault = loc.name.includes('กลุ่มงานดิจิทัล') || loc.name.includes('ดิจิทัล'); %>
+                  <option value="<%= loc.id %>" <%= isDefault ? 'selected' : '' %>><%= loc.name %></option>
                 <% }); %>
               <% } %>
             </select>
@@ -179,6 +183,7 @@
 
   const userPrefs = <%- typeof user !== 'undefined' && user.preferred_categories ? JSON.stringify(user.preferred_categories.split(',').map(s=>s.trim())) : '[]' %>;
   let currentQuickActions = <%- typeof user !== 'undefined' && user.quick_actions ? JSON.stringify(user.quick_actions.split(',').map(s=>s.trim()).filter(Boolean)) : '[]' %>;
+  const maxQuickActionsLimit = <%= locals.systemSettings?.max_quick_actions || 6 %>;
 
   function getFilteredAllActivities() {
     if (userPrefs.length === 0 || (userPrefs.length === 1 && userPrefs[0] === "")) return allActivities;
@@ -233,6 +238,51 @@
         autocompleteList.classList.add('d-none');
       }
     });
+
+    // Warning popup for exceeding 7 hours
+    const form = document.getElementById('createActivityForm');
+    if (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+          form.classList.add('was-validated');
+          return;
+        }
+
+        // Prevent default submit first to show Swal
+        event.preventDefault();
+
+        const todayTotal = <%= typeof todayTotalMinutes !== 'undefined' ? todayTotalMinutes : 0 %>;
+        const durationInput = document.getElementById('formSelectedDuration');
+        const durationVal = parseInt(durationInput?.value || 0, 10);
+        const projectedTotal = todayTotal + durationVal;
+
+        if (projectedTotal > 420) {
+          Swal.fire({
+            title: 'เวลาทำงานสะสมเกิน 7 ชั่วโมง',
+            html: `วันนี้คุณบันทึกเวลาทำงานสะสมไปแล้ว <strong>${todayTotal} นาที</strong><br>` +
+                  `และรายการนี้ระบุ <strong>${durationVal} นาที</strong><br>` +
+                  `ทำให้เวลารวมสะสมเป็น <strong>${projectedTotal} นาที</strong> (~${(projectedTotal/60).toFixed(1)} ชม.)<br><br>` +
+                  `คุณแน่ใจหรือไม่ว่าใส่ระยะเวลาถูกต้องแล้ว?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#0D9488',
+            cancelButtonColor: '#94A3B8',
+            confirmButtonText: 'ใช่ บันทึกเลย',
+            cancelButtonText: 'ยกเลิกเพื่อแก้ไข'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              form.classList.add('was-validated');
+              form.submit();
+            }
+          });
+        } else {
+          form.classList.add('was-validated');
+          form.submit();
+        }
+      });
+    }
   });
 
   function renderActivityList(items) {
@@ -303,6 +353,39 @@
     const btns = document.querySelectorAll('#formSessionGroup .chip-btn');
     btns.forEach(btn => btn.classList.remove('active'));
     element.classList.add('active');
+    
+    const durationInput = document.getElementById('formSelectedDuration');
+    const durationGroup = document.getElementById('formDurationGroup');
+    
+    if (value === 'AllDay') {
+      if (durationInput) {
+        durationInput.value = '420';
+        durationInput.readOnly = true;
+        durationInput.classList.add('bg-light');
+      }
+      if (durationGroup) {
+        durationGroup.querySelectorAll('.chip-btn').forEach(btn => {
+          btn.classList.remove('active');
+          btn.disabled = true;
+        });
+      }
+    } else {
+      if (durationInput) {
+        durationInput.readOnly = false;
+        durationInput.classList.remove('bg-light');
+        if (durationInput.value === '420') {
+          durationInput.value = '30';
+          // Set active chip for 30 mins
+          const chip30 = durationGroup?.querySelector('.chip-btn:nth-child(2)');
+          if (chip30) chip30.classList.add('active');
+        }
+      }
+      if (durationGroup) {
+        durationGroup.querySelectorAll('.chip-btn').forEach(btn => {
+          btn.disabled = false;
+        });
+      }
+    }
   }
 
   function setFormDuration(value, element) {
@@ -320,8 +403,8 @@
     if (index > -1) {
       currentQuickActions.splice(index, 1);
     } else {
-      if (currentQuickActions.length >= 6) {
-        Swal.fire('เกินจำนวนที่กำหนด', 'สามารถปักหมุดบันทึกด่วนได้สูงสุด 6 รายการ กรุณาปลดรายการเก่าออกก่อน', 'warning');
+      if (currentQuickActions.length >= maxQuickActionsLimit) {
+        Swal.fire('เกินจำนวนที่กำหนด', `สามารถปักหมุดบันทึกด่วนได้สูงสุด ${maxQuickActionsLimit} รายการ กรุณาปลดรายการเก่าออกก่อน`, 'warning');
         return;
       }
       currentQuickActions.push(strId);

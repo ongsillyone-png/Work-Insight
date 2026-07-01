@@ -1,4 +1,17 @@
 <!-- Facebook / Git Timeline Style View for Activity History -->
+<style>
+  .timeline-card {
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    border-left: 3px solid transparent !important;
+  }
+  .timeline-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+    border-left: 3px solid var(--hospital-teal) !important;
+    background-color: #FAFAFA !important;
+  }
+</style>
 <div class="row g-4">
   
   <!-- Left Side: Timeline Feed -->
@@ -20,19 +33,33 @@
     <div class="position-relative ps-4" style="border-left: 2px solid var(--border-color); margin-left: 20px;">
       
       <% if (logs && logs.length > 0) { %>
-        <!-- Group logs by date (in EJS or JS dynamically, but here we can iterate through them directly) -->
+        <!-- Group logs by date -->
         <% 
           let currentDate = ""; 
-          logs.forEach(function(log) { 
+          let isFirst = true;
+          logs.forEach(function(log, idx) { 
             if (log.date !== currentDate) {
               currentDate = log.date;
+              if (!isFirst) { 
         %>
-              <!-- Date Node Header -->
-              <div class="position-relative my-4" style="margin-left: -32px;">
-                <div class="bg-hospital-light text-teal border border-teal rounded-pill px-3 py-1 d-inline-block fw-bold shadow-sm" style="font-size: 0.85rem; border-color: var(--hospital-teal) !important;">
-                  <i class="bi bi-calendar-check me-2"></i><%= log.date %>
+                </div> <!-- Close previous day content wrapper -->
+                </div> <!-- Close previous day container -->
+        <% 
+              } 
+              isFirst = false;
+        %>
+              <!-- Day Container -->
+              <div class="day-group mb-4" id="group-<%= log.date %>">
+                <!-- Date Node Header (Clickable for collapse) -->
+                <div class="position-relative my-3" style="margin-left: -32px; cursor: pointer; user-select: none;" onclick="toggleDayCollapse('<%= log.date %>')">
+                  <div class="bg-hospital-light text-teal border border-teal rounded-pill px-3 py-1 d-inline-flex align-items-center fw-bold shadow-sm" style="font-size: 0.85rem; border-color: var(--hospital-teal) !important;">
+                    <i class="bi bi-calendar-check me-2"></i>
+                    <span><%= log.date %></span>
+                    <i class="bi bi-chevron-down ms-2 collapse-icon" id="icon-<%= log.date %>"></i>
+                  </div>
                 </div>
-              </div>
+                <!-- Day Content Wrapper -->
+                <div class="day-content" id="content-<%= log.date %>" style="transition: all 0.2s ease-in-out;">
         <% 
             } 
         %>
@@ -45,7 +72,7 @@
               </span>
 
               <!-- Content Card -->
-              <div class="card card-hospital p-3 border-0 bg-white shadow-sm">
+              <div class="card card-hospital p-3 border-0 bg-white shadow-sm timeline-card" onclick="window.location.href='/activity/edit/<%= log.id %>'">
                 <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
                   <div>
                     <h6 class="fw-bold text-dark mb-1"><%= log.activityName %></h6>
@@ -60,10 +87,10 @@
                   
                   <!-- Actions Button Group -->
                   <div class="d-flex gap-1">
-                    <a href="/activity/edit/<%= log.id %>" class="btn btn-light btn-sm rounded-circle p-1.5" title="แก้ไข">
+                    <a href="/activity/edit/<%= log.id %>" class="btn btn-light btn-sm rounded-circle p-1.5" title="แก้ไข" onclick="event.stopPropagation();">
                       <i class="bi bi-pencil text-secondary" style="font-size: 0.9rem;"></i>
                     </a>
-                    <button class="btn btn-light btn-sm rounded-circle p-1.5 btn-delete" data-id="<%= log.id %>" title="ลบ">
+                    <button class="btn btn-light btn-sm rounded-circle p-1.5 btn-delete" data-id="<%= log.id %>" title="ลบ" onclick="event.stopPropagation();">
                       <i class="bi bi-trash text-danger" style="font-size: 0.9rem;"></i>
                     </button>
                   </div>
@@ -87,6 +114,8 @@
             </div>
 
         <% }); %>
+          </div> <!-- Close last day content wrapper -->
+          </div> <!-- Close last day container -->
       <% } else { %>
         <!-- Empty State Container -->
         <div class="text-center py-5 text-muted bg-white rounded-card shadow-sm border p-4" style="margin-left: -20px;">
@@ -100,6 +129,53 @@
       <% } %>
 
     </div>
+
+    <!-- Pagination Navigator -->
+    <% if (locals.pagination && pagination.totalPages > 1) { %>
+      <nav aria-label="Timeline navigation" class="mt-4">
+        <ul class="pagination justify-content-center gap-1">
+          <!-- Previous Button -->
+          <li class="page-item <%= pagination.currentPage === 1 ? 'disabled' : '' %>">
+            <% 
+              let prevQuery = { ...query }; 
+              prevQuery.page = pagination.currentPage - 1;
+              let prevUrl = '/activity?' + new URLSearchParams(prevQuery).toString();
+            %>
+            <a class="page-link rounded-3 border px-3 py-2 text-teal fw-semibold shadow-sm" href="<%= prevUrl %>" aria-label="Previous">
+              &laquo; ก่อนหน้า
+            </a>
+          </li>
+
+          <!-- Page Numbers -->
+          <% for (let i = 1; i <= pagination.totalPages; i++) { %>
+            <% 
+              let pageQuery = { ...query }; 
+              pageQuery.page = i;
+              let pageUrl = '/activity?' + new URLSearchParams(pageQuery).toString();
+              let isActive = pagination.currentPage === i;
+            %>
+            <li class="page-item">
+              <a class="page-link rounded-3 border px-3 py-2 fw-semibold shadow-sm <%= isActive ? 'bg-teal border-teal text-white' : 'text-teal' %>" href="<%= pageUrl %>">
+                <%= i %>
+              </a>
+            </li>
+          <% } %>
+
+          <!-- Next Button -->
+          <li class="page-item <%= pagination.currentPage === pagination.totalPages ? 'disabled' : '' %>">
+            <% 
+              let nextQuery = { ...query }; 
+              nextQuery.page = pagination.currentPage + 1;
+              let nextUrl = '/activity?' + new URLSearchParams(nextQuery).toString();
+            %>
+            <a class="page-link rounded-3 border px-3 py-2 text-teal fw-semibold shadow-sm" href="<%= nextUrl %>" aria-label="Next">
+              ถัดไป &raquo;
+            </a>
+          </li>
+        </ul>
+      </nav>
+    <% } %>
+
   </div>
 
   <!-- Right Side: Sidebar Filters (Todoist-style Filters) -->
@@ -122,6 +198,7 @@
             <option value="Morning" <%= (locals.query && locals.query.session === 'Morning') ? 'selected' : '' %>>เช้า</option>
             <option value="Afternoon" <%= (locals.query && locals.query.session === 'Afternoon') ? 'selected' : '' %>>บ่าย</option>
             <option value="Night" <%= (locals.query && locals.query.session === 'Night') ? 'selected' : '' %>>ค่ำ</option>
+            <option value="AllDay" <%= (locals.query && locals.query.session === 'AllDay') ? 'selected' : '' %>>ทั้งวัน</option>
           </select>
         </div>
 
@@ -151,10 +228,39 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
+    // Show SweetAlert success notifications if query param is set
+    const urlParams = new URLSearchParams(window.location.search);
+    const successType = urlParams.get('success');
+    if (successType) {
+      let title = 'ดำเนินการสำเร็จ!';
+      let text = 'บันทึกข้อมูลเรียบร้อยแล้ว';
+      if (successType === 'create') {
+        title = 'บันทึกสำเร็จ!';
+        text = 'เพิ่มประวัติกิจกรรมการทำงานใหม่เรียบร้อยแล้ว';
+      } else if (successType === 'update') {
+        title = 'แก้ไขสำเร็จ!';
+        text = 'ปรับปรุงข้อมูลประวัติการทำงานเรียบร้อยแล้ว';
+      }
+      
+      Swal.fire({
+        title: title,
+        text: text,
+        icon: 'success',
+        timer: 2000,
+        showConfirmButton: false
+      });
+
+      // Clear the query parameter without reloading the page
+      urlParams.delete('success');
+      const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+      window.history.replaceState({}, '', newUrl);
+    }
+
     // Delete validation using SweetAlert2
     const deleteButtons = document.querySelectorAll('.btn-delete');
     deleteButtons.forEach(btn => {
-      btn.addEventListener('click', function() {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
         const id = this.getAttribute('data-id');
         Swal.fire({
           title: 'คุณแน่ใจหรือ?',
@@ -188,4 +294,20 @@
       });
     });
   });
+
+  function toggleDayCollapse(date) {
+    const content = document.getElementById('content-' + date);
+    const icon = document.getElementById('icon-' + date);
+    if (content && icon) {
+      if (content.style.display === 'none') {
+        content.style.display = 'block';
+        icon.classList.remove('bi-chevron-right');
+        icon.classList.add('bi-chevron-down');
+      } else {
+        content.style.display = 'none';
+        icon.classList.remove('bi-chevron-down');
+        icon.classList.add('bi-chevron-right');
+      }
+    }
+  }
 </script>

@@ -1,0 +1,129 @@
+<!-- views/setting/profile.ejs -->
+<div class="row">
+  <div class="col-lg-6 mx-auto">
+    
+    <div class="mb-4">
+      <h3 class="fw-bold text-dark mb-1">ตั้งค่าบัญชีส่วนตัว</h3>
+      <p class="text-secondary small">แก้ไขรายละเอียดข้อมูลส่วนตัวและรหัสผ่านของคุณ</p>
+    </div>
+
+    <!-- Alert dynamic message -->
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="alert alert-danger border-0 rounded-3 text-sm shadow-sm py-2 px-3 mb-3 d-flex align-items-center gap-2">
+        <i class="bi bi-exclamation-triangle"></i>
+        <span><%= error %></span>
+      </div>
+    <% } %>
+
+    <div class="card card-hospital border-0 p-4 p-md-5 bg-white shadow-sm">
+      <form action="/settings/profile/update" method="POST" class="needs-validation" novalidate id="profileSettingsForm">
+        
+        <!-- Username (Disabled/Readonly) -->
+        <div class="mb-3">
+          <label for="username" class="form-label text-secondary small fw-semibold">ชื่อบัญชีผู้ใช้งาน (Username)</label>
+          <input type="text" class="form-control rounded-3 bg-light border-0 fw-semibold text-secondary" id="username" value="<%= profileUser ? profileUser.username : '' %>" readonly disabled>
+          <div class="form-text text-muted text-xs"><i class="bi bi-info-circle me-1"></i>ไม่สามารถเปลี่ยนชื่อบัญชีเข้าใช้งานได้</div>
+        </div>
+
+        <!-- Full name -->
+        <div class="mb-3">
+          <label for="fullName" class="form-label text-secondary small fw-semibold">ชื่อจริง - นามสกุลจริง</label>
+          <input type="text" class="form-control rounded-3" id="fullName" name="fullName" required value="<%= profileUser ? profileUser.fullName || profileUser.full_name : '' %>" placeholder="เช่น นายสมชาย สายฟ้า">
+          <div class="invalid-feedback">กรุณากรอกชื่อจริงและนามสกุลจริง</div>
+        </div>
+
+        <!-- Position -->
+        <div class="mb-4">
+          <label for="position" class="form-label text-secondary small fw-semibold">ตำแหน่งงาน</label>
+          <input type="text" class="form-control rounded-3" id="position" name="position" value="<%= profileUser ? profileUser.position : '' %>" placeholder="เช่น นักวิชาการคอมพิวเตอร์">
+        </div>
+
+        <hr class="my-4 border-slate">
+
+        <h6 class="fw-bold text-dark mb-3"><i class="bi bi-lock me-1"></i>เปลี่ยนรหัสผ่าน (หากต้องการเปลี่ยน)</h6>
+
+        <!-- New Password -->
+        <div class="mb-3">
+          <label for="password" class="form-label text-secondary small fw-semibold">รหัสผ่านใหม่</label>
+          <input type="password" class="form-control rounded-3" id="password" name="password" minlength="4" placeholder="ระบุรหัสผ่านใหม่หากต้องการเปลี่ยน">
+          <div class="form-text text-muted text-xs">ต้องมีความยาวอย่างน้อย 4 ตัวอักษรขึ้นไป</div>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="mb-4">
+          <label for="confirmPassword" class="form-label text-secondary small fw-semibold">ยืนยันรหัสผ่านใหม่</label>
+          <input type="password" class="form-control rounded-3" id="confirmPassword" name="confirmPassword" placeholder="กรอกรหัสผ่านใหม่อีกครั้งเพื่อยืนยัน">
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex align-items-center justify-content-end gap-2 mt-4">
+          <a href="/home" class="btn btn-light rounded-3 px-4 py-2 border text-sm">ย้อนกลับ</a>
+          <button type="submit" class="btn btn-hospital rounded-3 px-4 py-2 text-sm fw-semibold">บันทึกตั้งค่าบัญชี</button>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('profileSettingsForm');
+    
+    // Show SweetAlert success notifications if query param is set
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('success') === 'profile') {
+      Swal.fire({
+        title: 'บันทึกสำเร็จ!',
+        text: 'ปรับปรุงข้อมูลบัญชีผู้ใช้งานของคุณเรียบร้อยแล้ว',
+        icon: 'success',
+        timer: 2000,
+        showConfirmButton: false
+      });
+
+      // Clear the query parameter without reloading the page
+      urlParams.delete('success');
+      const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+      window.history.replaceState({}, '', newUrl);
+    }
+    
+    // Front-end password match validation
+    form.addEventListener('submit', function (event) {
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      if (password) {
+        if (password !== confirmPassword) {
+          event.preventDefault();
+          event.stopPropagation();
+          Swal.fire({
+            title: 'รหัสผ่านไม่ตรงกัน',
+            text: 'กรุณากรอกรหัสผ่านใหม่และยืนยันรหัสผ่านใหม่ให้ตรงกัน',
+            icon: 'error',
+            confirmButtonColor: '#0D9488'
+          });
+          return;
+        }
+        if (password.length < 4) {
+          event.preventDefault();
+          event.stopPropagation();
+          Swal.fire({
+            title: 'รหัสผ่านสั้นเกินไป',
+            text: 'รหัสผ่านใหม่ต้องมีความยาวอย่างน้อย 4 ตัวอักษร',
+            icon: 'error',
+            confirmButtonColor: '#0D9488'
+          });
+          return;
+        }
+      }
+
+      form.classList.add('was-validated');
+    });
+  });
+</script>

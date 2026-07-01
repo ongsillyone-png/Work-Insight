@@ -20,6 +20,18 @@ app.use((req, res, next) => {
   next();
 });
 
+// Global Settings Middleware
+const settingRepository = require('./repositories/setting.repository');
+app.use(async (req, res, next) => {
+  try {
+    const settings = await settingRepository.getSettings();
+    res.locals.systemSettings = settings;
+  } catch (err) {
+    res.locals.systemSettings = { app_name: 'Work Insight', allow_registration: 0 };
+  }
+  next();
+});
+
 // Set View Engine
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');

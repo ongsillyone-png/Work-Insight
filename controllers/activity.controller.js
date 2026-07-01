@@ -7,12 +7,32 @@ class ActivityController {
   async renderIndex(req, res, next) {
     try {
       const { date, session, search } = req.query;
-      const logs = await activityService.getLoggedActivities(req.user?.id || 1, { date, session, search });
+      const page = parseInt(req.query.page, 10) || 1;
+      
+      const allLogs = await activityService.getLoggedActivities(req.user?.id || 1, { date, session, search });
+      
+      // Group by date to paginate by "days"
+      const uniqueDates = [...new Set(allLogs.map(log => log.date))];
+      const limitDays = 10;
+      const totalPages = Math.ceil(uniqueDates.length / limitDays) || 1;
+      const currentPage = Math.min(page, totalPages);
+      
+      // Get the dates for the current page
+      const pageDates = uniqueDates.slice((currentPage - 1) * limitDays, currentPage * limitDays);
+      
+      // Filter logs to only include those on the page's dates
+      const logs = allLogs.filter(log => pageDates.includes(log.date));
+
       return res.render('layouts/main', {
         body: '../activity/index',
         title: 'Activity Logs | Work Insight',
         logs,
         query: req.query || {},
+        pagination: {
+          currentPage,
+          totalPages,
+          totalDays: uniqueDates.length
+        },
         activeMenu: 'activity'
       });
     } catch (err) {
@@ -22,15 +42,23 @@ class ActivityController {
 
   async renderCreate(req, res, next) {
     try {
+      const userId = req.user?.id || 1;
       const activities = await activityMasterService.getAllActivities();
       const locations = await locationService.getAllLocations();
       const categories = await categoryService.getAllCategories();
+      
+      const todayStr = new Date().toISOString().split('T')[0];
+      const allUserLogs = await activityService.getLoggedActivities(userId);
+      const recents = allUserLogs.filter(log => log.date === todayStr);
+      const todayTotalMinutes = recents.reduce((sum, log) => sum + parseInt(log.duration || 0, 10), 0);
+
       return res.render('layouts/main', {
         body: '../activity/create',
         title: 'Log New Activity | Work Insight',
         activities,
         locations,
         categories,
+        todayTotalMinutes,
         activeMenu: 'record_activity'
       });
     } catch (err) {
@@ -71,7 +99,7 @@ class ActivityController {
         output,
         remark
       });
-      return res.redirect('/activity');
+      return res.redirect('/activity?success=create');
     } catch (err) {
       next(err);
     }
@@ -90,7 +118,7 @@ class ActivityController {
         output,
         remark
       });
-      return res.redirect('/activity');
+      return res.redirect('/activity?success=update');
     } catch (err) {
       next(err);
     }

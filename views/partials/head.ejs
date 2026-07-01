@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title><%= typeof title !== 'undefined' ? title : 'Work Insight' %></title>
+  <title><%= typeof title !== 'undefined' ? title : (locals.systemSettings?.app_name || 'Work Insight') %></title>
 
   <!-- Google Font: Source Sans Pro & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">

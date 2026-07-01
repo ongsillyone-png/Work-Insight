@@ -30,8 +30,15 @@ router.use('/users', userRoutes);
 router.use('/locations', locationRoutes);
 router.use('/activity-master', activityMasterRoutes);
 
-// Settings Module Route
-router.get('/settings', authMiddleware, settingController.renderIndex);
-router.post('/settings/update', authMiddleware, settingController.updateSettings);
+// Settings Module Route (Personal Profile Settings for all users)
+const userController = require('../controllers/user.controller');
+router.get('/settings', authMiddleware, userController.renderProfileSettings);
+router.post('/settings/profile/update', authMiddleware, userController.updateProfileSettings);
+
+// System Settings Module Route (Admin only)
+const permissionMiddleware = require('../middlewares/permission.middleware');
+const { ROLES } = require('../utils/constants');
+router.get('/system-settings', authMiddleware, permissionMiddleware([ROLES.ADMIN]), settingController.renderIndex);
+router.post('/system-settings/update', authMiddleware, permissionMiddleware([ROLES.ADMIN]), settingController.updateSettings);
 
 module.exports = router;

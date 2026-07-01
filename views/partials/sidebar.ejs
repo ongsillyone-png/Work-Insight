@@ -1,7 +1,7 @@
 <aside class="app-sidebar bg-body-dark shadow" data-bs-theme="dark">
   <!-- Brand Logo -->
   <a href="/home" class="brand-link text-center d-block text-decoration-none py-3">
-    <span class="brand-text fs-4 fw-bold">Work Insight</span>
+    <span class="brand-text fs-4 fw-bold"><%= locals.systemSettings?.app_name || 'Work Insight' %></span>
   </a>
 
   <!-- Sidebar -->
@@ -92,7 +92,7 @@
                   </a>
                 </li>
                 <li class="nav-item">
-                  <a href="/settings" class="nav-link <%= typeof activeMenu !== 'undefined' && activeMenu === 'setting' ? 'active' : '' %>">
+                  <a href="/system-settings" class="nav-link <%= typeof activeMenu !== 'undefined' && activeMenu === 'setting' ? 'active' : '' %>">
                     <i class="nav-icon bi bi-sliders"></i>
                     <p class="mb-0 d-inline-block">ตั้งค่า</p>
                   </a>

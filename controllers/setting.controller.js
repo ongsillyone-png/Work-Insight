@@ -17,10 +17,11 @@ class SettingController {
 
   async updateSettings(req, res, next) {
     try {
-      const { appName, allowRegistration } = req.body;
+      const { appName, allowRegistration, maxQuickActions } = req.body;
       await settingRepository.updateSettings({
         app_name: appName,
-        allow_registration: allowRegistration === 'true' || allowRegistration === true ? 1 : 0
+        allow_registration: allowRegistration === 'true' || allowRegistration === true ? 1 : 0,
+        max_quick_actions: parseInt(maxQuickActions, 10) || 6
       });
       return res.json({ success: true, message: 'Settings updated successfully' });
     } catch (err) {

@@ -163,7 +163,9 @@ class ActivityRepository {
           l.name AS location,
           al.output,
           al.remark,
-          am.name AS activityName
+          DATE_FORMAT(al.created_at, '%H:%i') as time,
+          am.name AS activityName,
+          am.name AS name
         FROM activity_logs al
         JOIN activity_master am ON al.activity_master_id = am.id
         LEFT JOIN locations l ON al.location_id = l.id

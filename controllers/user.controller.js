@@ -93,6 +93,58 @@ class UserController {
       return res.status(500).json({ success: false, message: 'ไม่สามารถบันทึก Quick Actions ได้' });
     }
   }
+
+  async renderProfileSettings(req, res, next) {
+    try {
+      const userId = req.user?.id || 1;
+      const userObj = await userService.getUserById(userId);
+      return res.render('layouts/main', {
+        body: '../setting/profile',
+        title: 'ตั้งค่าบัญชีส่วนตัว | Work Insight',
+        profileUser: userObj,
+        activeMenu: 'profile_setting'
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async updateProfileSettings(req, res, next) {
+    try {
+      const userId = req.user?.id || 1;
+      const { fullName, position, password } = req.body;
+      
+      const currentUser = await userService.getUserById(userId);
+      if (!currentUser) {
+        return res.status(404).send('User not found');
+      }
+
+      const updateData = {
+        username: currentUser.username,
+        full_name: fullName,
+        position: position || null,
+        role_id: currentUser.role_id,
+        avatar_url: currentUser.avatar_url,
+        is_active: currentUser.is_active
+      };
+
+      if (password) {
+        updateData.password = password;
+      }
+
+      await userService.updateUser(userId, updateData);
+      
+      // Update session values if user is stored in session
+      if (req.user) {
+        req.user.fullName = fullName;
+      }
+
+      return res.redirect('/settings?success=profile');
+    } catch (err) {
+      console.error('Error in updateProfileSettings:', err);
+      next(err);
+    }
+  }
 }
 
 module.exports = new UserController();
