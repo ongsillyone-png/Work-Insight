@@ -2,6 +2,7 @@ const activityService = require('../services/activity.service');
 const activityMasterService = require('../services/activity-master.service');
 const locationService = require('../services/location.service');
 const categoryService = require('../services/category.service');
+const { getLocalDateString } = require('../utils/date');
 
 class ActivityController {
   async renderIndex(req, res, next) {
@@ -47,7 +48,7 @@ class ActivityController {
       const locations = await locationService.getAllLocations();
       const categories = await categoryService.getAllCategories();
       
-      const todayStr = new Date().toISOString().split('T')[0];
+      const todayStr = getLocalDateString();
       const allUserLogs = await activityService.getLoggedActivities(userId);
       const recents = allUserLogs.filter(log => log.date === todayStr);
       const todayTotalMinutes = recents.reduce((sum, log) => sum + parseInt(log.duration || 0, 10), 0);

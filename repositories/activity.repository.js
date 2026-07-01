@@ -1,7 +1,6 @@
 const { pool } = require('../config/database');
+const { getLocalDateString } = require('../utils/date');
 
-const mockLogs = [];
-const mockFavorites = [];
 
 class ActivityRepository {
   async findAll() {
@@ -35,8 +34,8 @@ class ActivityRepository {
       `, [id]);
       return rows[0] || null;
     } catch (err) {
-      console.warn(`Database offline, finding mock log by id ${id}:`, err.message);
-      return mockLogs.find(l => l.id === parseInt(id, 10)) || null;
+      console.error(`Database error in activity.repository.js:`, err);
+      throw err;
     }
   }
 
@@ -48,7 +47,7 @@ class ActivityRepository {
         [
           data.user_id || 1,
           data.activityMasterId,
-          data.logDate || new Date().toISOString().split('T')[0],
+          data.logDate || getLocalDateString(),
           data.session,
           parseInt(data.duration, 10),
           data.locationId ? parseInt(data.locationId, 10) : null,
@@ -58,24 +57,8 @@ class ActivityRepository {
       );
       return { id: result.insertId, ...data };
     } catch (err) {
-      console.warn('Database offline, mock creating log:', err.message);
-      const newId = mockLogs.length > 0 ? Math.max(...mockLogs.map(l => l.id)) + 1 : 1;
-      const newLog = { 
-        id: newId, 
-        user_id: data.user_id || 1, 
-        activityMasterId: parseInt(data.activityMasterId, 10), 
-        activityName: 'กิจกรรมบันทึกใหม่', // Placeholder
-        logDate: data.logDate || new Date().toISOString().split('T')[0],
-        date: data.logDate || new Date().toISOString().split('T')[0],
-        session: data.session,
-        duration: parseInt(data.duration, 10),
-        locationId: data.locationId ? parseInt(data.locationId, 10) : null,
-        location: 'สถานที่ระบุ',
-        output: data.output,
-        remark: data.remark
-      };
-      mockLogs.push(newLog);
-      return newLog;
+      console.error(`Database error in activity.repository.js:`, err);
+      throw err;
     }
   }
 
@@ -98,19 +81,8 @@ class ActivityRepository {
       );
       return { id, ...data };
     } catch (err) {
-      console.warn(`Database offline, mock updating log ${id}:`, err.message);
-      const log = mockLogs.find(l => l.id === parseInt(id, 10));
-      if (log) {
-        log.activityMasterId = parseInt(data.activityMasterId, 10);
-        log.logDate = data.logDate;
-        log.date = data.logDate;
-        log.session = data.session;
-        log.duration = parseInt(data.duration, 10);
-        log.locationId = data.locationId ? parseInt(data.locationId, 10) : null;
-        log.output = data.output;
-        log.remark = data.remark;
-      }
-      return log || null;
+      console.error(`Database error in activity.repository.js:`, err);
+      throw err;
     }
   }
 
@@ -119,13 +91,8 @@ class ActivityRepository {
       await pool.query('UPDATE activity_logs SET deleted_at = NOW() WHERE id = ?', [id]);
       return true;
     } catch (err) {
-      console.warn(`Database offline, mock deleting log ${id}:`, err.message);
-      const index = mockLogs.findIndex(l => l.id === parseInt(id, 10));
-      if (index !== -1) {
-        mockLogs.splice(index, 1);
-        return true;
-      }
-      return false;
+      console.error(`Database error in activity.repository.js:`, err);
+      throw err;
     }
   }
 
@@ -143,8 +110,8 @@ class ActivityRepository {
       `, [userId]);
       return rows;
     } catch (err) {
-      console.warn(`Database offline, using mock favorites for user ${userId}:`, err.message);
-      return mockFavorites;
+      console.error(`Database error in activity.repository.js:`, err);
+      throw err;
     }
   }
 
@@ -192,23 +159,8 @@ class ActivityRepository {
       const rows = await pool.query(query, params);
       return rows;
     } catch (err) {
-      console.warn(`Database offline, using mock logs for user ${userId}:`, err.message);
-      let logs = mockLogs.filter(log => log.user_id === parseInt(userId, 10));
-      if (filters.date) {
-        logs = logs.filter(log => log.date === filters.date);
-      }
-      if (filters.session) {
-        logs = logs.filter(log => log.session === filters.session);
-      }
-      if (filters.search) {
-        const searchLower = filters.search.toLowerCase();
-        logs = logs.filter(log => 
-          (log.activityName && log.activityName.toLowerCase().includes(searchLower)) ||
-          (log.output && log.output.toLowerCase().includes(searchLower)) ||
-          (log.remark && log.remark.toLowerCase().includes(searchLower))
-        );
-      }
-      return logs;
+      console.error(`Database error in activity.repository.js:`, err);
+      throw err;
     }
   }
 }

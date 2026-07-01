@@ -15,16 +15,64 @@
   </div>
 </div>
 
+<!-- Date Filter Row -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card card-hospital border-0 p-3 bg-white shadow-sm">
+      <form action="/dashboard" method="GET" id="dashboardFilterForm" class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <!-- Date display in Thai -->
+        <div class="d-flex align-items-center gap-2 text-teal fw-bold">
+          <i class="bi bi-calendar-range-fill"></i>
+          <span>
+            <% 
+              // Display Thai Date
+              const startThai = new Date(query.startDate).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+              const endThai = new Date(query.endDate).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+              
+              if (query.range === 'today') {
+                %>วันนี้ - <%= startThai %><%
+              } else if (query.startDate === query.endDate) {
+                %><%= startThai %><%
+              } else {
+                %><%= startThai %> - <%= endThai %><%
+              }
+            %>
+          </span>
+        </div>
+        
+        <!-- Dropdown & Inputs -->
+        <div class="d-flex align-items-center gap-2 flex-wrap ms-auto">
+          <label class="text-secondary small fw-semibold me-1 mb-0">ช่วงเวลา:</label>
+          <select name="range" id="filterRange" class="form-select form-select-sm rounded-3" style="width: 160px;" onchange="onRangeChange(this.value)">
+            <option value="today" <%= query.range === 'today' ? 'selected' : '' %>>วันนี้ (Today)</option>
+            <option value="week" <%= query.range === 'week' ? 'selected' : '' %>>ย้อนหลัง 7 วัน</option>
+            <option value="month" <%= query.range === 'month' ? 'selected' : '' %>>ย้อนหลัง 30 วัน</option>
+            <option value="custom" <%= query.range === 'custom' ? 'selected' : '' %>>กำหนดเอง (Custom)</option>
+          </select>
+          
+          <!-- Custom Date inputs (Shown only when range is custom) -->
+          <div id="customDateContainer" class="d-none d-flex align-items-center gap-2">
+            <input type="date" name="start" id="filterStart" class="form-control form-control-sm rounded-3" value="<%= query.start %>" style="width: 130px;">
+            <span class="text-secondary text-xs">ถึง</span>
+            <input type="date" name="end" id="filterEnd" class="form-control form-control-sm rounded-3" value="<%= query.end %>" style="width: 130px;">
+            <button type="submit" class="btn btn-sm btn-hospital rounded-3 px-3"><i class="bi bi-search"></i></button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <!-- Stats Row -->
 <div class="row g-3 mb-4">
   
   <div class="col-md-4">
-    <div class="card card-hospital p-4 border-0 bg-white h-100">
+    <div class="card card-hospital p-4 border-0 bg-white h-100 shadow-sm">
       <div class="d-flex align-items-center justify-content-between">
         <div>
           <span class="text-secondary text-xs fw-semibold uppercase tracking-wider">ภาระงานที่บันทึกรวม</span>
           <h2 class="fw-bold text-dark mt-2 mb-0"><%= analytics.totalHours %> ชม.</h2>
-          <span class="text-muted text-xs"><i class="bi bi-info-circle me-1"></i>จากข้อมูลบันทึกทั้งหมด</span>
+          <span class="text-muted text-xs"><i class="bi bi-info-circle me-1"></i><%= query.range === 'today' ? 'จากข้อมูลวันนี้ทั้งหมด' : 'ในช่วงเวลาที่เลือก' %></span>
         </div>
         <div class="bg-hospital-light p-3 rounded-circle text-teal">
           <i class="bi bi-clock-history fs-3"></i>
@@ -34,10 +82,10 @@
   </div>
   
   <div class="col-md-4">
-    <div class="card card-hospital p-4 border-0 bg-white h-100">
+    <div class="card card-hospital p-4 border-0 bg-white h-100 shadow-sm">
       <div class="d-flex align-items-center justify-content-between">
         <div>
-          <span class="text-secondary text-xs fw-semibold uppercase tracking-wider">จำนวนผู้บันทึกงานวันนี้</span>
+          <span class="text-secondary text-xs fw-semibold uppercase tracking-wider"><%= query.range === 'today' ? 'จำนวนผู้บันทึกงานวันนี้' : 'ผู้บันทึกงานในช่วงนี้' %></span>
           <h2 class="fw-bold text-dark mt-2 mb-0"><%= analytics.activeUsersCount %> / <%= analytics.totalUsersCount %> คน</h2>
           <span class="text-muted text-xs">
             <% if (analytics.activeUsersCount === analytics.totalUsersCount && analytics.totalUsersCount > 0) { %>
@@ -55,10 +103,10 @@
   </div>
 
   <div class="col-md-4">
-    <div class="card card-hospital p-4 border-0 bg-white h-100">
+    <div class="card card-hospital p-4 border-0 bg-white h-100 shadow-sm">
       <div class="d-flex align-items-center justify-content-between">
         <div>
-          <span class="text-secondary text-xs fw-semibold uppercase tracking-wider">บันทึกกิจกรรมวันนี้</span>
+          <span class="text-secondary text-xs fw-semibold uppercase tracking-wider"><%= query.range === 'today' ? 'บันทึกกิจกรรมวันนี้' : 'บันทึกกิจกรรมช่วงนี้' %></span>
           <h2 class="fw-bold text-dark mt-2 mb-0"><%= analytics.activitiesLoggedToday %> กิจกรรม</h2>
           <span class="text-muted text-xs">
             เฉลี่ย <%= analytics.activeUsersCount > 0 ? (Math.round((analytics.activitiesLoggedToday / analytics.activeUsersCount) * 10) / 10) : 0 %> กิจกรรม/คนที่ส่ง
@@ -73,32 +121,55 @@
 
 </div>
 
-<!-- Charts Section Placeholder (As requested: Still no real charts until database integration is complete) -->
+<!-- Charts Section -->
 <div class="row g-4 mb-4">
   
   <div class="col-lg-7">
-    <div class="card card-hospital border-0 p-4 bg-white h-100 d-flex flex-column align-items-center justify-content-center text-center py-5">
-      <div class="bg-light rounded-circle p-4 mb-3 text-secondary">
-        <i class="bi bi-bar-chart-line fs-1"></i>
-      </div>
-      <h5 class="fw-bold text-dark mb-2">แผนภูมิแสดงผลผลิตการปฏิบัติงาน</h5>
-      <p class="text-secondary small mb-0" style="max-width: 400px;">
-        ระบบจะเปิดใช้งานแผนภูมิภาพวิเคราะห์เส้นไทม์ไลน์โดยละเอียด เมื่อมีการเชื่อมต่อฐานข้อมูลและบันทึกประวัติการทำงานจริงมากกว่า 5 วันขึ้นไป
+    <div class="card card-hospital border-0 p-4 bg-white h-100 shadow-sm">
+      <h5 class="fw-bold text-dark mb-1">แผนภูมิแสดงผลผลิตการปฏิบัติงาน</h5>
+      <p class="text-secondary small mb-4">
+        <%= query.range === 'today' ? 'แสดงข้อมูลแนวโน้มภาระงานย้อนหลัง 7 วัน (ชั่วโมงการปฏิบัติงาน)' : 'แสดงข้อมูลภาระงานแยกตามวันในเวลาที่เลือก (ชั่วโมงการปฏิบัติงาน)' %>
       </p>
+      
+      <!-- Chart Div -->
+      <div id="productivityChart" style="width: 100%; height: 320px;"></div>
     </div>
   </div>
 
   <div class="col-lg-5">
-    <div class="card card-hospital border-0 p-4 bg-white h-100">
-      <h5 class="fw-bold text-dark mb-3">สัดส่วนหมวดหมู่กิจกรรม (Department Share)</h5>
+    <style>
+      .category-drill-row {
+        transition: all 0.2s ease-in-out;
+        border: 1px solid transparent;
+      }
+      .category-drill-row:hover {
+        background-color: #F8FAFC;
+        transform: translateX(4px);
+        border-color: #E2E8F0;
+      }
+    </style>
+    
+    <div class="card card-hospital border-0 p-4 bg-white h-100 shadow-sm" id="shareDistributionCard">
+      <!-- Title Block -->
+      <div class="mb-3">
+        <h5 class="fw-bold text-dark mb-0" id="shareTitleText">สัดส่วนหมวดหมู่กิจกรรม (Department Share)</h5>
+      </div>
       
-      <!-- Progress Bar Breakdown -->
-      <div class="d-flex flex-column gap-3">
+      <!-- Back Button (Hidden by default) -->
+      <div id="shareBackBtnContainer" class="d-none mb-3">
+        <button onclick="handleBack()" class="btn btn-sm btn-link text-teal p-0 text-decoration-none fw-bold">
+          <i class="bi bi-arrow-left me-1"></i> ย้อนกลับ
+        </button>
+      </div>
+
+      <!-- Categories Container -->
+      <div id="categoriesContainer" class="d-flex flex-column gap-3">
         <% if (analytics.categoryDistribution && analytics.categoryDistribution.length > 0) { %>
-          <% analytics.categoryDistribution.forEach(function(item) { %>
-            <div>
+          <div class="text-muted text-xs mb-1"><i class="bi bi-info-circle me-1"></i>คลิกที่หมวดหมู่หลักเพื่อดูสัดส่วนกลุ่มกิจกรรมย่อย</div>
+          <% analytics.categoryDistribution.forEach(function(item, index) { %>
+            <div class="category-drill-row p-2 rounded-3" style="cursor: pointer;" onclick="drillDownToGroups('<%= index %>')">
               <div class="d-flex justify-content-between text-sm mb-1">
-                <span class="text-secondary"><%= item.name %></span>
+                <span class="text-secondary fw-semibold"><%= item.name %> <i class="bi bi-chevron-right text-muted text-xs ms-1"></i></span>
                 <span class="fw-bold text-dark"><%= item.percentage %>%</span>
               </div>
               <div class="progress rounded-pill" style="height: 8px;">
@@ -110,6 +181,11 @@
           <div class="text-center text-muted py-3 small">ไม่มีข้อมูลหมวดหมู่</div>
         <% } %>
       </div>
+
+      <!-- Activities Drilldown Container (Hidden by default) -->
+      <div id="activitiesDrilldownContainer" class="d-none d-flex flex-column gap-3">
+        <!-- Will be populated dynamically via Javascript -->
+      </div>
     </div>
   </div>
 
@@ -118,9 +194,17 @@
 <!-- Team Active Work Status -->
 <div class="row">
   <div class="col-12">
-    <div class="card card-hospital border-0 bg-white">
-      <div class="card-header bg-white border-0 py-3">
-        <h5 class="fw-bold text-dark mb-0">สถานะบันทึกภาระงานของทีม</h5>
+    <div class="card card-hospital border-0 bg-white shadow-sm">
+      <div class="card-header bg-white border-0 py-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <h5 class="fw-bold text-dark mb-0">สถานะบันทึกภาระงานของทีม <%= query.range === 'today' ? 'วันนี้' : 'ในช่วงเวลาที่เลือก' %></h5>
+        <div class="d-flex align-items-center gap-2">
+          <button onclick="exportData('excel')" class="btn btn-sm btn-outline-success rounded-3 px-3 fw-semibold text-xs d-flex align-items-center gap-1">
+            <i class="bi bi-file-earmark-excel"></i> ส่งออก Excel (ดิบ)
+          </button>
+          <button onclick="exportData('pdf')" class="btn btn-sm btn-outline-danger rounded-3 px-3 fw-semibold text-xs d-flex align-items-center gap-1">
+            <i class="bi bi-file-earmark-pdf"></i> ส่งออก PDF (พิมพ์)
+          </button>
+        </div>
       </div>
       <div class="card-body p-0">
         <div class="table-responsive">
@@ -130,7 +214,7 @@
                 <th class="ps-4">ชื่อสมาชิก</th>
                 <th>ตำแหน่งงาน</th>
                 <th>จำนวนกิจกรรมที่ส่ง</th>
-                <th>ชั่วโมงรวมวันนี้</th>
+                <th>ชั่วโมงรวม<%= query.range === 'today' ? 'วันนี้' : 'สะสม' %></th>
                 <th class="pe-4">สถานะส่งงาน</th>
               </tr>
             </thead>
@@ -144,9 +228,9 @@
                     <td><%= member.totalHours %> ชั่วโมง</td>
                     <td class="pe-4">
                       <% if (member.status === 'บันทึกเรียบร้อย') { %>
-                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-2">บันทึกเรียบร้อย</span>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-2"><%= query.range === 'today' ? 'บันทึกเรียบร้อย' : 'มีบันทึกภาระงาน' %></span>
                       <% } else { %>
-                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-2">ยังไม่บันทึก</span>
+                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-2"><%= query.range === 'today' ? 'ยังไม่บันทึก' : 'ไม่มีบันทึกงาน' %></span>
                       <% } %>
                     </td>
                   </tr>
@@ -163,3 +247,499 @@
     </div>
   </div>
 </div>
+
+<script>
+  // Global date range variables set by the controller
+  const CURRENT_START_DATE = '<%= query.startDate %>';
+  const CURRENT_END_DATE = '<%= query.endDate %>';
+
+  // Drill-down data for 3-level hierarchy (Category -> Group -> Activity)
+  const CATEGORY_DATA = <%- JSON.stringify(analytics.categoryDistribution) %>;
+  
+  let currentCategoryIndex = null;
+  let currentGroupIndex = null;
+
+  function drillDownToGroups(catIndex) {
+    currentCategoryIndex = parseInt(catIndex, 10);
+    currentGroupIndex = null;
+    const category = CATEGORY_DATA[currentCategoryIndex];
+    if (!category) return;
+
+    // Change title text
+    document.getElementById('shareTitleText').innerHTML = `<i class="bi bi-tag-fill me-1 text-teal"></i> กลุ่มย่อย: ${category.name}`;
+    
+    // Hide categories container and show back button
+    document.getElementById('categoriesContainer').classList.add('d-none');
+    document.getElementById('shareBackBtnContainer').classList.remove('d-none');
+    
+    // Populate activities drilldown container with Groups list (Level 2)
+    const container = document.getElementById('activitiesDrilldownContainer');
+    container.innerHTML = '';
+    
+    if (category.groups && category.groups.length > 0) {
+      const infoText = document.createElement('div');
+      infoText.className = 'text-muted text-xs mb-1';
+      infoText.innerHTML = '<i class="bi bi-info-circle me-1"></i>คลิกที่กลุ่มกิจกรรมย่อยเพื่อดูสัดส่วนกิจกรรมย่อย';
+      container.appendChild(infoText);
+
+      category.groups.forEach((group, grpIndex) => {
+        const groupEl = document.createElement('div');
+        groupEl.className = 'category-drill-row p-2 rounded-3';
+        groupEl.style.cursor = 'pointer';
+        groupEl.onclick = () => drillDownToActivities(grpIndex);
+        groupEl.innerHTML = `
+          <div class="d-flex justify-content-between text-sm mb-1">
+            <span class="text-secondary fw-semibold">${group.name} <i class="bi bi-chevron-right text-muted text-xs ms-1"></i></span>
+            <span class="fw-bold text-teal">${group.percentage}%</span>
+          </div>
+          <div class="progress rounded-pill" style="height: 8px;">
+            <div class="progress-bar bg-teal bg-opacity-75" style="width: ${group.percentage}%;"></div>
+          </div>
+        `;
+        container.appendChild(groupEl);
+      });
+    } else {
+      container.innerHTML = '<div class="text-center text-muted py-4 small"><i class="bi bi-inbox me-1"></i>ไม่มีข้อมูลกลุ่มกิจกรรมย่อย</div>';
+    }
+
+    container.classList.remove('d-none');
+  }
+
+  function drillDownToActivities(grpIndex) {
+    currentGroupIndex = parseInt(grpIndex, 10);
+    const category = CATEGORY_DATA[currentCategoryIndex];
+    if (!category) return;
+    const group = category.groups[currentGroupIndex];
+    if (!group) return;
+
+    // Change title text
+    document.getElementById('shareTitleText').innerHTML = `<i class="bi bi-tag-fill me-1 text-info"></i> กิจกรรมย่อย: ${group.name}`;
+    
+    // Populate activities drilldown container with Activities list (Level 3)
+    const container = document.getElementById('activitiesDrilldownContainer');
+    container.innerHTML = '';
+    
+    if (group.activities && group.activities.length > 0) {
+      group.activities.forEach(act => {
+        const actEl = document.createElement('div');
+        actEl.className = 'p-2 rounded-3';
+        actEl.innerHTML = `
+          <div class="d-flex justify-content-between text-sm mb-1">
+            <span class="text-secondary fw-semibold">${act.name}</span>
+            <span class="fw-bold text-info">${act.percentage}%</span>
+          </div>
+          <div class="progress rounded-pill" style="height: 8px;">
+            <div class="progress-bar bg-info bg-opacity-75" style="width: ${act.percentage}%;"></div>
+          </div>
+        `;
+        container.appendChild(actEl);
+      });
+    } else {
+      container.innerHTML = '<div class="text-center text-muted py-4 small"><i class="bi bi-inbox me-1"></i>ไม่มีข้อมูลกิจกรรมย่อย</div>';
+    }
+  }
+
+  function handleBack() {
+    if (currentGroupIndex !== null) {
+      // Go back to groups (Level 2)
+      drillDownToGroups(currentCategoryIndex);
+    } else {
+      // Go back to categories (Level 1)
+      showCategories();
+    }
+  }
+
+  function showCategories() {
+    currentCategoryIndex = null;
+    currentGroupIndex = null;
+    
+    // Restore default title text
+    document.getElementById('shareTitleText').innerText = 'สัดส่วนหมวดหมู่กิจกรรม (Department Share)';
+    
+    // Hide back button and sub-groups container
+    document.getElementById('shareBackBtnContainer').classList.add('d-none');
+    document.getElementById('activitiesDrilldownContainer').classList.add('d-none');
+    
+    // Show categories container
+    document.getElementById('categoriesContainer').classList.remove('d-none');
+  }
+
+  function onRangeChange(value) {
+    const customContainer = document.getElementById('customDateContainer');
+    if (value === 'custom') {
+      customContainer.classList.remove('d-none');
+    } else {
+      customContainer.classList.add('d-none');
+      // Auto-submit form when choosing today, week, or month
+      document.getElementById('dashboardFilterForm').submit();
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const rangeSelect = document.getElementById('filterRange');
+    const customContainer = document.getElementById('customDateContainer');
+    if (rangeSelect && rangeSelect.value === 'custom') {
+      customContainer.classList.remove('d-none');
+    }
+
+    // Initialize productivity chart using Apache ECharts
+    const chartDom = document.getElementById('productivityChart');
+    if (chartDom) {
+      const myChart = echarts.init(chartDom);
+      
+      // Parse database trend data dynamically
+      const chartData = <%- JSON.stringify(analytics.dailyTrend) %>;
+      
+      const xData = chartData.map(item => item.label);
+      const yData = chartData.map(item => item.hours);
+      
+      const option = {
+        color: ['#0D9488'], // Hospital Teal
+        tooltip: {
+          trigger: 'axis',
+          formatter: '{b}: <b>{c} ชั่วโมง</b>',
+          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+          borderColor: '#E2E8F0',
+          borderWidth: 1,
+          textStyle: {
+            color: '#1E293B',
+            fontSize: 12
+          }
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          top: '12%',
+          containLabel: true
+        },
+        xAxis: {
+          type: 'category',
+          boundaryGap: false,
+          data: xData,
+          axisLine: {
+            lineStyle: {
+              color: '#E2E8F0'
+            }
+          },
+          axisLabel: {
+            color: '#64748B',
+            fontSize: 11
+          }
+        },
+        yAxis: {
+          type: 'value',
+          name: 'ชั่วโมง',
+          nameTextStyle: {
+            color: '#64748B',
+            fontSize: 11
+          },
+          axisLine: {
+            show: false
+          },
+          splitLine: {
+            lineStyle: {
+              color: '#F1F5F9',
+              type: 'dashed'
+            }
+          },
+          axisLabel: {
+            color: '#64748B',
+            fontSize: 11
+          }
+        },
+        series: [
+          {
+            name: 'ภาระงาน',
+            type: 'line',
+            smooth: true,
+            symbol: 'circle',
+            symbolSize: 8,
+            showSymbol: true,
+            data: yData,
+            lineStyle: {
+              width: 3,
+              shadowColor: 'rgba(13, 148, 136, 0.2)',
+              shadowBlur: 10,
+              shadowOffsetY: 5
+            },
+            areaStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                {
+                  offset: 0,
+                  color: 'rgba(13, 148, 136, 0.3)'
+                },
+                {
+                  offset: 1,
+                  color: 'rgba(13, 148, 136, 0.01)'
+                }
+              ])
+            }
+          }
+        ]
+      };
+      
+      myChart.setOption(option);
+      
+      // Keep ECharts fluid on screen resize
+      window.addEventListener('resize', function () {
+        myChart.resize();
+      });
+    }
+  });
+
+  async function exportData(type) {
+    // Show loading spinner
+    Swal.fire({
+      title: 'กำลังดึงข้อมูล...',
+      text: 'กรุณารอสักครู่ ระบบกำลังจัดเตรียมข้อมูลสำหรับส่งออก',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
+    try {
+      // Fetch exactly the date range currently shown on the dashboard
+      const response = await fetch(`/dashboard/export-data?range=custom&start=${CURRENT_START_DATE}&end=${CURRENT_END_DATE}`);
+      const result = await response.json();
+      
+      if (!result.success || !result.logs || result.logs.length === 0) {
+        Swal.close();
+        Swal.fire('ไม่พบข้อมูล', 'ไม่มีประวัติภาระงานในช่วงเวลาที่เลือกสำหรับการส่งออก', 'info');
+        return;
+      }
+
+      Swal.close();
+
+      if (type === 'excel') {
+        downloadExcel(result.logs);
+      } else if (type === 'pdf') {
+        printPDF(result.logs);
+      }
+    } catch (err) {
+      console.error(err);
+      Swal.close();
+      Swal.fire('ข้อผิดพลาด', 'ไม่สามารถส่งออกข้อมูลได้ในขณะนี้', 'error');
+    }
+  }
+
+  function downloadExcel(logs) {
+    // Build an HTML table for Excel with perfect Thai encoding
+    let table = '<table border="1" style="font-family: \'Sarabun\', sans-serif; border-collapse: collapse;">';
+    
+    // Header
+    table += `<tr style="background-color: #0D9488; color: white; font-weight: bold; height: 35px;">
+      <th>วันที่</th>
+      <th>ช่วงเวลา</th>
+      <th>ชื่อ-นามสกุล</th>
+      <th>ตำแหน่งงาน</th>
+      <th>หมวดหมู่หลัก</th>
+      <th>กลุ่มกิจกรรมย่อย</th>
+      <th>กิจกรรมที่ปฏิบัติ</th>
+      <th>ระยะเวลา (นาที)</th>
+      <th>สถานที่ปฏิบัติงาน</th>
+    </tr>`;
+
+    // Rows
+    logs.forEach(log => {
+      const dateStr = new Date(log.logDate).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
+      const sessionMap = {
+        'Morning': 'ช่วงเช้า',
+        'Afternoon': 'ช่วงบ่าย',
+        'Night': 'ช่วงค่ำ/OT',
+        'AllDay': 'ทั้งวัน'
+      };
+      const sessionThai = sessionMap[log.session] || log.session;
+      
+      table += `<tr style="height: 28px;">
+        <td style="padding: 5px;">${dateStr}</td>
+        <td style="padding: 5px;">${sessionThai}</td>
+        <td style="padding: 5px; font-weight: bold;">${log.fullName}</td>
+        <td style="padding: 5px;">${log.position || '-'}</td>
+        <td style="padding: 5px;">${log.categoryName}</td>
+        <td style="padding: 5px;">${log.groupName}</td>
+        <td style="padding: 5px;">${log.activityName}</td>
+        <td style="padding: 5px; text-align: right;">${log.duration}</td>
+        <td style="padding: 5px;">${log.locationName}</td>
+      </tr>`;
+    });
+
+    table += '</table>';
+
+    // Set MIME type with UTF-8 BOM
+    const blob = new Blob(['\uFEFF' + table], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+    
+    // Create download link
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    
+    // File Name formatting
+    link.download = `Work_Insight_Report_${CURRENT_START_DATE}_to_${CURRENT_END_DATE}.xls`;
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  function printPDF(logs) {
+    // Open a new tab for printing
+    const printWindow = window.open('', '_blank');
+    
+    // Generate dates in Thai using the actual dashboard dates
+    const startDateThai = new Date(CURRENT_START_DATE).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+    const endDateThai = new Date(CURRENT_END_DATE).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+    const dateRangeStr = CURRENT_START_DATE === CURRENT_END_DATE ? startDateThai : `${startDateThai} ถึง ${endDateThai}`;
+
+    // Render print HTML
+    let html = `
+      <html>
+        <head>
+          <title>รายงานภาระงานปฏิบัติการบุคคล - Work Insight</title>
+          <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+          <style>
+            body {
+              font-family: 'Sarabun', sans-serif;
+              padding: 40px;
+              color: #1E293B;
+              background-color: #fff;
+              font-size: 13px;
+            }
+            .header-block {
+              text-align: center;
+              margin-bottom: 30px;
+              border-bottom: 2px solid #0D9488;
+              padding-bottom: 15px;
+            }
+            .header-block h2 {
+              margin: 0 0 5px 0;
+              color: #0F766E;
+              font-weight: 700;
+              font-size: 22px;
+            }
+            .header-block p {
+              margin: 0;
+              color: #64748B;
+              font-size: 13px;
+            }
+            .meta-info {
+              display: flex;
+              justify-content: space-between;
+              margin-bottom: 15px;
+              font-size: 12px;
+              color: #475569;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 10px;
+            }
+            th {
+              background-color: #F1F5F9;
+              color: #0F766E;
+              font-weight: 600;
+              border: 1px solid #CBD5E1;
+              padding: 10px 8px;
+              text-align: left;
+            }
+            td {
+              border: 1px solid #E2E8F0;
+              padding: 8px;
+              vertical-align: top;
+            }
+            tr:nth-child(even) {
+              background-color: #F8FAFC;
+            }
+            .text-right {
+              text-align: right;
+            }
+            .text-center {
+              text-align: center;
+            }
+            .bold {
+              font-weight: 600;
+            }
+            @media print {
+              body {
+                padding: 0;
+              }
+              @page {
+                size: A4 landscape;
+                margin: 1.5cm;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header-block">
+            <h2>รายงานสรุปภาระงานและกิจกรรมบุคคล (Individual Activity Report)</h2>
+            <p>ระบบบันทึกความดีและภาระงาน - กลุ่มงานดิจิทัลทางการแพทย์</p>
+          </div>
+          
+          <div class="meta-info">
+            <div><strong>ช่วงเวลาที่แสดง:</strong> ${dateRangeStr}</div>
+            <div><strong>วันที่พิมพ์รายงาน:</strong> ${new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })} น.</div>
+          </div>
+          
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 10%;">วันที่</th>
+                <th style="width: 8%;">ช่วงเวลา</th>
+                <th style="width: 14%;">ชื่อ-นามสกุล</th>
+                <th style="width: 10%;">หมวดหมู่หลัก</th>
+                <th style="width: 12%;">กลุ่มกิจกรรมย่อย</th>
+                <th style="width: 26%;">กิจกรรมที่ปฏิบัติ</th>
+                <th style="width: 8%; text-align: right;">ระยะเวลา</th>
+                <th style="width: 12%;">สถานที่</th>
+              </tr>
+            </thead>
+            <tbody>
+    `;
+
+    logs.forEach(log => {
+      const dateStr = new Date(log.logDate).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
+      const sessionMap = {
+        'Morning': 'ช่วงเช้า',
+        'Afternoon': 'ช่วงบ่าย',
+        'Night': 'ช่วงค่ำ/OT',
+        'AllDay': 'ทั้งวัน'
+      };
+      const sessionThai = sessionMap[log.session] || log.session;
+
+      html += `
+        <tr>
+          <td>${dateStr}</td>
+          <td>${sessionThai}</td>
+          <td class="bold">${log.fullName}</td>
+          <td>${log.categoryName}</td>
+          <td>${log.groupName}</td>
+          <td>${log.activityName}</td>
+          <td class="text-right">${log.duration} นาที</td>
+          <td>${log.locationName}</td>
+        </tr>
+      `;
+    });
+
+    html += `
+            </tbody>
+          </table>
+          
+          <div style="margin-top: 40px; text-align: right; font-size: 11px; color: #94A3B8;">
+            รายงานนี้ถูกสร้างขึ้นโดยระบบอัตโนมัติจากเว็บบอร์ด Work Insight
+          </div>
+          
+          <script>
+            window.onload = function() {
+              window.print();
+            }
+          <\/script>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.open();
+    printWindow.document.write(html);
+    printWindow.document.close();
+  }
+</script>

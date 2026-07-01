@@ -27,7 +27,7 @@
         <!-- Activity date selection -->
         <div class="mb-4">
           <label for="logDate" class="form-label text-secondary small fw-semibold">วันที่ปฏิบัติงาน</label>
-          <input type="date" class="form-control rounded-3" id="logDate" name="logDate" required value="<%= log ? log.logDate : new Date().toISOString().split('T')[0] %>">
+          <input type="date" class="form-control rounded-3" id="logDate" name="logDate" required value="<%= log ? log.logDate : (function(){ const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; })() %>">
           <div class="invalid-feedback">กรุณาเลือกวันที่ปฏิบัติงาน</div>
         </div>
 

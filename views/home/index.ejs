@@ -162,45 +162,78 @@
       </div>
     </div>
 
-    <!-- Dashboard Snapshot -->
-    <div class="card card-hospital border-0 p-4">
-      <h5 class="fw-bold text-dark mb-3">สัดส่วนหมวดหมู่ดิจิทัล (Snapshot)</h5>
+    <!-- Personal Workload Proportion Card -->
+    <style>
+      .category-drill-row {
+        transition: all 0.2s ease-in-out;
+        border: 1px solid transparent;
+      }
+      .category-drill-row:hover {
+        background-color: #F8FAFC;
+        transform: translateX(4px);
+        border-color: #E2E8F0;
+      }
+    </style>
+    
+    <div class="card card-hospital border-0 p-4 shadow-sm" id="personalDistributionCard">
+      <!-- Title Block -->
+      <div class="mb-2">
+        <h5 class="fw-bold text-dark mb-0" id="personalTitleText">สัดส่วนประเภทงานสะสมของคุณ</h5>
+      </div>
+
+      <!-- Date Range Selector in Card (Compact size) -->
+      <div class="mb-3">
+        <form action="/home" method="GET" id="homeFilterForm" class="d-flex flex-column gap-1">
+          <select name="range" id="homeFilterRange" class="form-select form-select-sm rounded-3 border-secondary-subtle" onchange="onHomeRangeChange(this.value)">
+            <option value="today" <%= query.range === 'today' ? 'selected' : '' %>>วันนี้ (Today)</option>
+            <option value="week" <%= query.range === 'week' ? 'selected' : '' %>>ย้อนหลัง 7 วัน</option>
+            <option value="month" <%= query.range === 'month' ? 'selected' : '' %>>ย้อนหลัง 30 วัน</option>
+            <option value="custom" <%= query.range === 'custom' ? 'selected' : '' %>>กำหนดเอง (Custom)</option>
+          </select>
+          
+          <div id="homeCustomDateContainer" class="<%= query.range === 'custom' ? '' : 'd-none' %> d-flex align-items-center gap-1 mt-1 flex-wrap">
+            <input type="date" class="form-control form-control-sm rounded-3 py-0.5" style="font-size: 11px;" id="homeFilterStart" name="start" value="<%= query.start %>" required>
+            <span class="text-xs text-muted">ถึง</span>
+            <input type="date" class="form-control form-control-sm rounded-3 py-0.5" style="font-size: 11px;" id="homeFilterEnd" name="end" value="<%= query.end %>" required>
+            <button type="submit" class="btn btn-sm btn-teal py-0.5 px-2 rounded-3 text-xs"><i class="bi bi-search"></i></button>
+          </div>
+        </form>
+      </div>
       
-      <!-- Progress Bar Breakdown -->
-      <div class="d-flex flex-column gap-3">
-        <div>
-          <div class="d-flex justify-content-between text-xs mb-1">
-            <span class="text-secondary">งานสนับสนุนแก้ปัญหาคอมพิวเตอร์</span>
-            <span class="fw-bold text-dark">60%</span>
-          </div>
-          <div class="progress rounded-pill" style="height: 6px;">
-            <div class="progress-bar bg-teal" style="width: 60%;"></div>
-          </div>
-        </div>
+      <!-- Back Button (Hidden by default) -->
+      <div id="personalBackBtnContainer" class="d-none mb-3">
+        <button onclick="handlePersonalBack()" class="btn btn-sm btn-link text-teal p-0 text-decoration-none fw-bold">
+          <i class="bi bi-arrow-left me-1"></i> ย้อนกลับ
+        </button>
+      </div>
 
-        <div>
-          <div class="d-flex justify-content-between text-xs mb-1">
-            <span class="text-secondary">บำรุงรักษาฐานข้อมูลระบบ HOSxP</span>
-            <span class="fw-bold text-dark">25%</span>
-          </div>
-          <div class="progress rounded-pill" style="height: 6px;">
-            <div class="progress-bar bg-teal" style="width: 25%;"></div>
-          </div>
-        </div>
+      <!-- Categories Container -->
+      <div id="personalCategoriesContainer" class="d-flex flex-column gap-3">
+        <% if (personalDistribution && personalDistribution.length > 0) { %>
+          <div class="text-muted text-xs mb-1" style="font-size: 10px;"><i class="bi bi-info-circle me-1"></i>คลิกหมวดหมู่หลักเพื่อดูสัดส่วนกลุ่มกิจกรรมย่อย</div>
+          <% personalDistribution.forEach(function(item, index) { %>
+            <div class="category-drill-row p-1.5 rounded-2" style="cursor: pointer;" onclick="drillDownPersonalGroups('<%= index %>')">
+              <div class="d-flex justify-content-between text-xs mb-1">
+                <span class="text-secondary fw-semibold"><%= item.name %> <i class="bi bi-chevron-right text-muted text-xs ms-0.5"></i></span>
+                <span class="fw-bold text-dark"><%= item.percentage %>%</span>
+              </div>
+              <div class="progress rounded-pill" style="height: 6px;">
+                <div class="progress-bar bg-teal" style="width: <%= item.percentage %>%;"></div>
+              </div>
+            </div>
+          <% }); %>
+        <% } else { %>
+          <div class="text-center text-muted py-4 small"><i class="bi bi-inbox me-1"></i>ไม่มีข้อมูลสัดส่วนกิจกรรม</div>
+        <% } %>
+      </div>
 
-        <div>
-          <div class="d-flex justify-content-between text-xs mb-1">
-            <span class="text-secondary">งานประชุมกลุ่มงานไอที</span>
-            <span class="fw-bold text-dark">15%</span>
-          </div>
-          <div class="progress rounded-pill" style="height: 6px;">
-            <div class="progress-bar bg-teal" style="width: 15%;"></div>
-          </div>
-        </div>
+      <!-- Activities/Groups Drilldown Container (Hidden by default) -->
+      <div id="personalDrilldownContainer" class="d-none d-flex flex-column gap-3">
+        <!-- Will be populated dynamically via Javascript -->
       </div>
 
       <div class="mt-4 pt-3 border-top text-center">
-        <a href="/dashboard" class="text-teal text-decoration-none small fw-semibold">
+        <a href="/dashboard?range=<%= query.range %>&start=<%= query.start %>&end=<%= query.end %>" class="text-teal text-decoration-none small fw-semibold">
           เปิดสถิติวิเคราะห์โดยละเอียด <i class="bi bi-arrow-right ms-1"></i>
         </a>
       </div>
@@ -463,4 +496,134 @@
     btns.forEach(btn => btn.classList.remove('active'));
     element.classList.add('active');
   }
+
+  // Personal 3-level workload drill-down logic
+  const PERSONAL_DATA = <%- JSON.stringify(personalDistribution) %>;
+  let homeCatIndex = null;
+  let homeGrpIndex = null;
+
+  function onHomeRangeChange(value) {
+    const customContainer = document.getElementById('homeCustomDateContainer');
+    if (value === 'custom') {
+      customContainer.classList.remove('d-none');
+    } else {
+      customContainer.classList.add('d-none');
+      document.getElementById('homeFilterForm').submit();
+    }
+  }
+
+  function drillDownPersonalGroups(catIndex) {
+    homeCatIndex = parseInt(catIndex, 10);
+    homeGrpIndex = null;
+    const category = PERSONAL_DATA[homeCatIndex];
+    if (!category) return;
+
+    // Change title text
+    document.getElementById('personalTitleText').innerHTML = `<i class="bi bi-tag-fill me-1 text-teal"></i> กลุ่มย่อย: ${category.name}`;
+    
+    // Hide categories container and show back button
+    document.getElementById('personalCategoriesContainer').classList.add('d-none');
+    document.getElementById('personalBackBtnContainer').classList.remove('d-none');
+    
+    // Populate activities drilldown container with Groups list (Level 2)
+    const container = document.getElementById('personalDrilldownContainer');
+    container.innerHTML = '';
+    
+    if (category.groups && category.groups.length > 0) {
+      const infoText = document.createElement('div');
+      infoText.className = 'text-muted text-xs mb-1';
+      infoText.style.fontSize = '10px';
+      infoText.innerHTML = '<i class="bi bi-info-circle me-1"></i>คลิกกลุ่มกิจกรรมย่อยเพื่อดูสัดส่วนกิจกรรมย่อย';
+      container.appendChild(infoText);
+
+      category.groups.forEach((group, grpIndex) => {
+        const groupEl = document.createElement('div');
+        groupEl.className = 'category-drill-row p-1.5 rounded-2';
+        groupEl.style.cursor = 'pointer';
+        groupEl.onclick = () => drillDownPersonalActivities(grpIndex);
+        groupEl.innerHTML = `
+          <div class="d-flex justify-content-between text-xs mb-1">
+            <span class="text-secondary fw-semibold">${group.name} <i class="bi bi-chevron-right text-muted text-xs ms-0.5"></i></span>
+            <span class="fw-bold text-teal">${group.percentage}%</span>
+          </div>
+          <div class="progress rounded-pill" style="height: 6px;">
+            <div class="progress-bar bg-teal bg-opacity-75" style="width: ${group.percentage}%;"></div>
+          </div>
+        `;
+        container.appendChild(groupEl);
+      });
+    } else {
+      container.innerHTML = '<div class="text-center text-muted py-4 small"><i class="bi bi-inbox me-1"></i>ไม่มีข้อมูลกลุ่มกิจกรรมย่อย</div>';
+    }
+
+    container.classList.remove('d-none');
+  }
+
+  function drillDownPersonalActivities(grpIndex) {
+    homeGrpIndex = parseInt(grpIndex, 10);
+    const category = PERSONAL_DATA[homeCatIndex];
+    if (!category) return;
+    const group = category.groups[homeGrpIndex];
+    if (!group) return;
+
+    // Change title text
+    document.getElementById('personalTitleText').innerHTML = `<i class="bi bi-tag-fill me-1 text-info"></i> กิจกรรมย่อย: ${group.name}`;
+    
+    // Populate activities drilldown container with Activities list (Level 3)
+    const container = document.getElementById('personalDrilldownContainer');
+    container.innerHTML = '';
+    
+    if (group.activities && group.activities.length > 0) {
+      group.activities.forEach(act => {
+        const actEl = document.createElement('div');
+        actEl.className = 'p-1.5 rounded-2';
+        actEl.innerHTML = `
+          <div class="d-flex justify-content-between text-xs mb-1">
+            <span class="text-secondary fw-semibold">${act.name}</span>
+            <span class="fw-bold text-info">${act.percentage}%</span>
+          </div>
+          <div class="progress rounded-pill" style="height: 6px;">
+            <div class="progress-bar bg-info bg-opacity-75" style="width: ${act.percentage}%;"></div>
+          </div>
+        `;
+        container.appendChild(actEl);
+      });
+    } else {
+      container.innerHTML = '<div class="text-center text-muted py-4 small"><i class="bi bi-inbox me-1"></i>ไม่มีข้อมูลกิจกรรมย่อย</div>';
+    }
+  }
+
+  function handlePersonalBack() {
+    if (homeGrpIndex !== null) {
+      // Go back to groups (Level 2)
+      drillDownPersonalGroups(homeCatIndex);
+    } else {
+      // Go back to categories (Level 1)
+      showPersonalCategories();
+    }
+  }
+
+  function showPersonalCategories() {
+    homeCatIndex = null;
+    homeGrpIndex = null;
+    
+    // Restore default title text
+    document.getElementById('personalTitleText').innerText = 'สัดส่วนประเภทงานสะสมของคุณ';
+    
+    // Hide back button and sub-groups container
+    document.getElementById('personalBackBtnContainer').classList.add('d-none');
+    document.getElementById('personalDrilldownContainer').classList.add('d-none');
+    
+    // Show categories container
+    document.getElementById('personalCategoriesContainer').classList.remove('d-none');
+  }
+
+  // Initialize custom date container if custom range is active on page load
+  document.addEventListener('DOMContentLoaded', function () {
+    const rangeSelect = document.getElementById('homeFilterRange');
+    const customContainer = document.getElementById('homeCustomDateContainer');
+    if (rangeSelect && rangeSelect.value === 'custom' && customContainer) {
+      customContainer.classList.remove('d-none');
+    }
+  });
 </script>

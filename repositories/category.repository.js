@@ -1,6 +1,5 @@
 const { pool } = require('../config/database');
 
-const mockCategories = [];
 
 class CategoryRepository {
   async findAll() {
@@ -18,8 +17,8 @@ class CategoryRepository {
       const rows = await pool.query('SELECT * FROM activity_categories WHERE id = ? AND deleted_at IS NULL', [id]);
       return rows[0] || null;
     } catch (err) {
-      console.warn(`Database offline, finding mock category by id ${id}:`, err.message);
-      return mockCategories.find(c => c.id === parseInt(id, 10)) || null;
+      console.error(`Database error in category.repository.js:`, err);
+      throw err;
     }
   }
 
@@ -32,11 +31,8 @@ class CategoryRepository {
       // mariadb package returns insertId in the result metadata
       return { id: result.insertId, ...data };
     } catch (err) {
-      console.warn('Database offline, mock creating category:', err.message);
-      const newId = mockCategories.length > 0 ? Math.max(...mockCategories.map(c => c.id)) + 1 : 1;
-      const newCategory = { id: newId, name: data.name, description: data.description, is_active: 1 };
-      mockCategories.push(newCategory);
-      return newCategory;
+      console.error(`Database error in category.repository.js:`, err);
+      throw err;
     }
   }
 
@@ -48,14 +44,8 @@ class CategoryRepository {
       );
       return { id, ...data };
     } catch (err) {
-      console.warn(`Database offline, mock updating category ${id}:`, err.message);
-      const category = mockCategories.find(c => c.id === parseInt(id, 10));
-      if (category) {
-        category.name = data.name;
-        category.description = data.description;
-        category.is_active = data.is_active !== undefined ? data.is_active : category.is_active;
-      }
-      return category || null;
+      console.error(`Database error in category.repository.js:`, err);
+      throw err;
     }
   }
 
@@ -65,13 +55,8 @@ class CategoryRepository {
       await pool.query('UPDATE activity_categories SET deleted_at = NOW() WHERE id = ?', [id]);
       return true;
     } catch (err) {
-      console.warn(`Database offline, mock deleting category ${id}:`, err.message);
-      const index = mockCategories.findIndex(c => c.id === parseInt(id, 10));
-      if (index !== -1) {
-        mockCategories.splice(index, 1);
-        return true;
-      }
-      return false;
+      console.error(`Database error in category.repository.js:`, err);
+      throw err;
     }
   }
 }

@@ -1,6 +1,5 @@
 const { pool } = require('../config/database');
 
-const mockGroups = [];
 
 class GroupRepository {
   async findAll() {
@@ -24,8 +23,8 @@ class GroupRepository {
       const rows = await pool.query('SELECT * FROM activity_groups WHERE id = ? AND deleted_at IS NULL', [id]);
       return rows[0] || null;
     } catch (err) {
-      console.warn(`Database offline, finding mock group by id ${id}:`, err.message);
-      return mockGroups.find(g => g.id === parseInt(id, 10)) || null;
+      console.error(`Database error in group.repository.js:`, err);
+      throw err;
     }
   }
 
@@ -37,11 +36,8 @@ class GroupRepository {
       );
       return { id: result.insertId, ...data };
     } catch (err) {
-      console.warn('Database offline, mock creating activity group:', err.message);
-      const newId = mockGroups.length > 0 ? Math.max(...mockGroups.map(g => g.id)) + 1 : 1;
-      const newGroup = { id: newId, name: data.name, description: data.description, is_active: 1 };
-      mockGroups.push(newGroup);
-      return newGroup;
+      console.error(`Database error in group.repository.js:`, err);
+      throw err;
     }
   }
 
@@ -53,14 +49,8 @@ class GroupRepository {
       );
       return { id, ...data };
     } catch (err) {
-      console.warn(`Database offline, mock updating group ${id}:`, err.message);
-      const group = mockGroups.find(g => g.id === parseInt(id, 10));
-      if (group) {
-        group.name = data.name;
-        group.description = data.description;
-        group.is_active = data.is_active !== undefined ? data.is_active : group.is_active;
-      }
-      return group || null;
+      console.error(`Database error in group.repository.js:`, err);
+      throw err;
     }
   }
 
@@ -69,13 +59,8 @@ class GroupRepository {
       await pool.query('UPDATE activity_groups SET deleted_at = NOW() WHERE id = ?', [id]);
       return true;
     } catch (err) {
-      console.warn(`Database offline, mock deleting group ${id}:`, err.message);
-      const index = mockGroups.findIndex(g => g.id === parseInt(id, 10));
-      if (index !== -1) {
-        mockGroups.splice(index, 1);
-        return true;
-      }
-      return false;
+      console.error(`Database error in group.repository.js:`, err);
+      throw err;
     }
   }
 }

@@ -1,6 +1,5 @@
 const { pool } = require('../config/database');
 
-const mockLocations = [];
 
 class LocationRepository {
   async findAll() {
@@ -18,8 +17,8 @@ class LocationRepository {
       const rows = await pool.query('SELECT * FROM locations WHERE id = ? AND deleted_at IS NULL', [id]);
       return rows[0] || null;
     } catch (err) {
-      console.warn(`Database offline, finding mock location by id ${id}:`, err.message);
-      return mockLocations.find(l => l.id === parseInt(id, 10)) || null;
+      console.error(`Database error in location.repository.js:`, err);
+      throw err;
     }
   }
 
@@ -31,11 +30,8 @@ class LocationRepository {
       );
       return { id: result.insertId, ...data };
     } catch (err) {
-      console.warn('Database offline, mock creating location:', err.message);
-      const newId = mockLocations.length > 0 ? Math.max(...mockLocations.map(l => l.id)) + 1 : 1;
-      const newLoc = { id: newId, name: data.name, description: data.description, is_active: 1 };
-      mockLocations.push(newLoc);
-      return newLoc;
+      console.error(`Database error in location.repository.js:`, err);
+      throw err;
     }
   }
 
@@ -47,14 +43,8 @@ class LocationRepository {
       );
       return { id, ...data };
     } catch (err) {
-      console.warn(`Database offline, mock updating location ${id}:`, err.message);
-      const loc = mockLocations.find(l => l.id === parseInt(id, 10));
-      if (loc) {
-        loc.name = data.name;
-        loc.description = data.description;
-        loc.is_active = data.is_active !== undefined ? data.is_active : loc.is_active;
-      }
-      return loc || null;
+      console.error(`Database error in location.repository.js:`, err);
+      throw err;
     }
   }
 
@@ -63,13 +53,8 @@ class LocationRepository {
       await pool.query('UPDATE locations SET deleted_at = NOW() WHERE id = ?', [id]);
       return true;
     } catch (err) {
-      console.warn(`Database offline, mock deleting location ${id}:`, err.message);
-      const index = mockLocations.findIndex(l => l.id === parseInt(id, 10));
-      if (index !== -1) {
-        mockLocations.splice(index, 1);
-        return true;
-      }
-      return false;
+      console.error(`Database error in location.repository.js:`, err);
+      throw err;
     }
   }
 }

@@ -7,7 +7,7 @@ class AuthController {
    */
   async renderLogin(req, res) {
     if (req.cookies?.token) {
-      return res.redirect('/dashboard');
+      return res.redirect('/home');
     }
     return res.render('auth/login', { title: 'Login | Work Insight', error: null });
   }
@@ -43,7 +43,7 @@ class AuthController {
       // Set cookie
       res.cookie('token', result.token, cookieOptions);
 
-      return res.redirect('/dashboard');
+      return res.redirect('/home');
     } catch (err) {
       console.error("[LOGIN ERROR]:", err.message);
       return res.render('auth/login', {
