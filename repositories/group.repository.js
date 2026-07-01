@@ -1,5 +1,7 @@
 const { pool } = require('../config/database');
 
+const mockGroups = [];
+
 class GroupRepository {
   async findAll() {
     try {

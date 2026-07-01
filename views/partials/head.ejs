@@ -276,7 +276,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       // Global click handler for mobile sidebar drawer toggle and close-outside behavior
       document.addEventListener('click', (e) => {
-        const toggleBtn = e.target.closest('[onclick*="sidebar-open"]') || e.target.closest('.btn-teal-light') || e.target.closest('.bi-list');
+        const toggleBtn = e.target.closest('.sidebar-toggle-btn');
         if (toggleBtn) {
           e.preventDefault();
           document.body.classList.toggle('sidebar-open');

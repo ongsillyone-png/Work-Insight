@@ -111,17 +111,17 @@
         <!-- Date -->
         <div>
           <label for="filterDate" class="form-label text-secondary small fw-semibold">เลือกวันที่</label>
-          <input type="date" class="form-control rounded-3" id="filterDate" name="date">
+          <input type="date" class="form-control rounded-3" id="filterDate" name="date" value="<%= (locals.query && locals.query.date) || '' %>">
         </div>
 
         <!-- Session selection -->
         <div>
           <label for="filterSession" class="form-label text-secondary small fw-semibold">ช่วงเวลาทำงาน</label>
           <select class="form-select rounded-3" id="filterSession" name="session">
-            <option value="">ทุกช่วงเวลา</option>
-            <option value="Morning">เช้า</option>
-            <option value="Afternoon">บ่าย</option>
-            <option value="Night">ค่ำ</option>
+            <option value="" <%= (locals.query && !locals.query.session) ? 'selected' : '' %>>ทุกช่วงเวลา</option>
+            <option value="Morning" <%= (locals.query && locals.query.session === 'Morning') ? 'selected' : '' %>>เช้า</option>
+            <option value="Afternoon" <%= (locals.query && locals.query.session === 'Afternoon') ? 'selected' : '' %>>บ่าย</option>
+            <option value="Night" <%= (locals.query && locals.query.session === 'Night') ? 'selected' : '' %>>ค่ำ</option>
           </select>
         </div>
 
@@ -130,7 +130,7 @@
           <label for="filterSearch" class="form-label text-secondary small fw-semibold">คำค้นหา</label>
           <div class="input-group input-group-sm border rounded-3 overflow-hidden">
             <span class="input-group-text bg-light border-0"><i class="bi bi-search text-secondary"></i></span>
-            <input type="text" class="form-control border-0" id="filterSearch" name="search" placeholder="ค้นหาชื่อผลงาน, กิจกรรม...">
+            <input type="text" class="form-control border-0" id="filterSearch" name="search" placeholder="ค้นหาชื่อผลงาน, กิจกรรม..." value="<%= (locals.query && locals.query.search) || '' %>">
           </div>
         </div>
 

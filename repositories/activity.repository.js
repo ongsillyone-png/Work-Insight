@@ -1,5 +1,8 @@
 const { pool } = require('../config/database');
 
+const mockLogs = [];
+const mockFavorites = [];
+
 class ActivityRepository {
   async findAll() {
     try {
@@ -145,9 +148,9 @@ class ActivityRepository {
     }
   }
 
-  async findLogsByUser(userId) {
+  async findLogsByUser(userId, filters = {}) {
     try {
-      const rows = await pool.query(`
+      let query = `
         SELECT 
           al.id,
           al.user_id,
@@ -165,12 +168,45 @@ class ActivityRepository {
         JOIN activity_master am ON al.activity_master_id = am.id
         LEFT JOIN locations l ON al.location_id = l.id
         WHERE al.user_id = ? AND al.deleted_at IS NULL
-        ORDER BY al.log_date DESC, al.created_at DESC
-      `, [userId]);
+      `;
+      const params = [userId];
+
+      if (filters.date) {
+        query += ` AND al.log_date = ?`;
+        params.push(filters.date);
+      }
+      if (filters.session) {
+        query += ` AND al.session = ?`;
+        params.push(filters.session);
+      }
+      if (filters.search) {
+        query += ` AND (am.name LIKE ? OR al.output LIKE ? OR al.remark LIKE ?)`;
+        const searchPattern = `%${filters.search}%`;
+        params.push(searchPattern, searchPattern, searchPattern);
+      }
+
+      query += ` ORDER BY al.log_date DESC, al.created_at DESC`;
+
+      const rows = await pool.query(query, params);
       return rows;
     } catch (err) {
       console.warn(`Database offline, using mock logs for user ${userId}:`, err.message);
-      return mockLogs.filter(log => log.user_id === parseInt(userId, 10));
+      let logs = mockLogs.filter(log => log.user_id === parseInt(userId, 10));
+      if (filters.date) {
+        logs = logs.filter(log => log.date === filters.date);
+      }
+      if (filters.session) {
+        logs = logs.filter(log => log.session === filters.session);
+      }
+      if (filters.search) {
+        const searchLower = filters.search.toLowerCase();
+        logs = logs.filter(log => 
+          (log.activityName && log.activityName.toLowerCase().includes(searchLower)) ||
+          (log.output && log.output.toLowerCase().includes(searchLower)) ||
+          (log.remark && log.remark.toLowerCase().includes(searchLower))
+        );
+      }
+      return logs;
     }
   }
 }

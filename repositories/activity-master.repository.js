@@ -1,5 +1,7 @@
 const { pool } = require('../config/database');
 
+const mockActivityMasters = [];
+
 class ActivityMasterRepository {
   async findAll() {
     try {

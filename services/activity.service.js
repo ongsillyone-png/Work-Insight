@@ -25,8 +25,8 @@ class ActivityService {
     return activityRepository.findFavoritesByUser(userId);
   }
 
-  async getLoggedActivities(userId) {
-    return activityRepository.findLogsByUser(userId);
+  async getLoggedActivities(userId, filters = {}) {
+    return activityRepository.findLogsByUser(userId, filters);
   }
 }
 

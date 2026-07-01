@@ -6,11 +6,13 @@ const categoryService = require('../services/category.service');
 class ActivityController {
   async renderIndex(req, res, next) {
     try {
-      const logs = await activityService.getLoggedActivities(req.user?.id || 1);
+      const { date, session, search } = req.query;
+      const logs = await activityService.getLoggedActivities(req.user?.id || 1, { date, session, search });
       return res.render('layouts/main', {
         body: '../activity/index',
         title: 'Activity Logs | Work Insight',
         logs,
+        query: req.query || {},
         activeMenu: 'activity'
       });
     } catch (err) {

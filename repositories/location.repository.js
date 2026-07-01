@@ -1,5 +1,7 @@
 const { pool } = require('../config/database');
 
+const mockLocations = [];
+
 class LocationRepository {
   async findAll() {
     try {

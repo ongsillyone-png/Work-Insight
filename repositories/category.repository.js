@@ -1,5 +1,7 @@
 const { pool } = require('../config/database');
 
+const mockCategories = [];
+
 class CategoryRepository {
   async findAll() {
     try {

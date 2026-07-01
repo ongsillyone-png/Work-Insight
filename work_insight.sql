@@ -382,8 +382,4 @@ CREATE TABLE `users` (
 -- ----------------------------
 -- Records of users
 -- ----------------------------
-INSERT INTO `users` VALUES ('1', 'admin', '$2b$10$IfmYUolSch.GyuWcZl/xeO3Kr26S8zjl7HgfPX.8dEdESXi2HZcZy', 'System Admin', 'IT Administrator', '1', null, '0', '2026-07-01 12:06:21', '2026-07-01 14:05:36', null, null, null, null, null);
-INSERT INTO `users` VALUES ('2', 'ong', '$2b$10$8VOVxkPIbM24jAZSHS2.IeBp9onilX4QSN3LXKFxNJzpTEGtA1xDq', 'วีระศักดิ์ สรสิทธิ์', 'นักวิชาการคอมพิวเตอร์', '1', null, '1', '2026-07-01 13:20:06', '2026-07-01 15:25:27', null, null, null, '1,4,6', '1,2,3,4,6,7');
-INSERT INTO `users` VALUES ('3', 'umim', '$2b$10$zrY2mMYn0dl2mN3c5DZIVux6M8K1Uz5EMPqqMQRaleqHYHfLFz5Ke', 'ปิยะรัตน์ สายโรจน์', 'นักวิชาการสาธารณสุข', '2', null, '1', '2026-07-01 13:27:36', '2026-07-01 14:04:51', null, null, null, null, null);
-INSERT INTO `users` VALUES ('5', 'addy', '$2b$10$VCxxcedSlqNkxo4.Xu1Z4uiZyaa0aVWWw7FFbBTb0RWbclAxbg6XC', 'ธีรพงษ์  ศรียอด', 'จพ.เครื่องคอมพิวเตอร์', '1', null, '1', '2026-07-01 14:35:48', '2026-07-01 15:25:17', null, null, null, '5,4,6,2', '6,8');
-INSERT INTO `users` VALUES ('6', 'onuma', '$2b$10$A2YlJ5SK3FCw1ZhwQEo67unUj1mk9.bWB7G853HQ.U.z28kiIBBqi', 'อรอุมา เทวรัตน์', 'หัวหน้างกลุ่มงานดิจิทัล', '2', null, '1', '2026-07-01 15:31:01', '2026-07-01 15:37:41', null, null, null, '1,5,4,6,2', '6');
+INSERT INTO `users` VALUES ('1', 'admin', '$2b$10$IfmYUolSch.GyuWcZl/xeO3Kr26S8zjl7HgfPX', 'System Admin', 'IT Administrator', '1', null, '0', '2026-07-01 12:06:21', '2026-07-01 14:05:36', null, null, null, null, null);
