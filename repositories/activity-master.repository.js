@@ -1,17 +1,5 @@
 const { pool } = require('../config/database');
 
-// Mock fallback data in case database is offline
-const mockActivityMasters = [
-  { id: 1, code: 'ACT-001', name: 'ซ่อมและแก้ไขอุปกรณ์คอมพิวเตอร์ (Hardware Repair)', keyword: 'ซ่อมคอม, เม้าส์, คีย์บอร์ด, จอภาพ', default_duration: 30, category_id: 1, group_id: 1, is_active: 1, categoryName: 'IT', groupName: 'Hardware' },
-  { id: 2, code: 'ACT-002', name: 'ตรวจสอบการสำรองข้อมูล MariaDB (Database Backup)', keyword: 'backup, database, สำรองข้อมูล, sql', default_duration: 30, category_id: 1, group_id: 3, is_active: 1, categoryName: 'IT', groupName: 'Database' },
-  { id: 3, code: 'ACT-003', name: 'ตรวจสอบอุณหภูมิห้องเซิร์ฟเวอร์ (Server Monitoring)', keyword: 'server, temp, monitor, อุณหภูมิ', default_duration: 15, category_id: 1, group_id: 4, is_active: 1, categoryName: 'IT', groupName: 'Server' },
-  { id: 4, code: 'ACT-004', name: 'วิเคราะห์และตั้งค่าเครือข่าย (Network Setup)', keyword: 'network, switch, router, ip, wifi', default_duration: 60, category_id: 1, group_id: 5, is_active: 1, categoryName: 'IT', groupName: 'Network' },
-  { id: 5, code: 'ACT-005', name: 'ออกแบบแบนเนอร์ประชาสัมพันธ์โรงพยาบาล (PR Graphic Design)', keyword: 'graphic, photoshop, banner, ออกแบบ, รูปภาพ', default_duration: 120, category_id: 3, group_id: 6, is_active: 1, categoryName: 'ประชาสัมพันธ์', groupName: 'Graphic' },
-  { id: 6, code: 'ACT-006', name: 'ประชุมวางแผนเทคโนโลยีสารสนเทศกลุ่มงานดิจิทัล (Meeting)', keyword: 'meeting, ประชุม, แผนงาน', default_duration: 60, category_id: 4, group_id: 7, is_active: 1, categoryName: 'ประชุม', groupName: 'HAIT' },
-  { id: 7, code: 'ACT-007', name: 'ติดตั้งเครื่องพิมพ์สำหรับจุดคัดกรอง OPD (Printer setup)', keyword: 'printer, setup, install, พรินเตอร์, เครื่องพิมพ์', default_duration: 45, category_id: 1, group_id: 1, is_active: 1, categoryName: 'IT', groupName: 'Hardware' },
-  { id: 8, code: 'ACT-008', name: 'จัดทำเอกสารคู่มือการใช้งานระบบ HOSxP (Documentation)', keyword: 'doc, manual, คู่มือ, เอกสาร', default_duration: 90, category_id: 6, group_id: 8, is_active: 1, categoryName: 'เอกสาร', groupName: 'KPI' }
-];
-
 class ActivityMasterRepository {
   async findAll() {
     try {
@@ -28,8 +16,8 @@ class ActivityMasterRepository {
       `);
       return rows;
     } catch (err) {
-      console.warn('Database offline, using mock master activities:', err.message);
-      return mockActivityMasters;
+      console.error(`Database error in activity-master.repository.js:`, err);
+      throw err;
     }
   }
 

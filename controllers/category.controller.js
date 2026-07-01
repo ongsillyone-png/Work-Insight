@@ -53,8 +53,8 @@ class CategoryController {
   // --- Group CRUD ---
   async createGroup(req, res, next) {
     try {
-      const { name, description } = req.body;
-      await groupService.createGroup({ name, description });
+      const { name, description, category_id } = req.body;
+      await groupService.createGroup({ name, description, category_id: category_id ? parseInt(category_id, 10) : null });
       return res.redirect('/category');
     } catch (err) {
       next(err);
@@ -64,8 +64,8 @@ class CategoryController {
   async updateGroup(req, res, next) {
     try {
       const { id } = req.params;
-      const { name, description } = req.body;
-      await groupService.updateGroup(id, { name, description });
+      const { name, description, category_id } = req.body;
+      await groupService.updateGroup(id, { name, description, category_id: category_id ? parseInt(category_id, 10) : null });
       return res.json({ success: true, message: 'กลุ่มกิจกรรมถูกอัปเดตเรียบร้อยแล้ว' });
     } catch (err) {
       return res.status(500).json({ success: false, message: err.message });

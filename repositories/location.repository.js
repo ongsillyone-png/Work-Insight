@@ -1,23 +1,13 @@
 const { pool } = require('../config/database');
 
-// Mock fallback data in case database is offline
-const mockLocations = [
-  { id: 1, name: 'OPD (แผนกผู้ป่วยนอก)', description: 'ตึกผู้ป่วยนอก ชั้น 1', is_active: 1 },
-  { id: 2, name: 'ER (ห้องฉุกเฉิน)', description: 'ตึกอุบัติเหตุและฉุกเฉิน ชั้น 1', is_active: 1 },
-  { id: 3, name: 'IPD (แผนกผู้ป่วยใน)', description: 'ตึกผู้ป่วยใน ชั้น 2-5', is_active: 1 },
-  { id: 4, name: 'LAB (ห้องปฏิบัติการ)', description: 'ตึกเทคนิคการแพทย์ ชั้น 1', is_active: 1 },
-  { id: 5, name: 'ห้องเซิร์ฟเวอร์', description: 'ห้องควบคุมเครือข่าย อาคารสารสนเทศ ชั้น 3', is_active: 1 },
-  { id: 6, name: 'ห้องประชุม', description: 'ห้องประชุม IT อาคารสารสนเทศ ชั้น 2', is_active: 1 }
-];
-
 class LocationRepository {
   async findAll() {
     try {
       const rows = await pool.query('SELECT * FROM locations WHERE deleted_at IS NULL ORDER BY name ASC');
       return rows;
     } catch (err) {
-      console.warn('Database offline, using mock locations:', err.message);
-      return mockLocations;
+      console.error(`Database error in location.repository.js:`, err);
+      throw err;
     }
   }
 

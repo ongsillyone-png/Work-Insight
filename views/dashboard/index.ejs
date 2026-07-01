@@ -23,8 +23,8 @@
       <div class="d-flex align-items-center justify-content-between">
         <div>
           <span class="text-secondary text-xs fw-semibold uppercase tracking-wider">ภาระงานที่บันทึกรวม</span>
-          <h2 class="fw-bold text-dark mt-2 mb-0">32.5 ชม.</h2>
-          <span class="text-muted text-xs"><i class="bi bi-arrow-up-right text-success me-1"></i>+12% จากสัปดาห์ที่แล้ว</span>
+          <h2 class="fw-bold text-dark mt-2 mb-0"><%= analytics.totalHours %> ชม.</h2>
+          <span class="text-muted text-xs"><i class="bi bi-info-circle me-1"></i>จากข้อมูลบันทึกทั้งหมด</span>
         </div>
         <div class="bg-hospital-light p-3 rounded-circle text-teal">
           <i class="bi bi-clock-history fs-3"></i>
@@ -38,8 +38,14 @@
       <div class="d-flex align-items-center justify-content-between">
         <div>
           <span class="text-secondary text-xs fw-semibold uppercase tracking-wider">จำนวนผู้บันทึกงานวันนี้</span>
-          <h2 class="fw-bold text-dark mt-2 mb-0">5 / 5 คน</h2>
-          <span class="text-muted text-xs"><span class="text-success"><i class="bi bi-circle-fill me-1" style="font-size: 8px;"></i>ส่งครบทุกคนแล้ว</span></span>
+          <h2 class="fw-bold text-dark mt-2 mb-0"><%= analytics.activeUsersCount %> / <%= analytics.totalUsersCount %> คน</h2>
+          <span class="text-muted text-xs">
+            <% if (analytics.activeUsersCount === analytics.totalUsersCount && analytics.totalUsersCount > 0) { %>
+              <span class="text-success"><i class="bi bi-circle-fill me-1" style="font-size: 8px;"></i>ส่งครบทุกคนแล้ว</span>
+            <% } else { %>
+              <span class="text-warning"><i class="bi bi-circle-fill me-1" style="font-size: 8px;"></i>ยังส่งไม่ครบทุกคน</span>
+            <% } %>
+          </span>
         </div>
         <div class="bg-hospital-light p-3 rounded-circle text-teal">
           <i class="bi bi-people-fill fs-3"></i>
@@ -53,8 +59,10 @@
       <div class="d-flex align-items-center justify-content-between">
         <div>
           <span class="text-secondary text-xs fw-semibold uppercase tracking-wider">บันทึกกิจกรรมวันนี้</span>
-          <h2 class="fw-bold text-dark mt-2 mb-0">14 กิจกรรม</h2>
-          <span class="text-muted text-xs">เฉลี่ย 2.8 กิจกรรม/คน</span>
+          <h2 class="fw-bold text-dark mt-2 mb-0"><%= analytics.activitiesLoggedToday %> กิจกรรม</h2>
+          <span class="text-muted text-xs">
+            เฉลี่ย <%= analytics.activeUsersCount > 0 ? (Math.round((analytics.activitiesLoggedToday / analytics.activeUsersCount) * 10) / 10) : 0 %> กิจกรรม/คนที่ส่ง
+          </span>
         </div>
         <div class="bg-hospital-light p-3 rounded-circle text-teal">
           <i class="bi bi-journal-check fs-3"></i>
@@ -86,45 +94,21 @@
       
       <!-- Progress Bar Breakdown -->
       <div class="d-flex flex-column gap-3">
-        <div>
-          <div class="d-flex justify-content-between text-sm mb-1">
-            <span class="text-secondary">งานดูแลและบำรุงรักษาซอฟต์แวร์ HOSxP</span>
-            <span class="fw-bold text-dark">40%</span>
-          </div>
-          <div class="progress rounded-pill" style="height: 8px;">
-            <div class="progress-bar bg-teal" style="width: 40%;"></div>
-          </div>
-        </div>
-
-        <div>
-          <div class="d-flex justify-content-between text-sm mb-1">
-            <span class="text-secondary">แก้ไขปัญหาซ่อมอุปกรณ์ฮาร์ดแวร์</span>
-            <span class="fw-bold text-dark">30%</span>
-          </div>
-          <div class="progress rounded-pill" style="height: 8px;">
-            <div class="progress-bar bg-teal" style="width: 30%;"></div>
-          </div>
-        </div>
-
-        <div>
-          <div class="d-flex justify-content-between text-sm mb-1">
-            <span class="text-secondary">การประชุม และงานบริหารทั่วไป</span>
-            <span class="fw-bold text-dark">20%</span>
-          </div>
-          <div class="progress rounded-pill" style="height: 8px;">
-            <div class="progress-bar bg-teal" style="width: 20%;"></div>
-          </div>
-        </div>
-
-        <div>
-          <div class="d-flex justify-content-between text-sm mb-1">
-            <span class="text-secondary">บำรุงรักษาระบบฐานข้อมูลเครือข่าย</span>
-            <span class="fw-bold text-dark">10%</span>
-          </div>
-          <div class="progress rounded-pill" style="height: 8px;">
-            <div class="progress-bar bg-teal" style="width: 10%;"></div>
-          </div>
-        </div>
+        <% if (analytics.categoryDistribution && analytics.categoryDistribution.length > 0) { %>
+          <% analytics.categoryDistribution.forEach(function(item) { %>
+            <div>
+              <div class="d-flex justify-content-between text-sm mb-1">
+                <span class="text-secondary"><%= item.name %></span>
+                <span class="fw-bold text-dark"><%= item.percentage %>%</span>
+              </div>
+              <div class="progress rounded-pill" style="height: 8px;">
+                <div class="progress-bar bg-teal" style="width: <%= item.percentage %>%;"></div>
+              </div>
+            </div>
+          <% }); %>
+        <% } else { %>
+          <div class="text-center text-muted py-3 small">ไม่มีข้อมูลหมวดหมู่</div>
+        <% } %>
       </div>
     </div>
   </div>
@@ -151,34 +135,27 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td class="ps-4 fw-semibold text-dark">สมชาย เจริญสุข</td>
-                <td class="text-secondary">หัวหน้ากลุ่มงานดิจิทัล</td>
-                <td>3 กิจกรรม</td>
-                <td>4.5 ชั่วโมง</td>
-                <td class="pe-4"><span class="badge bg-success-subtle text-success border border-success-subtle rounded-2">บันทึกเรียบร้อย</span></td>
-              </tr>
-              <tr>
-                <td class="ps-4 fw-semibold text-dark">วันชัย มั่นคง</td>
-                <td class="text-secondary">นักวิชาการคอมพิวเตอร์</td>
-                <td>5 กิจกรรม</td>
-                <td>6 ชั่วโมง</td>
-                <td class="pe-4"><span class="badge bg-success-subtle text-success border border-success-subtle rounded-2">บันทึกเรียบร้อย</span></td>
-              </tr>
-              <tr>
-                <td class="ps-4 fw-semibold text-dark">เกียรติศักดิ์ รักดี</td>
-                <td class="text-secondary">นักวิชาการคอมพิวเตอร์</td>
-                <td>4 กิจกรรม</td>
-                <td>5.5 ชั่วโมง</td>
-                <td class="pe-4"><span class="badge bg-success-subtle text-success border border-success-subtle rounded-2">บันทึกเรียบร้อย</span></td>
-              </tr>
-              <tr>
-                <td class="ps-4 fw-semibold text-dark">พิมลวรรณ แสนสวย</td>
-                <td class="text-secondary">นักวิชาการสาธารณสุข</td>
-                <td>2 กิจกรรม</td>
-                <td>2.5 ชั่วโมง</td>
-                <td class="pe-4"><span class="badge bg-success-subtle text-success border border-success-subtle rounded-2">บันทึกเรียบร้อย</span></td>
-              </tr>
+              <% if (analytics.teamStatus && analytics.teamStatus.length > 0) { %>
+                <% analytics.teamStatus.forEach(function(member) { %>
+                  <tr>
+                    <td class="ps-4 fw-semibold text-dark"><%= member.fullName %></td>
+                    <td class="text-secondary"><%= member.position || '-' %></td>
+                    <td><%= member.activityCount %> กิจกรรม</td>
+                    <td><%= member.totalHours %> ชั่วโมง</td>
+                    <td class="pe-4">
+                      <% if (member.status === 'บันทึกเรียบร้อย') { %>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-2">บันทึกเรียบร้อย</span>
+                      <% } else { %>
+                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-2">ยังไม่บันทึก</span>
+                      <% } %>
+                    </td>
+                  </tr>
+                <% }); %>
+              <% } else { %>
+                <tr>
+                  <td colspan="5" class="text-center py-4 text-muted">ไม่มีข้อมูลของทีม</td>
+                </tr>
+              <% } %>
             </tbody>
           </table>
         </div>

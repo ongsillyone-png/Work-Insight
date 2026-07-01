@@ -52,29 +52,27 @@
       
       <div class="row g-3">
         <% 
-          // Icon mapping helper for mock favorites
-          const icons = {
-            1: 'bi-pc-display',
-            2: 'bi-printer',
-            3: 'bi-database',
-            4: 'bi-people',
-            5: 'bi-hdd-network'
-          };
-          favorites.forEach(function(fav) { 
+          if (favorites && favorites.length > 0) {
+            favorites.forEach(function(fav, index) { 
         %>
           <div class="col-md-4 col-sm-6">
-            <div class="card card-hospital p-3 h-100 cursor-pointer border hover-shadow" onclick="openHomeQuickLog('<%= fav.id %>', '<%= fav.name %>')">
-              <div class="d-flex align-items-center justify-content-between mb-3">
-                <div class="bg-hospital-light text-teal rounded p-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
-                  <i class="bi <%= icons[fav.id] || 'bi-clipboard-check' %> fs-5"></i>
+            <div class="card card-hospital p-3 cursor-pointer d-flex flex-row align-items-center justify-content-between border hover-bg-light-subtle" onclick="openHomeQuickLog('<%= fav.id %>', '<%= fav.code %>: <%= fav.name.replace(/'/g, "\\'") %>')">
+              <div class="d-flex align-items-center gap-3 w-100">
+                <div class="bg-hospital-light text-teal rounded p-2 d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px;"><%= index + 1 %></div>
+                <div class="text-truncate flex-grow-1">
+                  <h6 class="fw-bold text-dark mb-0 text-truncate" title="<%= fav.name %>"><%= fav.name %></h6>
                 </div>
-                <i class="bi bi-star-fill text-warning"></i>
               </div>
-              <h6 class="fw-bold text-dark mb-1"><%= fav.name %></h6>
-              <p class="text-secondary text-xs mb-0">ล่าสุดเมื่อวาน</p>
             </div>
           </div>
-        <% }); %>
+        <% 
+            });
+          } else { 
+        %>
+          <div class="col-12">
+            <div class="p-3 text-muted small text-center border rounded border-dashed bg-white">ยังไม่มีบันทึกด่วน กรุณาไปที่หน้า <a href="/activity/create" class="text-teal text-decoration-none">บันทึกกิจกรรม</a> เพื่อปักหมุด</div>
+          </div>
+        <% } %>
       </div>
     </div>
 
@@ -252,12 +250,18 @@
             <label for="homeLocation" class="form-label text-secondary small fw-semibold">สถานที่</label>
             <select class="form-select rounded-3" id="homeLocation" name="locationId">
               <option value="">เลือกสถานที่...</option>
-              <option value="1">OPD (แผนกผู้ป่วยนอก)</option>
-              <option value="2">ER (ห้องฉุกเฉิน)</option>
-              <option value="3">IPD (แผนกผู้ป่วยใน)</option>
-              <option value="4">LAB (ห้องปฏิบัติการ)</option>
-              <option value="5">ห้องเซิร์ฟเวอร์</option>
-              <option value="6">ห้องประชุม</option>
+              <% if (typeof locations !== 'undefined' && locations.length > 0) { %>
+                <% locations.forEach(function(loc) { %>
+                  <option value="<%= loc.id %>"><%= loc.name %></option>
+                <% }); %>
+              <% } else { %>
+                <option value="1">OPD (แผนกผู้ป่วยนอก)</option>
+                <option value="2">ER (ห้องฉุกเฉิน)</option>
+                <option value="3">IPD (แผนกผู้ป่วยใน)</option>
+                <option value="4">LAB (ห้องปฏิบัติการ)</option>
+                <option value="5">ห้องเซิร์ฟเวอร์</option>
+                <option value="6">ห้องประชุม</option>
+              <% } %>
             </select>
           </div>
 
@@ -283,16 +287,12 @@
   </div>
 </div>
 
+<!-- Dynamic data container for client-side JavaScript -->
+<div id="home-activities-data" data-activities="<%= typeof activities !== 'undefined' ? JSON.stringify(activities.map(act => ({ id: act.id.toString(), name: `${act.code}: ${act.name}` }))) : '[]' %>"></div>
+
 <script>
   let homeQuickModal;
-  const masterActivities = [
-    { id: 1, name: 'ACT-001: ซ่อมและแก้ไขอุปกรณ์คอมพิวเตอร์ (Hardware Repair)' },
-    { id: 2, name: 'ACT-002: ตรวจสอบการสำรองข้อมูล MariaDB (Database Backup)' },
-    { id: 3, name: 'ACT-003: ตรวจสอบอุณหภูมิห้องเซิร์ฟเวอร์ (Server Monitoring)' },
-    { id: 4, name: 'ACT-004: วิเคราะห์และตั้งค่าเครือข่าย (Network Setup)' },
-    { id: 5, name: 'ACT-005: ออกแบบแบนเนอร์ประชาสัมพันธ์โรงพยาบาล (PR Graphic Design)' },
-    { id: 6, name: 'ACT-006: ประชุมวางแผนเทคโนโลยีสารสนเทศกลุ่มงานดิจิทัล (Meeting)' }
-  ];
+  const masterActivities = JSON.parse(document.getElementById('home-activities-data').dataset.activities);
 
   document.addEventListener('DOMContentLoaded', () => {
     if (typeof bootstrap !== 'undefined') {

@@ -13,23 +13,28 @@ const logger = require('./utils/logger');
 
 const app = express();
 
+// Global Request Logger
+app.use((req, res, next) => {
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+  console.log(`\n[INCOMING REQUEST] IP: ${ip} | Method: ${req.method} | Path: ${req.path}`);
+  next();
+});
+
 // Set View Engine
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 // Security Middlewares
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://fonts.googleapis.com"],
-      fontSrc: ["'self'", "https://cdn.jsdelivr.net", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "https://cdn.jsdelivr.net"]
-    }
-  }
+  contentSecurityPolicy: false,
+  hsts: false,
+  crossOriginOpenerPolicy: false
 }));
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Rate Limiting
 const limiter = rateLimit({

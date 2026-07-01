@@ -26,16 +26,24 @@
           <label for="username" class="form-label text-secondary small fw-semibold">ชื่อผู้ใช้งาน</label>
           <div class="input-group border rounded-3 overflow-hidden">
             <span class="input-group-text bg-white border-0 text-secondary pe-0"><i class="bi bi-person"></i></span>
-            <input type="text" class="form-control border-0 ps-3 py-2.5" id="username" name="username" placeholder="กรอกชื่อผู้ใช้" required value="admin">
+            <input type="text" class="form-control border-0 ps-3 py-2.5" id="username" name="username" placeholder="กรอกชื่อผู้ใช้" required>
           </div>
         </div>
 
-        <div class="mb-4">
+        <div class="mb-3">
           <label for="password" class="form-label text-secondary small fw-semibold">รหัสผ่าน</label>
           <div class="input-group border rounded-3 overflow-hidden">
             <span class="input-group-text bg-white border-0 text-secondary pe-0"><i class="bi bi-lock"></i></span>
-            <input type="password" class="form-control border-0 ps-3 py-2.5" id="password" name="password" placeholder="กรอกรหัสผ่าน" required value="admin123">
+            <input type="password" class="form-control border-0 ps-3 py-2.5" id="password" name="password" placeholder="กรอกรหัสผ่าน" required>
+            <button class="btn btn-outline-secondary border-0 bg-white text-secondary px-3 shadow-none" type="button" id="togglePassword" style="border-radius: 0;">
+              <i class="bi bi-eye"></i>
+            </button>
           </div>
+        </div>
+
+        <div class="mb-4 form-check">
+          <input type="checkbox" class="form-check-input" id="remember_me" name="remember_me">
+          <label class="form-check-label text-secondary small" for="remember_me">จำการเข้าสู่ระบบ</label>
         </div>
 
         <button type="submit" class="btn btn-hospital w-100 py-2.5 rounded-3 fw-medium">
@@ -52,5 +60,21 @@
   </div>
 
   <%- include('../partials/scripts') %>
+  <script>
+    document.getElementById('togglePassword').addEventListener('click', function () {
+      const passwordInput = document.getElementById('password');
+      const icon = this.querySelector('i');
+      
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.classList.remove('bi-eye');
+        icon.classList.add('bi-eye-slash');
+      } else {
+        passwordInput.type = 'password';
+        icon.classList.remove('bi-eye-slash');
+        icon.classList.add('bi-eye');
+      }
+    });
+  </script>
 </body>
 </html>

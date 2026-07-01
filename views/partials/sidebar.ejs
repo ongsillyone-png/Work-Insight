@@ -38,9 +38,43 @@
           </a>
         </li>
 
+        <!-- ตั้งค่ากิจกรรม Collapse (All Users) -->
+        <% const isActivitySettingsActive = ['category', 'activity_master', 'locations'].includes(typeof activeMenu !== 'undefined' ? activeMenu : ''); %>
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center justify-content-between" data-bs-toggle="collapse" href="#activitySettingsCollapse" role="button" aria-expanded="<%= isActivitySettingsActive ? 'true' : 'false' %>" aria-controls="activitySettingsCollapse">
+            <div class="d-flex align-items-center gap-2">
+              <i class="nav-icon bi bi-list-task"></i>
+              <span>ตั้งค่ากิจกรรม</span>
+            </div>
+            <i class="bi bi-chevron-down nav-arrow-icon <%= isActivitySettingsActive ? 'rotate-180' : '' %>" style="font-size: 0.8rem;"></i>
+          </a>
+          <div class="collapse <%= isActivitySettingsActive ? 'show' : '' %>" id="activitySettingsCollapse">
+            <ul class="nav flex-column ps-3 mt-1" style="list-style: none; padding-left: 0;">
+              <li class="nav-item">
+                <a href="/category" class="nav-link <%= typeof activeMenu !== 'undefined' && activeMenu === 'category' ? 'active' : '' %>">
+                  <i class="nav-icon bi bi-tags"></i>
+                  <p class="mb-0 d-inline-block">หมวดกิจกรรม</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/activity-master" class="nav-link <%= typeof activeMenu !== 'undefined' && activeMenu === 'activity_master' ? 'active' : '' %>">
+                  <i class="nav-icon bi bi-lightning-charge"></i>
+                  <p class="mb-0 d-inline-block">กิจกรรม</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="/locations" class="nav-link <%= typeof activeMenu !== 'undefined' && activeMenu === 'locations' ? 'active' : '' %>">
+                  <i class="nav-icon bi bi-geo-alt"></i>
+                  <p class="mb-0 d-inline-block">สถานที่</p>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </li>
+
         <!-- จัดการระบบ Collapse (เฉพาะ Admin เท่านั้น) -->
         <% if (typeof user !== 'undefined' && user.role === 'Admin') { %>
-          <% const isSystemActive = ['category', 'user', 'setting'].includes(typeof activeMenu !== 'undefined' ? activeMenu : ''); %>
+          <% const isSystemActive = ['user', 'setting'].includes(typeof activeMenu !== 'undefined' ? activeMenu : ''); %>
           <li class="nav-item">
             <a class="nav-link d-flex align-items-center justify-content-between" data-bs-toggle="collapse" href="#systemManagementCollapse" role="button" aria-expanded="<%= isSystemActive ? 'true' : 'false' %>" aria-controls="systemManagementCollapse">
               <div class="d-flex align-items-center gap-2">
@@ -51,30 +85,6 @@
             </a>
             <div class="collapse <%= isSystemActive ? 'show' : '' %>" id="systemManagementCollapse">
               <ul class="nav flex-column ps-3 mt-1" style="list-style: none; padding-left: 0;">
-                <li class="nav-item">
-                  <a href="/category" class="nav-link <%= typeof activeMenu !== 'undefined' && activeMenu === 'category' ? 'active' : '' %>">
-                    <i class="nav-icon bi bi-tags"></i>
-                    <p class="mb-0 d-inline-block">หมวดหมู่</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="/category" class="nav-link">
-                    <i class="nav-icon bi bi-folder"></i>
-                    <p class="mb-0 d-inline-block">กลุ่มกิจกรรม</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="/activity-master" class="nav-link <%= typeof activeMenu !== 'undefined' && activeMenu === 'activity_master' ? 'active' : '' %>">
-                    <i class="nav-icon bi bi-lightning-charge"></i>
-                    <p class="mb-0 d-inline-block">กิจกรรม</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="/locations" class="nav-link <%= typeof activeMenu !== 'undefined' && activeMenu === 'locations' ? 'active' : '' %>">
-                    <i class="nav-icon bi bi-geo-alt"></i>
-                    <p class="mb-0 d-inline-block">สถานที่</p>
-                  </a>
-                </li>
                 <li class="nav-item">
                   <a href="/users" class="nav-link <%= typeof activeMenu !== 'undefined' && activeMenu === 'user' ? 'active' : '' %>">
                     <i class="nav-icon bi bi-people"></i>

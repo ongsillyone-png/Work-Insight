@@ -1,27 +1,58 @@
 const activityService = require('../services/activity.service');
+const activityMasterService = require('../services/activity-master.service');
+const locationService = require('../services/location.service');
 
 class HomeController {
   async renderHome(req, res, next) {
     try {
-      // Mock or fetch actual favorites, recents, and summary stats
-      const favorites = [
-        { id: 1, name: 'แก้ไข HOSxP', code: 'ACT-001' },
-        { id: 2, name: 'ซ่อมเครื่องพิมพ์', code: 'ACT-002' },
-        { id: 3, name: 'ตรวจสอบ Backup', code: 'ACT-003' },
-        { id: 4, name: 'ประชุมกลุ่มงาน', code: 'ACT-004' },
-        { id: 5, name: 'ดูแลระบบ Network', code: 'ACT-005' }
-      ];
+      const userId = req.user?.id || 1;
 
-      const recents = [
-        { time: '09:30', name: 'แก้ไข HOSxP ช้า', duration: 30, location: 'ห้องเซิร์ฟเวอร์' },
-        { time: '11:15', name: 'แก้ไขคิว Printer', duration: 15, location: 'OPD (แผนกผู้ป่วยนอก)' },
-        { time: '14:00', name: 'ตรวจสอบ MariaDB Backup', duration: 60, location: 'ห้องเซิร์ฟเวอร์' }
-      ];
+      const allMasters = await activityMasterService.getAllActivities();
+      
+      let favorites = [];
+      if (req.user && req.user.quick_actions) {
+        const quickActionIds = req.user.quick_actions.split(',').map(s => s.trim()).filter(Boolean);
+        favorites = quickActionIds
+          .map(id => allMasters.find(am => am.id.toString() === id))
+          .filter(Boolean)
+          .map(am => ({
+            id: am.id,
+            name: am.name,
+            code: am.code,
+            activity_master_id: am.id
+          }));
+      }
+
+      // If user doesn't have any favorites yet, fall back to the first 5 active master activities
+      if (favorites.length === 0) {
+        favorites = allMasters.slice(0, 5).map(am => ({
+          id: am.id,
+          name: am.name,
+          code: am.code,
+          activity_master_id: am.id
+        }));
+      }
+
+      // 2. Fetch logged activities for today
+      const todayStr = new Date().toISOString().split('T')[0];
+      const allUserLogs = await activityService.getLoggedActivities(userId);
+      const recents = allUserLogs.filter(log => log.date === todayStr);
+
+      // 3. Calculate summary stats for today
+      const activityCount = recents.length;
+      const totalMinutes = recents.reduce((sum, log) => sum + parseInt(log.duration || 0, 10), 0);
+      const totalHours = Math.round((totalMinutes / 60) * 10) / 10; // Round to 1 decimal place
 
       const summary = {
-        activityCount: 5,
-        totalHours: 3.5
+        activityCount,
+        totalHours
       };
+
+      // 4. Fetch all active master activities for search autocomplete
+      const activities = await activityMasterService.getAllActivities();
+
+      // 5. Fetch all locations for physical locations drop-down
+      const locations = await locationService.getAllLocations();
 
       return res.render('layouts/main', {
         body: '../home/index',
@@ -29,6 +60,8 @@ class HomeController {
         favorites,
         recents,
         summary,
+        activities,
+        locations,
         activeMenu: 'home'
       });
     } catch (err) {

@@ -32,5 +32,6 @@ router.use('/activity-master', activityMasterRoutes);
 
 // Settings Module Route
 router.get('/settings', authMiddleware, settingController.renderIndex);
+router.post('/settings/update', authMiddleware, settingController.updateSettings);
 
 module.exports = router;

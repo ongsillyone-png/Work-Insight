@@ -209,10 +209,77 @@
 
 <script>
   let editModalObj;
+  let createModalObj;
+  
+  const existingCodes = [];
+  <% if (activities && activities.length > 0) { %>
+    <% activities.forEach(function(act) { %>
+      existingCodes.push('<%= act.code %>');
+    <% }); %>
+  <% } %>
+
+  const allGroups = [];
+  <% if (groups && groups.length > 0) { %>
+    <% groups.forEach(function(grp) { %>
+      allGroups.push({
+        id: <%= grp.id %>,
+        name: '<%= grp.name %>',
+        category_id: <%= grp.category_id || 'null' %>
+      });
+    <% }); %>
+  <% } %>
 
   document.addEventListener('DOMContentLoaded', () => {
     editModalObj = new bootstrap.Modal(document.getElementById('editActivityMasterModal'));
+    createModalObj = new bootstrap.Modal(document.getElementById('createActivityMasterModal'));
+
+    document.getElementById('createActivityMasterModal').addEventListener('show.bs.modal', function () {
+      let maxNum = 0;
+      existingCodes.forEach(code => {
+        const match = code.match(/^ACT-(\d+)$/);
+        if (match) {
+          const num = parseInt(match[1], 10);
+          if (num > maxNum) maxNum = num;
+        }
+      });
+      const nextNum = maxNum + 1;
+      document.getElementById('newCode').value = `ACT-${String(nextNum).padStart(3, '0')}`;
+      
+      // Reset dropdowns
+      document.getElementById('newCategory').value = '';
+      filterGroupsByCategory('newCategory', 'newGroup');
+    });
+
+    document.getElementById('newCategory').addEventListener('change', function() {
+      filterGroupsByCategory('newCategory', 'newGroup');
+    });
+
+    document.getElementById('editCategory').addEventListener('change', function() {
+      filterGroupsByCategory('editCategory', 'editGroup');
+    });
   });
+
+  function filterGroupsByCategory(categoryDropdownId, groupDropdownId, selectedGroupId = null) {
+    const categoryId = document.getElementById(categoryDropdownId).value;
+    const groupDropdown = document.getElementById(groupDropdownId);
+    
+    groupDropdown.innerHTML = '<option value="">เลือกกลุ่มกิจกรรม...</option>';
+    
+    if (!categoryId) return;
+    
+    // Show groups that belong to the category (or have no category assigned)
+    const filteredGroups = allGroups.filter(g => g.category_id == categoryId || g.category_id === null);
+    
+    filteredGroups.forEach(grp => {
+      const option = document.createElement('option');
+      option.value = grp.id;
+      option.textContent = grp.name;
+      if (selectedGroupId && grp.id == selectedGroupId) {
+        option.selected = true;
+      }
+      groupDropdown.appendChild(option);
+    });
+  }
 
   function openEditModal(id, code, name, keyword, duration, categoryId, groupId, isActive) {
     document.getElementById('editId').value = id;
@@ -221,7 +288,7 @@
     document.getElementById('editKeyword').value = keyword;
     document.getElementById('editDuration').value = duration;
     document.getElementById('editCategory').value = categoryId;
-    document.getElementById('editGroup').value = groupId;
+    filterGroupsByCategory('editCategory', 'editGroup', groupId);
     document.getElementById('editActive').value = isActive ? "1" : "0";
     editModalObj.show();
   }

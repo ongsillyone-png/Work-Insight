@@ -119,6 +119,26 @@
     .card-hospital:hover {
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05) !important;
     }
+    .card-hospital.cursor-pointer:hover {
+      background-color: var(--hospital-teal-light-bg) !important;
+      border-color: var(--hospital-teal-light) !important;
+      transform: translateY(-2px);
+    }
+    .card-hospital.cursor-pointer:active,
+    .hover-bg-light-subtle:active {
+      background-color: var(--hospital-teal-light) !important;
+      transform: scale(0.98) !important;
+    }
+    .hover-bg-light-subtle {
+      transition: all 0.2s;
+    }
+    .hover-bg-light-subtle:hover {
+      background-color: var(--hospital-teal-light-bg) !important;
+      border-color: var(--hospital-teal-light) !important;
+    }
+    .cursor-pointer {
+      cursor: pointer;
+    }
     .rounded-card {
       border-radius: 12px !important;
       border: 1px solid var(--border-color) !important;

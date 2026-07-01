@@ -1,25 +1,19 @@
 const { pool } = require('../config/database');
 
-// Mock fallback data in case database is offline
-const mockGroups = [
-  { id: 1, name: 'Hardware', description: 'อุปกรณ์และฮาร์ดแวร์คอมพิวเตอร์', is_active: 1 },
-  { id: 2, name: 'Software', description: 'โปรแกรมและแอปพลิเคชันระบบ', is_active: 1 },
-  { id: 3, name: 'Database', description: 'ระบบฐานข้อมูลดิจิทัล', is_active: 1 },
-  { id: 4, name: 'Server', description: 'เครื่องแม่ข่ายและการบำรุงรักษา', is_active: 1 },
-  { id: 5, name: 'Network', description: 'ระบบเครือข่ายความเร็วสูง', is_active: 1 },
-  { id: 6, name: 'Graphic', description: 'งานออกแบบและสื่อสารภาพลักษณ์', is_active: 1 },
-  { id: 7, name: 'HAIT', description: 'มาตรฐานเทคโนโลยีสารสนเทศโรงพยาบาล', is_active: 1 },
-  { id: 8, name: 'KPI', description: 'ตัวชี้วัดและสถิติประเมินผลการทำงาน', is_active: 1 }
-];
-
 class GroupRepository {
   async findAll() {
     try {
-      const rows = await pool.query('SELECT * FROM activity_groups WHERE deleted_at IS NULL ORDER BY name ASC');
+      const rows = await pool.query(`
+        SELECT g.*, c.name as category_name 
+        FROM activity_groups g 
+        LEFT JOIN activity_categories c ON g.category_id = c.id 
+        WHERE g.deleted_at IS NULL 
+        ORDER BY g.name ASC
+      `);
       return rows;
     } catch (err) {
-      console.warn('Database offline, using mock activity groups:', err.message);
-      return mockGroups;
+      console.error(`Database error in group.repository.js:`, err);
+      throw err;
     }
   }
 
@@ -36,8 +30,8 @@ class GroupRepository {
   async create(data) {
     try {
       const result = await pool.query(
-        'INSERT INTO activity_groups (name, description, is_active) VALUES (?, ?, ?)',
-        [data.name, data.description || null, data.is_active !== undefined ? data.is_active : 1]
+        'INSERT INTO activity_groups (name, description, category_id, is_active) VALUES (?, ?, ?, ?)',
+        [data.name, data.description || null, data.category_id || null, data.is_active !== undefined ? data.is_active : 1]
       );
       return { id: result.insertId, ...data };
     } catch (err) {
@@ -52,8 +46,8 @@ class GroupRepository {
   async update(id, data) {
     try {
       await pool.query(
-        'UPDATE activity_groups SET name = ?, description = ?, is_active = ? WHERE id = ?',
-        [data.name, data.description || null, data.is_active !== undefined ? data.is_active : 1, id]
+        'UPDATE activity_groups SET name = ?, description = ?, category_id = ?, is_active = ? WHERE id = ?',
+        [data.name, data.description || null, data.category_id || null, data.is_active !== undefined ? data.is_active : 1, id]
       );
       return { id, ...data };
     } catch (err) {

@@ -11,11 +11,11 @@
     <div class="card card-hospital border-0 p-4 p-md-5 bg-white shadow-sm">
       <h5 class="fw-bold text-dark mb-4">การตั้งค่าทั่วไป (General Settings)</h5>
       
-      <form>
+      <form id="settingsForm" onsubmit="saveSettings(event)">
         <!-- Application Title -->
         <div class="mb-4">
           <label for="appName" class="form-label text-secondary small fw-semibold">ชื่อแอปพลิเคชัน (Application Name)</label>
-          <input type="text" class="form-control rounded-3" id="appName" value="Work Insight" required>
+          <input type="text" class="form-control rounded-3" id="appName" value="<%= settings.app_name %>" required>
         </div>
 
         <!-- Org scope -->
@@ -29,17 +29,43 @@
         <div class="mb-4">
           <label for="allowRegistration" class="form-label text-secondary small fw-semibold">การลงทะเบียนสมาชิกใหม่ (Registration)</label>
           <select class="form-select rounded-3" id="allowRegistration">
-            <option value="false" selected>ปิดการใช้งาน (เพิ่มผู้ใช้งานโดยผู้ดูแลระบบเท่านั้น)</option>
-            <option value="true">เปิดการใช้งาน (สาธารณะ)</option>
+            <option value="false" <%= !settings.allow_registration ? 'selected' : '' %>>ปิดการใช้งาน (เพิ่มผู้ใช้งานโดยผู้ดูแลระบบเท่านั้น)</option>
+            <option value="true" <%= settings.allow_registration ? 'selected' : '' %>>เปิดการใช้งาน (สาธารณะ)</option>
           </select>
         </div>
 
         <!-- Actions -->
         <div class="d-flex align-items-center justify-content-end gap-2 mt-5">
-          <button type="button" class="btn btn-light border rounded-3 px-4 py-2">ยกเลิก</button>
-          <button type="button" class="btn btn-hospital rounded-3 px-4 py-2">บันทึกการตั้งค่า</button>
+          <button type="button" class="btn btn-light border rounded-3 px-4 py-2" onclick="window.location.reload()">ยกเลิก</button>
+          <button type="submit" class="btn btn-hospital rounded-3 px-4 py-2">บันทึกการตั้งค่า</button>
         </div>
       </form>
     </div>
   </div>
 </div>
+
+<script>
+  async function saveSettings(event) {
+    event.preventDefault();
+    const data = {
+      appName: document.getElementById('appName').value,
+      allowRegistration: document.getElementById('allowRegistration').value
+    };
+
+    try {
+      const response = await fetch('/settings/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await response.json();
+      if (result.success) {
+        Swal.fire({ title: 'สำเร็จ!', text: result.message, icon: 'success', timer: 1500, showConfirmButton: false }).then(() => window.location.reload());
+      } else {
+        Swal.fire('ผิดพลาด!', result.message, 'error');
+      }
+    } catch (err) {
+      Swal.fire('ผิดพลาด!', 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์', 'error');
+    }
+  }
+</script>

@@ -10,3 +10,5 @@ git commit -m "เพิ่มระบบ Dashboard"
 git push
 
 git status
+
+ong

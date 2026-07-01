@@ -1,27 +1,13 @@
 const { pool } = require('../config/database');
 
-// Mock fallback logs
-const mockLogs = [
-  { id: 1, user_id: 1, activityMasterId: 1, activityName: 'ซ่อมและแก้ไขอุปกรณ์คอมพิวเตอร์ (Hardware Repair)', logDate: '2026-06-30', date: '2026-06-30', session: 'Morning', duration: 30, locationId: 5, location: 'ห้องเซิร์ฟเวอร์', output: 'แก้ไข HOSxP ช้า', remark: 'เปิดแอร์เครื่องสำรอง' },
-  { id: 2, user_id: 1, activityMasterId: 7, activityName: 'ติดตั้งเครื่องพิมพ์สำหรับจุดคัดกรอง OPD (Printer setup)', logDate: '2026-06-30', date: '2026-06-30', session: 'Afternoon', duration: 15, locationId: 1, location: 'OPD (แผนกผู้ป่วยนอก)', output: 'แก้ไขคิว Printer', remark: 'เปลี่ยนสาย USB' },
-  { id: 3, user_id: 1, activityMasterId: 2, activityName: 'ตรวจสอบการสำรองข้อมูล MariaDB (Database Backup)', logDate: '2026-06-29', date: '2026-06-29', session: 'Afternoon', duration: 60, locationId: 5, location: 'ห้องเซิร์ฟเวอร์', output: 'ตรวจสอบ MariaDB Backup เรียบร้อย', remark: 'ขนาดไฟล์ 45GB' }
-];
-
-// Mock fallback favorites
-const mockFavorites = [
-  { id: 1, name: 'ซ่อมและแก้ไขอุปกรณ์คอมพิวเตอร์ (Hardware Repair)', code: 'ACT-001', activity_master_id: 1 },
-  { id: 2, name: 'ตรวจสอบการสำรองข้อมูล MariaDB (Database Backup)', code: 'ACT-002', activity_master_id: 2 },
-  { id: 3, name: 'ตรวจสอบอุณหภูมิห้องเซิร์ฟเวอร์ (Server Monitoring)', code: 'ACT-003', activity_master_id: 3 }
-];
-
 class ActivityRepository {
   async findAll() {
     try {
       const rows = await pool.query('SELECT * FROM activity_logs WHERE deleted_at IS NULL');
       return rows;
     } catch (err) {
-      console.warn('Database offline, using mock logs for findAll:', err.message);
-      return mockLogs;
+      console.error(`Database error in activity.repository.js:`, err);
+      throw err;
     }
   }
 

@@ -27,90 +27,52 @@
         </tr>
       </thead>
       <tbody>
-        <!-- somchaj -->
-        <tr>
-          <td class="ps-3">
-            <div class="d-flex align-items-center gap-3">
-              <div class="bg-hospital-light text-teal fw-bold d-flex align-items-center justify-content-center rounded-circle" style="width: 36px; height: 36px;">
-                สม
-              </div>
-              <div>
-                <span class="fw-semibold text-dark d-block">สมชาย เจริญสุข</span>
-                <span class="text-secondary text-xs">somchaj.j@hospital.go.th</span>
-              </div>
-            </div>
-          </td>
-          <td>somchaj.j</td>
-          <td class="text-secondary">หัวหน้ากลุ่มงานดิจิทัลทางการแพทย์</td>
-          <td><span class="badge bg-secondary-subtle text-dark border">หัวหน้างาน</span></td>
-          <td><span class="badge bg-success-subtle text-success border border-success-subtle rounded-2">ใช้งาน</span></td>
-          <td class="pe-3 text-end">
-            <button class="btn btn-sm btn-light border rounded-2 p-1.5"><i class="bi bi-pencil"></i></button>
-          </td>
-        </tr>
-        <!-- wanchai -->
-        <tr>
-          <td class="ps-3">
-            <div class="d-flex align-items-center gap-3">
-              <div class="bg-hospital-light text-teal fw-bold d-flex align-items-center justify-content-center rounded-circle" style="width: 36px; height: 36px;">
-                วัน
-              </div>
-              <div>
-                <span class="fw-semibold text-dark d-block">วันชัย มั่นคง</span>
-                <span class="text-secondary text-xs">wanchai.m@hospital.go.th</span>
-              </div>
-            </div>
-          </td>
-          <td>wanchai.m</td>
-          <td class="text-secondary">นักวิชาการคอมพิวเตอร์</td>
-          <td><span class="badge bg-success-subtle text-teal border border-success-subtle rounded-2">ผู้ดูแลระบบ</span></td>
-          <td><span class="badge bg-success-subtle text-success border border-success-subtle rounded-2">ใช้งาน</span></td>
-          <td class="pe-3 text-end">
-            <button class="btn btn-sm btn-light border rounded-2 p-1.5"><i class="bi bi-pencil"></i></button>
-          </td>
-        </tr>
-        <!-- kiatisak -->
-        <tr>
-          <td class="ps-3">
-            <div class="d-flex align-items-center gap-3">
-              <div class="bg-hospital-light text-teal fw-bold d-flex align-items-center justify-content-center rounded-circle" style="width: 36px; height: 36px;">
-                เก
-              </div>
-              <div>
-                <span class="fw-semibold text-dark d-block">เกียรติศักดิ์ รักดี</span>
-                <span class="text-secondary text-xs">kiatisak.r@hospital.go.th</span>
-              </div>
-            </div>
-          </td>
-          <td>kiatisak.r</td>
-          <td class="text-secondary">นักวิชาการคอมพิวเตอร์</td>
-          <td><span class="badge bg-success-subtle text-teal border border-success-subtle rounded-2">ผู้ดูแลระบบ</span></td>
-          <td><span class="badge bg-success-subtle text-success border border-success-subtle rounded-2">ใช้งาน</span></td>
-          <td class="pe-3 text-end">
-            <button class="btn btn-sm btn-light border rounded-2 p-1.5"><i class="bi bi-pencil"></i></button>
-          </td>
-        </tr>
-        <!-- pimonwan -->
-        <tr>
-          <td class="ps-3">
-            <div class="d-flex align-items-center gap-3">
-              <div class="bg-hospital-light text-teal fw-bold d-flex align-items-center justify-content-center rounded-circle" style="width: 36px; height: 36px;">
-                พิ
-              </div>
-              <div>
-                <span class="fw-semibold text-dark d-block">พิมลวรรณ แสนสวย</span>
-                <span class="text-secondary text-xs">pimonwan.s@hospital.go.th</span>
-              </div>
-            </div>
-          </td>
-          <td>pimonwan.s</td>
-          <td class="text-secondary">นักวิชาการสาธารณสุข</td>
-          <td><span class="badge bg-light text-secondary border">เจ้าหน้าที่</span></td>
-          <td><span class="badge bg-success-subtle text-success border border-success-subtle rounded-2">ใช้งาน</span></td>
-          <td class="pe-3 text-end">
-            <button class="btn btn-sm btn-light border rounded-2 p-1.5"><i class="bi bi-pencil"></i></button>
-          </td>
-        </tr>
+        <% if (users && users.length > 0) { %>
+          <% users.forEach(function(user) { %>
+            <tr>
+              <td class="ps-3">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="bg-hospital-light text-teal fw-bold d-flex align-items-center justify-content-center rounded-circle" style="width: 36px; height: 36px;">
+                    <%= user.full_name.substring(0, 2) %>
+                  </div>
+                  <div>
+                    <span class="fw-semibold text-dark d-block"><%= user.full_name %></span>
+                  </div>
+                </div>
+              </td>
+              <td><%= user.username %></td>
+              <td class="text-secondary"><%= user.position || '-' %></td>
+              <td>
+                <% if (user.role === 'Admin') { %>
+                  <span class="badge bg-success-subtle text-teal border border-success-subtle rounded-2">ผู้ดูแลระบบ</span>
+                <% } else if (user.role === 'Head') { %>
+                  <span class="badge bg-secondary-subtle text-dark border">หัวหน้างาน</span>
+                <% } else { %>
+                  <span class="badge bg-light text-secondary border">เจ้าหน้าที่</span>
+                <% } %>
+              </td>
+              <td>
+                <% if (user.is_active) { %>
+                  <span class="badge bg-success-subtle text-success border border-success-subtle rounded-2">ใช้งาน</span>
+                <% } else { %>
+                  <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-2">ปิดใช้งาน</span>
+                <% } %>
+              </td>
+              <td class="pe-3 text-end">
+                <button class="btn btn-sm btn-light border rounded-2 p-1.5 me-1" onclick="openEditUserModal(<%= user.id %>, '<%= user.full_name %>', '<%= user.username %>', '<%= user.position || '' %>', <%= user.role_id %>, <%= user.is_active %>)">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-sm btn-light border rounded-2 p-1.5" onclick="deleteUser(<%= user.id %>)">
+                  <i class="bi bi-trash text-danger"></i>
+                </button>
+              </td>
+            </tr>
+          <% }); %>
+        <% } else { %>
+          <tr>
+            <td colspan="6" class="text-center py-4 text-muted">ยังไม่มีข้อมูลผู้ใช้งาน</td>
+          </tr>
+        <% } %>
       </tbody>
     </table>
   </div>
@@ -124,32 +86,254 @@
         <h5 class="modal-title fw-bold text-dark">เพิ่มผู้ใช้งาน</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body py-3">
-        <div class="mb-3">
-          <label for="newFullName" class="form-label text-secondary small fw-semibold">ชื่อ-นามสกุล</label>
-          <input type="text" class="form-control rounded-3" id="newFullName" placeholder="เช่น นายวันชัย มั่นคง" required>
+      <form id="createUserForm" onsubmit="submitCreateUser(event)">
+        <div class="modal-body py-3">
+          <div class="mb-3">
+            <label for="newFullName" class="form-label text-secondary small fw-semibold">ชื่อ-นามสกุล</label>
+            <input type="text" class="form-control rounded-3" id="newFullName" required>
+          </div>
+          <div class="mb-3">
+            <label for="newUsername" class="form-label text-secondary small fw-semibold">Username (สำหรับ Login)</label>
+            <input type="text" class="form-control rounded-3" id="newUsername" required>
+          </div>
+          <div class="mb-3">
+            <label for="newPassword" class="form-label text-secondary small fw-semibold">รหัสผ่าน</label>
+            <div class="input-group">
+              <input type="password" class="form-control" id="newPassword" required>
+              <button class="btn btn-outline-secondary bg-white border" type="button" onclick="togglePasswordVisibility('newPassword', this)">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="newConfirmPassword" class="form-label text-secondary small fw-semibold">ยืนยันรหัสผ่าน</label>
+            <div class="input-group">
+              <input type="password" class="form-control" id="newConfirmPassword" required>
+              <button class="btn btn-outline-secondary bg-white border" type="button" onclick="togglePasswordVisibility('newConfirmPassword', this)">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="newPosition" class="form-label text-secondary small fw-semibold">ตำแหน่งงาน</label>
+            <input type="text" class="form-control rounded-3" id="newPosition" required>
+          </div>
+          <div class="mb-3">
+            <label for="newRole" class="form-label text-secondary small fw-semibold">ระดับสิทธิ์ (Permissions)</label>
+            <select class="form-select rounded-3" id="newRole" required>
+              <% roles.forEach(function(role) { %>
+                <option value="<%= role.id %>"><%= role.name %> - <%= role.description %></option>
+              <% }); %>
+            </select>
+          </div>
         </div>
-        <div class="mb-3">
-          <label for="newEmail" class="form-label text-secondary small fw-semibold">อีเมล</label>
-          <input type="email" class="form-control rounded-3" id="newEmail" placeholder="เช่น username@hospital.go.th" required>
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">ยกเลิก</button>
+          <button type="submit" class="btn btn-hospital rounded-3 px-4">สร้างผู้ใช้</button>
         </div>
-        <div class="mb-3">
-          <label for="newPosition" class="form-label text-secondary small fw-semibold">ตำแหน่งงาน</label>
-          <input type="text" class="form-control rounded-3" id="newPosition" placeholder="เช่น นักวิชาการคอมพิวเตอร์" required>
-        </div>
-        <div class="mb-3">
-          <label for="newRole" class="form-label text-secondary small fw-semibold">ระดับสิทธิ์ (Permissions)</label>
-          <select class="form-select rounded-3" id="newRole" required>
-            <option value="Staff">เจ้าหน้าที่ทั่วไป (Staff)</option>
-            <option value="Admin">ผู้ดูแลระบบ (Admin)</option>
-            <option value="Head">หัวหน้ากลุ่มงาน (Head)</option>
-          </select>
-        </div>
-      </div>
-      <div class="modal-footer border-0 pt-0">
-        <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">ยกเลิก</button>
-        <button type="button" class="btn btn-hospital rounded-3 px-4" data-bs-dismiss="modal">สร้างผู้ใช้</button>
-      </div>
+      </form>
     </div>
   </div>
 </div>
+
+<!-- Modal Edit User -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 460px;">
+    <div class="modal-content border-0 rounded-card shadow-lg">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold text-dark">แก้ไขผู้ใช้งาน</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="editUserForm" onsubmit="submitEditUser(event)">
+        <div class="modal-body py-3">
+          <input type="hidden" id="editUserId">
+          <div class="mb-3">
+            <label for="editFullName" class="form-label text-secondary small fw-semibold">ชื่อ-นามสกุล</label>
+            <input type="text" class="form-control rounded-3" id="editFullName" required>
+          </div>
+          <div class="mb-3">
+            <label for="editUsername" class="form-label text-secondary small fw-semibold">Username</label>
+            <input type="text" class="form-control rounded-3" id="editUsername" required>
+          </div>
+          <div class="mb-3">
+            <label for="editPassword" class="form-label text-secondary small fw-semibold">รหัสผ่านใหม่ (เว้นว่างไว้หากไม่ต้องการเปลี่ยน)</label>
+            <div class="input-group">
+              <input type="password" class="form-control" id="editPassword">
+              <button class="btn btn-outline-secondary bg-white border" type="button" onclick="togglePasswordVisibility('editPassword', this)">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="editConfirmPassword" class="form-label text-secondary small fw-semibold">ยืนยันรหัสผ่านใหม่</label>
+            <div class="input-group">
+              <input type="password" class="form-control" id="editConfirmPassword">
+              <button class="btn btn-outline-secondary bg-white border" type="button" onclick="togglePasswordVisibility('editConfirmPassword', this)">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="editPosition" class="form-label text-secondary small fw-semibold">ตำแหน่งงาน</label>
+            <input type="text" class="form-control rounded-3" id="editPosition" required>
+          </div>
+          <div class="mb-3">
+            <label for="editRole" class="form-label text-secondary small fw-semibold">ระดับสิทธิ์</label>
+            <select class="form-select rounded-3" id="editRole" required>
+              <% roles.forEach(function(role) { %>
+                <option value="<%= role.id %>"><%= role.name %></option>
+              <% }); %>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="editStatus" class="form-label text-secondary small fw-semibold">สถานะ</label>
+            <select class="form-select rounded-3" id="editStatus" required>
+              <option value="1">ใช้งาน</option>
+              <option value="0">ปิดใช้งาน</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">ยกเลิก</button>
+          <button type="submit" class="btn btn-hospital rounded-3 px-4">บันทึกการแก้ไข</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  let editUserModal;
+  let createUserModal;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    editUserModal = new bootstrap.Modal(document.getElementById('editUserModal'));
+    createUserModal = new bootstrap.Modal(document.getElementById('createUserModal'));
+  });
+
+  function togglePasswordVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon = btn.querySelector('i');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.classList.remove('bi-eye');
+      icon.classList.add('bi-eye-slash');
+    } else {
+      input.type = 'password';
+      icon.classList.remove('bi-eye-slash');
+      icon.classList.add('bi-eye');
+    }
+  }
+
+  async function submitCreateUser(event) {
+    event.preventDefault();
+    
+    const password = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('newConfirmPassword').value;
+
+    if (password !== confirmPassword) {
+      return Swal.fire('ผิดพลาด!', 'รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน', 'error');
+    }
+
+    const data = {
+      full_name: document.getElementById('newFullName').value,
+      username: document.getElementById('newUsername').value,
+      password: password,
+      position: document.getElementById('newPosition').value,
+      role_id: document.getElementById('newRole').value
+    };
+
+    try {
+      const response = await fetch('/users/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await response.json();
+      if (result.success) {
+        createUserModal.hide();
+        Swal.fire({ title: 'สำเร็จ!', text: result.message, icon: 'success', timer: 1500, showConfirmButton: false }).then(() => window.location.reload());
+      } else {
+        Swal.fire('ผิดพลาด!', result.message, 'error');
+      }
+    } catch (err) {
+      Swal.fire('ผิดพลาด!', 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์', 'error');
+    }
+  }
+
+  function openEditUserModal(id, fullName, username, position, roleId, isActive) {
+    document.getElementById('editUserId').value = id;
+    document.getElementById('editFullName').value = fullName;
+    document.getElementById('editUsername').value = username;
+    document.getElementById('editPassword').value = '';
+    document.getElementById('editConfirmPassword').value = '';
+    document.getElementById('editPosition').value = position;
+    document.getElementById('editRole').value = roleId;
+    document.getElementById('editStatus').value = isActive ? '1' : '0';
+    editUserModal.show();
+  }
+
+  async function submitEditUser(event) {
+    event.preventDefault();
+    const id = document.getElementById('editUserId').value;
+    const password = document.getElementById('editPassword').value;
+    const confirmPassword = document.getElementById('editConfirmPassword').value;
+
+    if (password && password !== confirmPassword) {
+      return Swal.fire('ผิดพลาด!', 'รหัสผ่านใหม่และยืนยันรหัสผ่านไม่ตรงกัน', 'error');
+    }
+
+    const data = {
+      full_name: document.getElementById('editFullName').value,
+      username: document.getElementById('editUsername').value,
+      password: password,
+      position: document.getElementById('editPosition').value,
+      role_id: document.getElementById('editRole').value,
+      is_active: document.getElementById('editStatus').value
+    };
+
+    try {
+      const response = await fetch(`/users/update/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await response.json();
+      if (result.success) {
+        editUserModal.hide();
+        Swal.fire({ title: 'สำเร็จ!', text: result.message, icon: 'success', timer: 1500, showConfirmButton: false }).then(() => window.location.reload());
+      } else {
+        Swal.fire('ผิดพลาด!', result.message, 'error');
+      }
+    } catch (err) {
+      Swal.fire('ผิดพลาด!', 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์', 'error');
+    }
+  }
+
+  function deleteUser(id) {
+    Swal.fire({
+      title: 'ยืนยันการลบ?',
+      text: 'คุณต้องการลบผู้ใช้งานนี้ใช่หรือไม่?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#0D9488',
+      cancelButtonColor: '#EF4444',
+      confirmButtonText: 'ลบเลย',
+      cancelButtonText: 'ยกเลิก'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await fetch(`/users/delete/${id}`, { method: 'DELETE' });
+          const data = await response.json();
+          if (data.success) {
+            Swal.fire({ title: 'สำเร็จ!', text: data.message, icon: 'success', timer: 1500, showConfirmButton: false }).then(() => window.location.reload());
+          } else {
+            Swal.fire('ผิดพลาด!', data.message, 'error');
+          }
+        } catch (err) {
+          Swal.fire('ผิดพลาด!', 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์', 'error');
+        }
+      }
+    });
+  }
+</script>

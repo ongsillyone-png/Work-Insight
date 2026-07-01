@@ -25,18 +25,27 @@ class AuthController {
         });
       }
 
-      const { username, password } = req.body;
-      const result = await authService.login(username, password);
+      const { username, password, remember_me } = req.body;
+      const isRememberMe = remember_me === 'on' || remember_me === true;
+      console.log(`[LOGIN ATTEMPT] Username: "${username}", Remember Me: ${isRememberMe}`);
+      
+      const result = await authService.login(username, password, isRememberMe);
+
+      const cookieOptions = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production'
+      };
+
+      if (isRememberMe) {
+        cookieOptions.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
+      }
 
       // Set cookie
-      res.cookie('token', result.token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
-      });
+      res.cookie('token', result.token, cookieOptions);
 
       return res.redirect('/dashboard');
     } catch (err) {
+      console.error("[LOGIN ERROR]:", err.message);
       return res.render('auth/login', {
         title: 'Login | Work Insight',
         error: 'Invalid username or password'

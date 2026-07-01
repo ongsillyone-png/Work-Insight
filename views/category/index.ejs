@@ -68,13 +68,28 @@
   <!-- Sub-groups Card -->
   <div class="col-md-6">
     <div class="card card-hospital border-0 p-3 h-100 bg-white shadow-sm">
-      <h5 class="fw-bold text-dark mb-3">กลุ่มกิจกรรมย่อย (Sub-Groups)</h5>
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold text-dark mb-0">กลุ่มกิจกรรมย่อย (Sub-Groups)</h5>
+      </div>
+      
+      <!-- Category Filter Chips -->
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <button type="button" class="chip-btn filter-group-btn" data-category="all" onclick="filterGroupsByCategory('all', this)">ทั้งหมด</button>
+        <% if (categories && categories.length > 0) { %>
+          <% categories.forEach(function(cat) { %>
+            <button type="button" class="chip-btn filter-group-btn <%= cat.name === 'IT' ? 'active' : '' %>" data-category="<%= cat.id %>" onclick="filterGroupsByCategory('<%= cat.id %>', this)">
+              <%= cat.name %>
+            </button>
+          <% }); %>
+        <% } %>
+      </div>
       
       <div class="table-responsive">
         <table class="table table-hover align-middle mb-0 text-sm">
           <thead class="table-light">
             <tr>
               <th class="ps-3">ชื่อกลุ่มกิจกรรม</th>
+              <th>หมวดหมู่</th>
               <th>คำอธิบาย</th>
               <th>สถานะ</th>
               <th class="pe-3 text-end">จัดการ</th>
@@ -83,8 +98,9 @@
           <tbody>
             <% if (groups && groups.length > 0) { %>
               <% groups.forEach(function(grp) { %>
-                <tr>
+                <tr class="group-row" data-category-id="<%= grp.category_id || 'null' %>">
                   <td class="ps-3 fw-semibold text-dark"><%= grp.name %></td>
+                  <td><span class="badge bg-light text-secondary border"><%= grp.category_name || '-' %></span></td>
                   <td class="text-secondary text-xs"><%= grp.description || '-' %></td>
                   <td>
                     <% if (grp.is_active) { %>
@@ -94,7 +110,7 @@
                     <% } %>
                   </td>
                   <td class="pe-3 text-end">
-                    <button class="btn btn-sm btn-light border rounded-2 p-1" onclick="openEditGroupModal(<%= grp.id %>, '<%= grp.name %>', '<%= grp.description || '' %>')">
+                    <button class="btn btn-sm btn-light border rounded-2 p-1" onclick="openEditGroupModal(<%= grp.id %>, '<%= grp.name %>', '<%= grp.description || '' %>', <%= grp.category_id || 'null' %>)">
                       <i class="bi bi-pencil-fill text-secondary"></i>
                     </button>
                     <button class="btn btn-sm btn-light border rounded-2 p-1" onclick="deleteGroup(<%= grp.id %>)">
@@ -187,6 +203,17 @@
             <input type="text" class="form-control rounded-3" id="newGroupName" name="name" required placeholder="เช่น Hardware, Software">
           </div>
           <div class="mb-3">
+            <label for="newGroupCategory" class="form-label text-secondary small fw-semibold">สังกัดหมวดหมู่หลัก</label>
+            <select class="form-select rounded-3" id="newGroupCategory" name="category_id" required>
+              <option value="">เลือกหมวดหมู่หลัก...</option>
+              <% if (categories && categories.length > 0) { %>
+                <% categories.forEach(function(cat) { %>
+                  <option value="<%= cat.id %>"><%= cat.name %></option>
+                <% }); %>
+              <% } %>
+            </select>
+          </div>
+          <div class="mb-3">
             <label for="newGroupDesc" class="form-label text-secondary small fw-semibold">คำอธิบายรายละเอียด</label>
             <textarea class="form-control rounded-3" id="newGroupDesc" name="description" rows="3" placeholder="อธิบายวัตถุประสงค์สั้นๆ..."></textarea>
           </div>
@@ -214,6 +241,17 @@
           <div class="mb-3">
             <label for="editGroupName" class="form-label text-secondary small fw-semibold">ชื่อกลุ่มกิจกรรม</label>
             <input type="text" class="form-control rounded-3" id="editGroupName" required>
+          </div>
+          <div class="mb-3">
+            <label for="editGroupCategory" class="form-label text-secondary small fw-semibold">สังกัดหมวดหมู่หลัก</label>
+            <select class="form-select rounded-3" id="editGroupCategory" required>
+              <option value="">เลือกหมวดหมู่หลัก...</option>
+              <% if (categories && categories.length > 0) { %>
+                <% categories.forEach(function(cat) { %>
+                  <option value="<%= cat.id %>"><%= cat.name %></option>
+                <% }); %>
+              <% } %>
+            </select>
           </div>
           <div class="mb-3">
             <label for="editGroupDesc" class="form-label text-secondary small fw-semibold">คำอธิบายรายละเอียด</label>
@@ -310,10 +348,11 @@
   }
 
   // --- Group Actions ---
-  function openEditGroupModal(id, name, description) {
+  function openEditGroupModal(id, name, description, categoryId) {
     document.getElementById('editGroupId').value = id;
     document.getElementById('editGroupName').value = name;
     document.getElementById('editGroupDesc').value = description;
+    document.getElementById('editGroupCategory').value = categoryId || '';
     editGroupModal.show();
   }
 
@@ -322,12 +361,13 @@
     const id = document.getElementById('editGroupId').value;
     const name = document.getElementById('editGroupName').value;
     const description = document.getElementById('editGroupDesc').value;
+    const category_id = document.getElementById('editGroupCategory').value;
 
     try {
       const response = await fetch(`/category/group/update/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, description })
+        body: JSON.stringify({ name, description, category_id })
       });
       const data = await response.json();
       if (data.success) {
@@ -379,4 +419,58 @@
       }
     });
   }
+
+  // --- Filter Groups ---
+  function filterGroupsByCategory(categoryId, element) {
+    // Update active state
+    if (element) {
+      document.querySelectorAll('.filter-group-btn').forEach(btn => btn.classList.remove('active'));
+      element.classList.add('active');
+    }
+
+    const rows = document.querySelectorAll('.group-row');
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+      const rowCategory = row.getAttribute('data-category-id');
+      if (categoryId === 'all' || rowCategory === categoryId.toString()) {
+        row.style.display = '';
+        visibleCount++;
+      } else {
+        row.style.display = 'none';
+      }
+    });
+
+    // Handle empty state
+    let emptyRow = document.getElementById('emptyGroupRow');
+    if (visibleCount === 0) {
+      if (!emptyRow) {
+        const tbody = document.querySelector('.group-row').parentNode;
+        emptyRow = document.createElement('tr');
+        emptyRow.id = 'emptyGroupRow';
+        emptyRow.innerHTML = '<td colspan="5" class="text-center py-4 text-muted">ไม่พบข้อมูลกลุ่มกิจกรรมในหมวดหมู่นี้</td>';
+        tbody.appendChild(emptyRow);
+      } else {
+        emptyRow.style.display = '';
+      }
+    } else if (emptyRow) {
+      emptyRow.style.display = 'none';
+    }
+  }
+
+  // Initialize group filter on load to "IT" or whatever is active
+  document.addEventListener('DOMContentLoaded', () => {
+    const activeBtn = document.querySelector('.filter-group-btn.active');
+    if (activeBtn) {
+      const categoryId = activeBtn.getAttribute('data-category');
+      filterGroupsByCategory(categoryId, activeBtn);
+    } else {
+      // Fallback to all if no IT category exists
+      const allBtn = document.querySelector('.filter-group-btn[data-category="all"]');
+      if (allBtn) {
+        allBtn.classList.add('active');
+        filterGroupsByCategory('all', allBtn);
+      }
+    }
+  });
 </script>

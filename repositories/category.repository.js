@@ -1,23 +1,13 @@
 const { pool } = require('../config/database');
 
-// Mock fallback data in case database is offline
-const mockCategories = [
-  { id: 1, name: 'IT', description: 'งานเทคโนโลยีสารสนเทศและดิจิทัล', is_active: 1 },
-  { id: 2, name: 'แผนงาน', description: 'งานนโยบายและแผนงาน', is_active: 1 },
-  { id: 3, name: 'ประชาสัมพันธ์', description: 'งานสื่อสารองค์กรและประชาสัมพันธ์', is_active: 1 },
-  { id: 4, name: 'ประชุม', description: 'การประชุมและสัมมนาวิชาการ', is_active: 1 },
-  { id: 5, name: 'บริหาร', description: 'งานบริหารทั่วไปและทรัพยากรบุคคล', is_active: 1 },
-  { id: 6, name: 'เอกสาร', description: 'งานสารบรรณและงานเอกสาร', is_active: 1 }
-];
-
 class CategoryRepository {
   async findAll() {
     try {
       const rows = await pool.query('SELECT * FROM activity_categories WHERE deleted_at IS NULL ORDER BY name ASC');
       return rows;
     } catch (err) {
-      console.warn('Database offline, using mock categories:', err.message);
-      return mockCategories;
+      console.error(`Database error in category.repository.js:`, err);
+      throw err;
     }
   }
 
