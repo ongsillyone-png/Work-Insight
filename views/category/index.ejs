@@ -1,12 +1,15 @@
 <div class="row mb-4">
   <div class="col-12 d-flex align-items-center justify-content-between flex-wrap gap-2">
     <div>
-      <h3 class="fw-bold text-dark mb-0">จัดการข้อมูลหมวดหมู่ (Categories)</h3>
-      <p class="text-secondary small mb-0">กำหนดค่าระดับกลุ่มงานหลักและกลุ่มกิจกรรมย่อยสำหรับการปฏิบัติงานประจำวัน</p>
+      <h3 class="fw-bold text-dark mb-0">จัดการข้อมูลหมวดหมู่ & กลุ่มกิจกรรม</h3>
+      <p class="text-secondary small mb-0">กำหนดค่าหมวดหมู่ระดับหลักและกลุ่มย่อยสำหรับการจัดหมวดหมู่ภาระงาน</p>
     </div>
-    <div>
-      <button class="btn btn-hospital px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#createCategoryModal">
-        <i class="bi bi-plus-lg me-2"></i>เพิ่มหมวดหมู่
+    <div class="d-flex gap-2">
+      <button class="btn btn-hospital px-3 shadow-sm text-sm" data-bs-toggle="modal" data-bs-target="#createCategoryModal">
+        <i class="bi bi-plus-lg me-1"></i>เพิ่มหมวดหมู่
+      </button>
+      <button class="btn btn-teal-light px-3 border border-teal text-teal text-sm" data-bs-toggle="modal" data-bs-target="#createGroupModal">
+        <i class="bi bi-folder-plus me-1"></i>เพิ่มกลุ่มกิจกรรม
       </button>
     </div>
   </div>
@@ -23,21 +26,39 @@
           <thead class="table-light">
             <tr>
               <th class="ps-3">ชื่อหมวดหมู่</th>
+              <th>คำอธิบาย</th>
               <th>สถานะ</th>
               <th class="pe-3 text-end">จัดการ</th>
             </tr>
           </thead>
           <tbody>
-            <% const categoriesList = ['IT', 'แผนงาน', 'ประชาสัมพันธ์', 'ประชุม', 'บริหาร', 'เอกสาร']; %>
-            <% categoriesList.forEach(function(cat) { %>
+            <% if (categories && categories.length > 0) { %>
+              <% categories.forEach(function(cat) { %>
+                <tr>
+                  <td class="ps-3 fw-semibold text-dark"><%= cat.name %></td>
+                  <td class="text-secondary text-xs"><%= cat.description || '-' %></td>
+                  <td>
+                    <% if (cat.is_active) { %>
+                      <span class="badge bg-success-subtle text-success border border-success-subtle rounded-2">ใช้งาน</span>
+                    <% } else { %>
+                      <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-2">ปิดใช้งาน</span>
+                    <% } %>
+                  </td>
+                  <td class="pe-3 text-end">
+                    <button class="btn btn-sm btn-light border rounded-2 p-1" onclick="openEditCategoryModal(<%= cat.id %>, '<%= cat.name %>', '<%= cat.description || '' %>')">
+                      <i class="bi bi-pencil-fill text-secondary"></i>
+                    </button>
+                    <button class="btn btn-sm btn-light border rounded-2 p-1" onclick="deleteCategory(<%= cat.id %>)">
+                      <i class="bi bi-trash-fill text-danger"></i>
+                    </button>
+                  </td>
+                </tr>
+              <% }); %>
+            <% } else { %>
               <tr>
-                <td class="ps-3 fw-semibold text-dark"><%= cat %></td>
-                <td><span class="badge bg-success-subtle text-success border border-success-subtle rounded-2">ใช้งาน</span></td>
-                <td class="pe-3 text-end">
-                  <button class="btn btn-sm btn-light border rounded-2 p-1.5"><i class="bi bi-pencil"></i></button>
-                </td>
+                <td colspan="4" class="text-center py-4 text-muted">ยังไม่มีข้อมูลหมวดหมู่</td>
               </tr>
-            <% }); %>
+            <% } %>
           </tbody>
         </table>
       </div>
@@ -54,21 +75,39 @@
           <thead class="table-light">
             <tr>
               <th class="ps-3">ชื่อกลุ่มกิจกรรม</th>
+              <th>คำอธิบาย</th>
               <th>สถานะ</th>
               <th class="pe-3 text-end">จัดการ</th>
             </tr>
           </thead>
           <tbody>
-            <% const groupsList = ['Hardware', 'Software', 'Database', 'Server', 'Network', 'Graphic', 'HAIT', 'KPI']; %>
-            <% groupsList.forEach(function(grp) { %>
+            <% if (groups && groups.length > 0) { %>
+              <% groups.forEach(function(grp) { %>
+                <tr>
+                  <td class="ps-3 fw-semibold text-dark"><%= grp.name %></td>
+                  <td class="text-secondary text-xs"><%= grp.description || '-' %></td>
+                  <td>
+                    <% if (grp.is_active) { %>
+                      <span class="badge bg-success-subtle text-success border border-success-subtle rounded-2">ใช้งาน</span>
+                    <% } else { %>
+                      <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-2">ปิดใช้งาน</span>
+                    <% } %>
+                  </td>
+                  <td class="pe-3 text-end">
+                    <button class="btn btn-sm btn-light border rounded-2 p-1" onclick="openEditGroupModal(<%= grp.id %>, '<%= grp.name %>', '<%= grp.description || '' %>')">
+                      <i class="bi bi-pencil-fill text-secondary"></i>
+                    </button>
+                    <button class="btn btn-sm btn-light border rounded-2 p-1" onclick="deleteGroup(<%= grp.id %>)">
+                      <i class="bi bi-trash-fill text-danger"></i>
+                    </button>
+                  </td>
+                </tr>
+              <% }); %>
+            <% } else { %>
               <tr>
-                <td class="ps-3 fw-semibold text-dark"><%= grp %></td>
-                <td><span class="badge bg-success-subtle text-success border border-success-subtle rounded-2">ใช้งาน</span></td>
-                <td class="pe-3 text-end">
-                  <button class="btn btn-sm btn-light border rounded-2 p-1.5"><i class="bi bi-pencil"></i></button>
-                </td>
+                <td colspan="4" class="text-center py-4 text-muted">ยังไม่มีข้อมูลกลุ่มกิจกรรม</td>
               </tr>
-            <% }); %>
+            <% } %>
           </tbody>
         </table>
       </div>
@@ -81,23 +120,263 @@
   <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
     <div class="modal-content border-0 rounded-card shadow-lg">
       <div class="modal-header border-0 pb-0">
-        <h5 class="modal-title fw-bold text-dark" id="createCategoryModalLabel">เพิ่มหมวดหมู่</h5>
+        <h5 class="modal-title fw-bold text-dark" id="createCategoryModalLabel">เพิ่มหมวดหมู่หลัก</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body py-3">
-        <div class="mb-3">
-          <label for="newCategoryName" class="form-label text-secondary small fw-semibold">ชื่อหมวดหมู่</label>
-          <input type="text" class="form-control rounded-3" id="newCategoryName" placeholder="เช่น IT, บริหารงานทั่วไป">
+      <form action="/category/create" method="POST">
+        <div class="modal-body py-3">
+          <div class="mb-3">
+            <label for="newCategoryName" class="form-label text-secondary small fw-semibold">ชื่อหมวดหมู่</label>
+            <input type="text" class="form-control rounded-3" id="newCategoryName" name="name" required placeholder="เช่น IT, บริหารงานทั่วไป">
+          </div>
+          <div class="mb-3">
+            <label for="newCategoryDesc" class="form-label text-secondary small fw-semibold">คำอธิบายรายละเอียด</label>
+            <textarea class="form-control rounded-3" id="newCategoryDesc" name="description" rows="3" placeholder="อธิบายวัตถุประสงค์สั้นๆ..."></textarea>
+          </div>
         </div>
-        <div class="mb-3">
-          <label for="newCategoryDesc" class="form-label text-secondary small fw-semibold">คำอธิบายรายละเอียด</label>
-          <textarea class="form-control rounded-3" id="newCategoryDesc" rows="3" placeholder="อธิบายวัตถุประสงค์สั้นๆ..."></textarea>
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">ยกเลิก</button>
+          <button type="submit" class="btn btn-hospital rounded-3 px-4">บันทึกข้อมูล</button>
         </div>
-      </div>
-      <div class="modal-footer border-0 pt-0">
-        <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">ยกเลิก</button>
-        <button type="button" class="btn btn-hospital rounded-3 px-4" data-bs-dismiss="modal">บันทึกข้อมูล</button>
-      </div>
+      </form>
     </div>
   </div>
 </div>
+
+<!-- Modal Edit Category -->
+<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+    <div class="modal-content border-0 rounded-card shadow-lg">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold text-dark">แก้ไขหมวดหมู่หลัก</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="editCategoryForm" onsubmit="submitEditCategory(event)">
+        <div class="modal-body py-3">
+          <input type="hidden" id="editCategoryId">
+          <div class="mb-3">
+            <label for="editCategoryName" class="form-label text-secondary small fw-semibold">ชื่อหมวดหมู่</label>
+            <input type="text" class="form-control rounded-3" id="editCategoryName" required>
+          </div>
+          <div class="mb-3">
+            <label for="editCategoryDesc" class="form-label text-secondary small fw-semibold">คำอธิบายรายละเอียด</label>
+            <textarea class="form-control rounded-3" id="editCategoryDesc" rows="3"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">ยกเลิก</button>
+          <button type="submit" class="btn btn-hospital rounded-3 px-4">บันทึกการแก้ไข</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Add Group -->
+<div class="modal fade" id="createGroupModal" tabindex="-1" aria-labelledby="createGroupModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+    <div class="modal-content border-0 rounded-card shadow-lg">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold text-dark" id="createGroupModalLabel">เพิ่มกลุ่มกิจกรรมย่อย</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="/category/group/create" method="POST">
+        <div class="modal-body py-3">
+          <div class="mb-3">
+            <label for="newGroupName" class="form-label text-secondary small fw-semibold">ชื่อกลุ่มกิจกรรมย่อย</label>
+            <input type="text" class="form-control rounded-3" id="newGroupName" name="name" required placeholder="เช่น Hardware, Software">
+          </div>
+          <div class="mb-3">
+            <label for="newGroupDesc" class="form-label text-secondary small fw-semibold">คำอธิบายรายละเอียด</label>
+            <textarea class="form-control rounded-3" id="newGroupDesc" name="description" rows="3" placeholder="อธิบายวัตถุประสงค์สั้นๆ..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">ยกเลิก</button>
+          <button type="submit" class="btn btn-hospital rounded-3 px-4">บันทึกข้อมูล</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Edit Group -->
+<div class="modal fade" id="editGroupModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+    <div class="modal-content border-0 rounded-card shadow-lg">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold text-dark">แก้ไขกลุ่มกิจกรรมย่อย</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="editGroupForm" onsubmit="submitEditGroup(event)">
+        <div class="modal-body py-3">
+          <input type="hidden" id="editGroupId">
+          <div class="mb-3">
+            <label for="editGroupName" class="form-label text-secondary small fw-semibold">ชื่อกลุ่มกิจกรรม</label>
+            <input type="text" class="form-control rounded-3" id="editGroupName" required>
+          </div>
+          <div class="mb-3">
+            <label for="editGroupDesc" class="form-label text-secondary small fw-semibold">คำอธิบายรายละเอียด</label>
+            <textarea class="form-control rounded-3" id="editGroupDesc" rows="3"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">ยกเลิก</button>
+          <button type="submit" class="btn btn-hospital rounded-3 px-4">บันทึกการแก้ไข</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  let editCategoryModal;
+  let editGroupModal;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    editCategoryModal = new bootstrap.Modal(document.getElementById('editCategoryModal'));
+    editGroupModal = new bootstrap.Modal(document.getElementById('editGroupModal'));
+  });
+
+  // --- Category Actions ---
+  function openEditCategoryModal(id, name, description) {
+    document.getElementById('editCategoryId').value = id;
+    document.getElementById('editCategoryName').value = name;
+    document.getElementById('editCategoryDesc').value = description;
+    editCategoryModal.show();
+  }
+
+  async function submitEditCategory(event) {
+    event.preventDefault();
+    const id = document.getElementById('editCategoryId').value;
+    const name = document.getElementById('editCategoryName').value;
+    const description = document.getElementById('editCategoryDesc').value;
+
+    try {
+      const response = await fetch(`/category/update/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, description })
+      });
+      const data = await response.json();
+      if (data.success) {
+        editCategoryModal.hide();
+        Swal.fire({
+          title: 'สำเร็จ!',
+          text: data.message,
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false
+        }).then(() => window.location.reload());
+      } else {
+        Swal.fire('ผิดพลาด!', data.message || 'บันทึกข้อมูลไม่สำเร็จ', 'error');
+      }
+    } catch (err) {
+      Swal.fire('ผิดพลาด!', 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์', 'error');
+    }
+  }
+
+  function deleteCategory(id) {
+    Swal.fire({
+      title: 'ลบหมวดหมู่หลัก?',
+      text: 'คุณต้องการลบหมวดหมู่หลักนี้ออกจากระบบใช่หรือไม่?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#0D9488',
+      cancelButtonColor: '#EF4444',
+      confirmButtonText: 'ลบเลย',
+      cancelButtonText: 'ยกเลิก'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await fetch(`/category/delete/${id}`, { method: 'DELETE' });
+          const data = await response.json();
+          if (data.success) {
+            Swal.fire({
+              title: 'สำเร็จ!',
+              text: data.message,
+              icon: 'success',
+              timer: 1500,
+              showConfirmButton: false
+            }).then(() => window.location.reload());
+          } else {
+            Swal.fire('ผิดพลาด!', data.message || 'ลบข้อมูลไม่สำเร็จ', 'error');
+          }
+        } catch (err) {
+          Swal.fire('ผิดพลาด!', 'เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
+        }
+      }
+    });
+  }
+
+  // --- Group Actions ---
+  function openEditGroupModal(id, name, description) {
+    document.getElementById('editGroupId').value = id;
+    document.getElementById('editGroupName').value = name;
+    document.getElementById('editGroupDesc').value = description;
+    editGroupModal.show();
+  }
+
+  async function submitEditGroup(event) {
+    event.preventDefault();
+    const id = document.getElementById('editGroupId').value;
+    const name = document.getElementById('editGroupName').value;
+    const description = document.getElementById('editGroupDesc').value;
+
+    try {
+      const response = await fetch(`/category/group/update/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, description })
+      });
+      const data = await response.json();
+      if (data.success) {
+        editGroupModal.hide();
+        Swal.fire({
+          title: 'สำเร็จ!',
+          text: data.message,
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false
+        }).then(() => window.location.reload());
+      } else {
+        Swal.fire('ผิดพลาด!', data.message || 'บันทึกข้อมูลไม่สำเร็จ', 'error');
+      }
+    } catch (err) {
+      Swal.fire('ผิดพลาด!', 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์', 'error');
+    }
+  }
+
+  function deleteGroup(id) {
+    Swal.fire({
+      title: 'ลบกลุ่มกิจกรรม?',
+      text: 'คุณต้องการลบกลุ่มกิจกรรมย่อยนี้ออกจากระบบใช่หรือไม่?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#0D9488',
+      cancelButtonColor: '#EF4444',
+      confirmButtonText: 'ลบเลย',
+      cancelButtonText: 'ยกเลิก'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await fetch(`/category/group/delete/${id}`, { method: 'DELETE' });
+          const data = await response.json();
+          if (data.success) {
+            Swal.fire({
+              title: 'สำเร็จ!',
+              text: data.message,
+              icon: 'success',
+              timer: 1500,
+              showConfirmButton: false
+            }).then(() => window.location.reload());
+          } else {
+            Swal.fire('ผิดพลาด!', data.message || 'ลบข้อมูลไม่สำเร็จ', 'error');
+          }
+        } catch (err) {
+          Swal.fire('ผิดพลาด!', 'เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
+        }
+      }
+    });
+  }
+</script>

@@ -60,10 +60,11 @@
       <h6 class="text-secondary text-uppercase tracking-wider small fw-semibold mb-3">เลือกหมวดหมู่กิจกรรม (Browse Category)</h6>
       <div class="d-flex flex-wrap gap-2">
         <button type="button" class="chip-btn active filter-category-btn" onclick="filterByCategory('all', this)">ทั้งหมด</button>
-        <button type="button" class="chip-btn filter-category-btn" onclick="filterByCategory('IT', this)">ไอที (IT)</button>
-        <button type="button" class="chip-btn filter-category-btn" onclick="filterByCategory('Meeting', this)">การประชุม</button>
-        <button type="button" class="chip-btn filter-category-btn" onclick="filterByCategory('Administration', this)">บริหาร/เอกสาร</button>
-        <button type="button" class="chip-btn filter-category-btn" onclick="filterByCategory('Network', this)">ระบบเครือข่าย</button>
+        <% if (typeof categories !== 'undefined' && categories && categories.length > 0) { %>
+          <% categories.forEach(function(cat) { %>
+            <button type="button" class="chip-btn filter-category-btn" onclick="filterByCategory('<%= cat.name %>', this)"><%= cat.name %></button>
+          <% }); %>
+        <% } %>
       </div>
     </div>
 
@@ -126,12 +127,11 @@
             <label for="formLocation" class="form-label text-secondary small fw-semibold">สถานที่ปฏิบัติงาน</label>
             <select class="form-select rounded-3" id="formLocation" name="locationId">
               <option value="">เลือกสถานที่...</option>
-              <option value="1">OPD (แผนกผู้ป่วยนอก)</option>
-              <option value="2">ER (ห้องฉุกเฉิน)</option>
-              <option value="3">IPD (แผนกผู้ป่วยใน)</option>
-              <option value="4">LAB (ห้องปฏิบัติการ)</option>
-              <option value="5">ห้องเซิร์ฟเวอร์</option>
-              <option value="6">ห้องประชุม</option>
+              <% if (typeof locations !== 'undefined' && locations && locations.length > 0) { %>
+                <% locations.forEach(function(loc) { %>
+                  <option value="<%= loc.id %>"><%= loc.name %></option>
+                <% }); %>
+              <% } %>
             </select>
           </div>
 
@@ -158,17 +158,12 @@
 </div>
 
 <script>
-  // All system activities defined for mock search filtering
-  const allActivities = [
-    { id: 1, name: 'ACT-001: ซ่อมและแก้ไขอุปกรณ์คอมพิวเตอร์ (Hardware Repair)', category: 'IT' },
-    { id: 2, name: 'ACT-002: ตรวจสอบการสำรองข้อมูล MariaDB (Database Backup)', category: 'IT' },
-    { id: 3, name: 'ACT-003: ตรวจสอบอุณหภูมิห้องเซิร์ฟเวอร์ (Server Monitoring)', category: 'IT' },
-    { id: 4, name: 'ACT-004: วิเคราะห์และตั้งค่าเครือข่าย (Network Setup)', category: 'Network' },
-    { id: 5, name: 'ACT-005: ออกแบบแบนเนอร์ประชาสัมพันธ์โรงพยาบาล (PR Graphic Design)', category: 'Administration' },
-    { id: 6, name: 'ACT-006: ประชุมวางแผนเทคโนโลยีสารสนเทศกลุ่มงานดิจิทัล (Meeting)', category: 'Meeting' },
-    { id: 7, name: 'ACT-007: ติดตั้งเครื่องพิมพ์สำหรับจุดคัดกรอง OPD (Printer setup)', category: 'IT' },
-    { id: 8, name: 'ACT-008: จัดทำเอกสารคู่มือการใช้งานระบบ HOSxP (Documentation)', category: 'Administration' }
-  ];
+  // All system activities defined for search filtering from DB
+  const allActivities = <%- typeof activities !== 'undefined' && activities ? JSON.stringify(activities.map(act => ({
+    id: act.id,
+    name: `${act.code}: ${act.name}`,
+    category: act.categoryName
+  }))) : '[]' %>;
 
   let recordModal;
 

@@ -1,0 +1,223 @@
+<div class="row mb-4">
+  <div class="col-12 d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <div>
+      <h3 class="fw-bold text-dark mb-0">จัดการข้อมูลสถานที่ (Locations)</h3>
+      <p class="text-secondary small mb-0">กำหนดรายชื่อแผนก ห้อง หรือสถานที่สำหรับการระบุจุดปฏิบัติงานประจำวัน</p>
+    </div>
+    <div>
+      <button class="btn btn-hospital px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#createLocationModal">
+        <i class="bi bi-plus-lg me-2"></i>เพิ่มสถานที่
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card card-hospital border-0 p-4 bg-white shadow-sm">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 text-sm">
+          <thead class="table-light">
+            <tr>
+              <th class="ps-3" style="width: 25%;">ชื่อสถานที่</th>
+              <th style="width: 45%;">คำอธิบาย/รายละเอียดสถานที่</th>
+              <th style="width: 15%;">สถานะ</th>
+              <th class="pe-3 text-end" style="width: 15%;">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (locations && locations.length > 0) { %>
+              <% locations.forEach(function(loc) { %>
+                <tr>
+                  <td class="ps-3 fw-semibold text-dark">
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="bg-hospital-light text-teal rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                        <i class="bi bi-geo-alt"></i>
+                      </span>
+                      <%= loc.name %>
+                    </div>
+                  </td>
+                  <td class="text-secondary"><%= loc.description || '-' %></td>
+                  <td>
+                    <% if (loc.is_active) { %>
+                      <span class="badge bg-success-subtle text-success border border-success-subtle rounded-2">ใช้งาน</span>
+                    <% } else { %>
+                      <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-2">ปิดใช้งาน</span>
+                    <% } %>
+                  </td>
+                  <td class="pe-3 text-end">
+                    <button class="btn btn-sm btn-light border rounded-2 p-1.5" onclick="openEditModal(<%= loc.id %>, '<%= loc.name %>', '<%= loc.description || '' %>', <%= loc.is_active %>)">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-light border rounded-2 p-1.5" onclick="deleteLocation(<%= loc.id %>)">
+                      <i class="bi bi-trash text-danger"></i>
+                    </button>
+                  </td>
+                </tr>
+              <% }); %>
+            <% } else { %>
+              <tr>
+                <td colspan="4" class="text-center py-5 text-muted">
+                  <i class="bi bi-geo-fill fs-2 text-secondary d-block mb-2"></i>
+                  ยังไม่มีข้อมูลสถานที่ในระบบ
+                </td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Add Location -->
+<div class="modal fade" id="createLocationModal" tabindex="-1" aria-labelledby="createLocationModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 450px;">
+    <div class="modal-content border-0 rounded-card shadow-lg">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold text-dark" id="createLocationModalLabel">เพิ่มสถานที่ใหม่</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="/locations/create" method="POST">
+        <div class="modal-body py-3">
+          <div class="mb-3">
+            <label for="newName" class="form-label text-secondary small fw-semibold">ชื่อสถานที่/แผนก</label>
+            <input type="text" class="form-control rounded-3" id="newName" name="name" required placeholder="เช่น OPD, ห้องเซิร์ฟเวอร์ ชั้น 3">
+          </div>
+          <div class="mb-3">
+            <label for="newDesc" class="form-label text-secondary small fw-semibold">คำอธิบายรายละเอียด</label>
+            <textarea class="form-control rounded-3" id="newDesc" name="description" rows="3" placeholder="ระบุตำแหน่ง อาคาร หรือรายละเอียดของสถานที่..."></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="newActive" class="form-label text-secondary small fw-semibold">สถานะการใช้งาน</label>
+            <select class="form-select rounded-3" id="newActive" name="is_active">
+              <option value="1">ใช้งาน</option>
+              <option value="0">ปิดใช้งาน</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">ยกเลิก</button>
+          <button type="submit" class="btn btn-hospital rounded-3 px-4">บันทึกข้อมูล</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Edit Location -->
+<div class="modal fade" id="editLocationModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 450px;">
+    <div class="modal-content border-0 rounded-card shadow-lg">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold text-dark">แก้ไขข้อมูลสถานที่</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="editForm" onsubmit="submitEdit(event)">
+        <div class="modal-body py-3">
+          <input type="hidden" id="editId">
+          <div class="mb-3">
+            <label for="editName" class="form-label text-secondary small fw-semibold">ชื่อสถานที่/แผนก</label>
+            <input type="text" class="form-control rounded-3" id="editName" required>
+          </div>
+          <div class="mb-3">
+            <label for="editDesc" class="form-label text-secondary small fw-semibold">คำอธิบายรายละเอียด</label>
+            <textarea class="form-control rounded-3" id="editDesc" rows="3"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="editActive" class="form-label text-secondary small fw-semibold">สถานะการใช้งาน</label>
+            <select class="form-select rounded-3" id="editActive">
+              <option value="1">ใช้งาน</option>
+              <option value="0">ปิดใช้งาน</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">ยกเลิก</button>
+          <button type="submit" class="btn btn-hospital rounded-3 px-4">บันทึกการแก้ไข</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  let editModalObj;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    editModalObj = new bootstrap.Modal(document.getElementById('editLocationModal'));
+  });
+
+  function openEditModal(id, name, description, isActive) {
+    document.getElementById('editId').value = id;
+    document.getElementById('editName').value = name;
+    document.getElementById('editDesc').value = description;
+    document.getElementById('editActive').value = isActive ? "1" : "0";
+    editModalObj.show();
+  }
+
+  async function submitEdit(event) {
+    event.preventDefault();
+    const id = document.getElementById('editId').value;
+    const name = document.getElementById('editName').value;
+    const description = document.getElementById('editDesc').value;
+    const isActive = document.getElementById('editActive').value;
+
+    try {
+      const response = await fetch(`/locations/update/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, description, is_active: parseInt(isActive, 10) })
+      });
+      const data = await response.json();
+      
+      if (data.success) {
+        editModalObj.hide();
+        Swal.fire({
+          title: 'สำเร็จ!',
+          text: data.message,
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false
+        }).then(() => window.location.reload());
+      } else {
+        Swal.fire('ผิดพลาด!', data.message || 'เกิดข้อผิดพลาดในการบันทึก', 'error');
+      }
+    } catch (err) {
+      Swal.fire('ผิดพลาด!', 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์', 'error');
+    }
+  }
+
+  function deleteLocation(id) {
+    Swal.fire({
+      title: 'คุณแน่ใจหรือไม่?',
+      text: 'คุณต้องการลบสถานที่นี้ออกจากระบบใช่หรือไม่?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#0D9488',
+      cancelButtonColor: '#EF4444',
+      confirmButtonText: 'ลบเลย',
+      cancelButtonText: 'ยกเลิก'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await fetch(`/locations/delete/${id}`, { method: 'DELETE' });
+          const data = await response.json();
+          if (data.success) {
+            Swal.fire({
+              title: 'สำเร็จ!',
+              text: data.message,
+              icon: 'success',
+              timer: 1500,
+              showConfirmButton: false
+            }).then(() => window.location.reload());
+          } else {
+            Swal.fire('ผิดพลาด!', data.message || 'เกิดข้อผิดพลาดในการลบ', 'error');
+          }
+        } catch (err) {
+          Swal.fire('ผิดพลาด!', 'เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
+        }
+      }
+    });
+  }
+</script>

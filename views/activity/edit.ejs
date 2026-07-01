@@ -67,12 +67,11 @@
           <label for="locationId" class="form-label text-secondary small fw-semibold">สถานที่ปฏิบัติงาน</label>
           <select class="form-select rounded-3" id="locationId" name="locationId">
             <option value="">เลือกสถานที่...</option>
-            <option value="1" <%= log && log.locationId === '1' ? 'selected' : '' %>>OPD (แผนกผู้ป่วยนอก)</option>
-            <option value="2" <%= log && log.locationId === '2' ? 'selected' : '' %>>ER (ห้องฉุกเฉิน)</option>
-            <option value="3" <%= log && log.locationId === '3' ? 'selected' : '' %>>IPD (แผนกผู้ป่วยใน)</option>
-            <option value="4" <%= log && log.locationId === '4' ? 'selected' : '' %>>LAB (ห้องปฏิบัติการ)</option>
-            <option value="5" <%= log && log.locationId === '5' ? 'selected' : '' %>>ห้องเซิร์ฟเวอร์</option>
-            <option value="6" <%= log && log.locationId === '6' ? 'selected' : '' %>>ห้องประชุม</option>
+            <% if (typeof locations !== 'undefined' && locations && locations.length > 0) { %>
+              <% locations.forEach(function(loc) { %>
+                <option value="<%= loc.id %>" <%= log && log.locationId == loc.id ? 'selected' : '' %>><%= loc.name %></option>
+              <% }); %>
+            <% } %>
           </select>
         </div>
 

@@ -1,0 +1,305 @@
+<div class="row mb-4">
+  <div class="col-12 d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <div>
+      <h3 class="fw-bold text-dark mb-0">จัดการกิจกรรมย่อยหลัก (Master Activities)</h3>
+      <p class="text-secondary small mb-0">เพิ่มหรือกำหนดค่ากิจกรรมย่อยสำหรับการบันทึกภาระงาน จัดกลุ่มตามหมวดหมู่และกลุ่มกิจกรรมย่อย</p>
+    </div>
+    <div>
+      <button class="btn btn-hospital px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#createActivityMasterModal">
+        <i class="bi bi-plus-lg me-2"></i>เพิ่มกิจกรรมย่อย
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card card-hospital border-0 p-4 bg-white shadow-sm">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 text-sm">
+          <thead class="table-light">
+            <tr>
+              <th class="ps-3" style="width: 10%;">รหัส</th>
+              <th style="width: 30%;">ชื่อกิจกรรมหลัก</th>
+              <th style="width: 15%;">หมวดหมู่หลัก</th>
+              <th style="width: 15%;">กลุ่มย่อย</th>
+              <th style="width: 12%;">เวลามาตรฐาน</th>
+              <th style="width: 8%;">สถานะ</th>
+              <th class="pe-3 text-end" style="width: 10%;">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (activities && activities.length > 0) { %>
+              <% activities.forEach(function(act) { %>
+                <tr>
+                  <td class="ps-3 fw-bold text-teal"><%= act.code %></td>
+                  <td>
+                    <div class="fw-semibold text-dark"><%= act.name %></div>
+                    <% if (act.keyword) { %>
+                      <small class="text-secondary text-xs italic"><i class="bi bi-search me-1"></i>คีย์เวิร์ด: <%= act.keyword %></small>
+                    <% } %>
+                  </td>
+                  <td><span class="badge bg-hospital-light"><%= act.categoryName || 'IT' %></span></td>
+                  <td><span class="badge bg-light text-secondary border"><%= act.groupName || 'Hardware' %></span></td>
+                  <td class="fw-medium text-dark"><%= act.default_duration %> นาที</td>
+                  <td>
+                    <% if (act.is_active) { %>
+                      <span class="badge bg-success-subtle text-success border border-success-subtle rounded-2">ใช้งาน</span>
+                    <% } else { %>
+                      <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-2">ปิดใช้งาน</span>
+                    <% } %>
+                  </td>
+                  <td class="pe-3 text-end">
+                    <button class="btn btn-sm btn-light border rounded-2 p-1.5" onclick="openEditModal(<%= act.id %>, '<%= act.code %>', '<%= act.name.replace(/'/g, "\\'") %>', '<%= (act.keyword || '').replace(/'/g, "\\'") %>', <%= act.default_duration %>, <%= act.category_id %>, <%= act.group_id %>, <%= act.is_active %>)">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-light border rounded-2 p-1.5" onclick="deleteActivity(<%= act.id %>)">
+                      <i class="bi bi-trash text-danger"></i>
+                    </button>
+                  </td>
+                </tr>
+              <% }); %>
+            <% } else { %>
+              <tr>
+                <td colspan="7" class="text-center py-5 text-muted">
+                  <i class="bi bi-clipboard2-x fs-2 text-secondary d-block mb-2"></i>
+                  ยังไม่มีข้อมูลกิจกรรมหลักในระบบ
+                </td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Add Activity Master -->
+<div class="modal fade" id="createActivityMasterModal" tabindex="-1" aria-labelledby="createActivityMasterModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;">
+    <div class="modal-content border-0 rounded-card shadow-lg">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold text-dark" id="createActivityMasterModalLabel">เพิ่มกิจกรรมย่อยใหม่</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="/activity-master/create" method="POST">
+        <div class="modal-body py-3">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label for="newCode" class="form-label text-secondary small fw-semibold">รหัสกิจกรรม</label>
+              <input type="text" class="form-control rounded-3" id="newCode" name="code" required placeholder="เช่น ACT-009">
+            </div>
+            <div class="col-md-8">
+              <label for="newName" class="form-label text-secondary small fw-semibold">ชื่อกิจกรรมหลัก</label>
+              <input type="text" class="form-control rounded-3" id="newName" name="name" required placeholder="เช่น ซ่อมบำรุงเครือข่าย">
+            </div>
+            <div class="col-12">
+              <label for="newKeyword" class="form-label text-secondary small fw-semibold">คีย์เวิร์ดช่วยค้นหา (คั่นด้วยจุลภาค `,` เพื่อแยกคำ)</label>
+              <input type="text" class="form-control rounded-3" id="newKeyword" name="keyword" placeholder="เช่น ซ่อม, switch, patch panel">
+            </div>
+            <div class="col-md-6">
+              <label for="newDuration" class="form-label text-secondary small fw-semibold">เวลาเริ่มต้นมาตรฐาน (นาที)</label>
+              <input type="number" class="form-control rounded-3" id="newDuration" name="default_duration" value="30" min="0">
+            </div>
+            <div class="col-md-6">
+              <label for="newActive" class="form-label text-secondary small fw-semibold">สถานะการใช้งาน</label>
+              <select class="form-select rounded-3" id="newActive" name="is_active">
+                <option value="1">ใช้งาน</option>
+                <option value="0">ปิดใช้งาน</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="newCategory" class="form-label text-secondary small fw-semibold">หมวดหมู่หลัก (Category)</label>
+              <select class="form-select rounded-3" id="newCategory" name="category_id" required>
+                <option value="">เลือกหมวดหมู่...</option>
+                <% if (categories && categories.length > 0) { %>
+                  <% categories.forEach(function(cat) { %>
+                    <option value="<%= cat.id %>"><%= cat.name %></option>
+                  <% }); %>
+                <% } %>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="newGroup" class="form-label text-secondary small fw-semibold">กลุ่มกิจกรรมย่อย (Group)</label>
+              <select class="form-select rounded-3" id="newGroup" name="group_id" required>
+                <option value="">เลือกกลุ่มกิจกรรม...</option>
+                <% if (groups && groups.length > 0) { %>
+                  <% groups.forEach(function(grp) { %>
+                    <option value="<%= grp.id %>"><%= grp.name %></option>
+                  <% }); %>
+                <% } %>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">ยกเลิก</button>
+          <button type="submit" class="btn btn-hospital rounded-3 px-4">บันทึกข้อมูล</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Edit Activity Master -->
+<div class="modal fade" id="editActivityMasterModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;">
+    <div class="modal-content border-0 rounded-card shadow-lg">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold text-dark">แก้ไขข้อมูลกิจกรรมย่อย</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="editForm" onsubmit="submitEdit(event)">
+        <div class="modal-body py-3">
+          <input type="hidden" id="editId">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label for="editCode" class="form-label text-secondary small fw-semibold">รหัสกิจกรรม</label>
+              <input type="text" class="form-control rounded-3" id="editCode" required>
+            </div>
+            <div class="col-md-8">
+              <label for="editName" class="form-label text-secondary small fw-semibold">ชื่อกิจกรรมหลัก</label>
+              <input type="text" class="form-control rounded-3" id="editName" required>
+            </div>
+            <div class="col-12">
+              <label for="editKeyword" class="form-label text-secondary small fw-semibold">คีย์เวิร์ดช่วยค้นหา</label>
+              <input type="text" class="form-control rounded-3" id="editKeyword">
+            </div>
+            <div class="col-md-6">
+              <label for="editDuration" class="form-label text-secondary small fw-semibold">เวลาเริ่มต้นมาตรฐาน (นาที)</label>
+              <input type="number" class="form-control rounded-3" id="editDuration" min="0" required>
+            </div>
+            <div class="col-md-6">
+              <label for="editActive" class="form-label text-secondary small fw-semibold">สถานะการใช้งาน</label>
+              <select class="form-select rounded-3" id="editActive">
+                <option value="1">ใช้งาน</option>
+                <option value="0">ปิดใช้งาน</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="editCategory" class="form-label text-secondary small fw-semibold">หมวดหมู่หลัก (Category)</label>
+              <select class="form-select rounded-3" id="editCategory" required>
+                <% if (categories && categories.length > 0) { %>
+                  <% categories.forEach(function(cat) { %>
+                    <option value="<%= cat.id %>"><%= cat.name %></option>
+                  <% }); %>
+                <% } %>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="editGroup" class="form-label text-secondary small fw-semibold">กลุ่มกิจกรรมย่อย (Group)</label>
+              <select class="form-select rounded-3" id="editGroup" required>
+                <% if (groups && groups.length > 0) { %>
+                  <% groups.forEach(function(grp) { %>
+                    <option value="<%= grp.id %>"><%= grp.name %></option>
+                  <% }); %>
+                <% } %>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">ยกเลิก</button>
+          <button type="submit" class="btn btn-hospital rounded-3 px-4">บันทึกการแก้ไข</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  let editModalObj;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    editModalObj = new bootstrap.Modal(document.getElementById('editActivityMasterModal'));
+  });
+
+  function openEditModal(id, code, name, keyword, duration, categoryId, groupId, isActive) {
+    document.getElementById('editId').value = id;
+    document.getElementById('editCode').value = code;
+    document.getElementById('editName').value = name;
+    document.getElementById('editKeyword').value = keyword;
+    document.getElementById('editDuration').value = duration;
+    document.getElementById('editCategory').value = categoryId;
+    document.getElementById('editGroup').value = groupId;
+    document.getElementById('editActive').value = isActive ? "1" : "0";
+    editModalObj.show();
+  }
+
+  async function submitEdit(event) {
+    event.preventDefault();
+    const id = document.getElementById('editId').value;
+    const code = document.getElementById('editCode').value;
+    const name = document.getElementById('editName').value;
+    const keyword = document.getElementById('editKeyword').value;
+    const duration = document.getElementById('editDuration').value;
+    const categoryId = document.getElementById('editCategory').value;
+    const groupId = document.getElementById('editGroup').value;
+    const isActive = document.getElementById('editActive').value;
+
+    try {
+      const response = await fetch(`/activity-master/update/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code,
+          name,
+          keyword,
+          default_duration: parseInt(duration, 10),
+          category_id: parseInt(categoryId, 10),
+          group_id: parseInt(groupId, 10),
+          is_active: parseInt(isActive, 10)
+        })
+      });
+      const data = await response.json();
+      
+      if (data.success) {
+        editModalObj.hide();
+        Swal.fire({
+          title: 'สำเร็จ!',
+          text: data.message,
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false
+        }).then(() => window.location.reload());
+      } else {
+        Swal.fire('ผิดพลาด!', data.message || 'เกิดข้อผิดพลาดในการบันทึก', 'error');
+      }
+    } catch (err) {
+      Swal.fire('ผิดพลาด!', 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์', 'error');
+    }
+  }
+
+  function deleteActivity(id) {
+    Swal.fire({
+      title: 'คุณแน่ใจหรือไม่?',
+      text: 'คุณต้องการลบกิจกรรมย่อยหลักนี้ออกจากระบบใช่หรือไม่?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#0D9488',
+      cancelButtonColor: '#EF4444',
+      confirmButtonText: 'ลบเลย',
+      cancelButtonText: 'ยกเลิก'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await fetch(`/activity-master/delete/${id}`, { method: 'DELETE' });
+          const data = await response.json();
+          if (data.success) {
+            Swal.fire({
+              title: 'สำเร็จ!',
+              text: data.message,
+              icon: 'success',
+              timer: 1500,
+              showConfirmButton: false
+            }).then(() => window.location.reload());
+          } else {
+            Swal.fire('ผิดพลาด!', data.message || 'เกิดข้อผิดพลาดในการลบ', 'error');
+          }
+        } catch (err) {
+          Swal.fire('ผิดพลาด!', 'เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
+        }
+      }
+    });
+  }
+</script>

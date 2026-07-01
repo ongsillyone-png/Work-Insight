@@ -166,10 +166,24 @@
           confirmButtonText: 'ใช่ ลบเลย!',
           cancelButtonText: 'ยกเลิก'
         }).then((result) => {
-          if (result.isConfirmed) {
-            Swal.fire('ลบแล้ว!', 'บันทึกประวัติการทำงานถูกลบเรียบร้อยแล้ว', 'success');
-            // actual request can be made to endpoint here: `/activity/delete/${id}`
-          }
+            fetch(`/activity/delete/${id}`, { method: 'DELETE' })
+              .then(res => res.json())
+              .then(data => {
+                if (data.success) {
+                  Swal.fire({
+                    title: 'ลบแล้ว!',
+                    text: 'บันทึกประวัติการทำงานถูกลบเรียบร้อยแล้ว',
+                    icon: 'success',
+                    timer: 1500,
+                    showConfirmButton: false
+                  }).then(() => window.location.reload());
+                } else {
+                  Swal.fire('ผิดพลาด!', data.message || 'ลบข้อมูลไม่สำเร็จ', 'error');
+                }
+              })
+              .catch(err => {
+                Swal.fire('ผิดพลาด!', 'เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
+              });
         });
       });
     });

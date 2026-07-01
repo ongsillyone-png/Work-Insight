@@ -6,6 +6,8 @@ const dashboardRoutes = require('./dashboard.routes');
 const activityRoutes = require('./activity.routes');
 const categoryRoutes = require('./category.routes');
 const userRoutes = require('./user.routes');
+const locationRoutes = require('./location.routes');
+const activityMasterRoutes = require('./activity-master.routes');
 
 const settingController = require('../controllers/setting.controller');
 const authMiddleware = require('../middlewares/auth.middleware');
@@ -25,6 +27,8 @@ router.use('/dashboard', dashboardRoutes);
 router.use('/activity', activityRoutes);
 router.use('/category', categoryRoutes);
 router.use('/users', userRoutes);
+router.use('/locations', locationRoutes);
+router.use('/activity-master', activityMasterRoutes);
 
 // Settings Module Route
 router.get('/settings', authMiddleware, settingController.renderIndex);
