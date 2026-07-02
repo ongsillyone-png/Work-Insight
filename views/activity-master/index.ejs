@@ -18,6 +18,28 @@
 <div class="row">
   <div class="col-12">
     <div class="card card-hospital border-0 p-4 bg-white shadow-sm">
+      <!-- Search & Filter -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <label for="searchInput" class="form-label text-secondary small fw-semibold">ค้นหาชื่อ/คีย์เวิร์ด</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+            <input type="text" class="form-control border-start-0 ps-0" id="searchInput" placeholder="พิมพ์ชื่อกิจกรรม หรือคีย์เวิร์ดที่ต้องการค้นหา...">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label for="categoryFilter" class="form-label text-secondary small fw-semibold">หมวดหมู่</label>
+          <select class="form-select rounded-3" id="categoryFilter">
+            <option value="">ทั้งหมด</option>
+            <% if (categories && categories.length > 0) { %>
+              <% categories.forEach(function(cat) { %>
+                <option value="<%= cat.name %>"><%= cat.name %></option>
+              <% }); %>
+            <% } %>
+          </select>
+        </div>
+      </div>
+
       <div class="table-responsive">
         <table class="table table-hover align-middle mb-0 text-sm">
           <thead class="table-light">
@@ -252,22 +274,56 @@
       filterGroupsByCategory('editCategory', 'editGroup');
     });
 
-    // --- Simple Pagination (10 rows per page) ---
+    // --- Search, Filter & Pagination (10 rows per page) ---
     const rowsPerPage = 10;
     const tbody = document.querySelector('.table-responsive tbody');
     // Ensure we don't paginate the "no data" row
-    const rows = Array.from(tbody.querySelectorAll('tr')).filter(tr => !tr.querySelector('td[colspan="7"]'));
-    const pageCount = Math.ceil(rows.length / rowsPerPage);
+    const allRows = Array.from(tbody.querySelectorAll('tr')).filter(tr => !tr.querySelector('td[colspan="7"]'));
+    let filteredRows = [...allRows];
+    let pageCount = Math.ceil(filteredRows.length / rowsPerPage) || 1;
     let currentPage = 1;
 
     function renderTable(page) {
       const start = (page - 1) * rowsPerPage;
       const end = start + rowsPerPage;
-      rows.forEach((row, index) => {
-        row.style.display = (index >= start && index < end) ? '' : 'none';
+      
+      allRows.forEach(row => row.style.display = 'none');
+      
+      filteredRows.forEach((row, index) => {
+        if (index >= start && index < end) {
+          row.style.display = '';
+        }
       });
+      
+      const countBadge = document.querySelector('h3 .badge');
+      if (countBadge) {
+        countBadge.textContent = `${filteredRows.length} รายการ`;
+      }
+      
       renderPagination();
     }
+    
+    function applyFilters() {
+      const searchText = document.getElementById('searchInput').value.toLowerCase().trim();
+      const categoryText = document.getElementById('categoryFilter').value.toLowerCase().trim();
+      
+      filteredRows = allRows.filter(row => {
+        const nameCell = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+        const categoryCell = row.querySelector('td:nth-child(3)').textContent.toLowerCase().trim();
+        
+        const matchSearch = searchText === '' || nameCell.includes(searchText);
+        const matchCategory = categoryText === '' || categoryCell === categoryText;
+        
+        return matchSearch && matchCategory;
+      });
+      
+      pageCount = Math.ceil(filteredRows.length / rowsPerPage) || 1;
+      currentPage = 1;
+      renderTable(currentPage);
+    }
+
+    document.getElementById('searchInput')?.addEventListener('input', applyFilters);
+    document.getElementById('categoryFilter')?.addEventListener('change', applyFilters);
 
     function renderPagination() {
       let paginationHtml = '';
@@ -297,7 +353,7 @@
       }
     }
 
-    if (rows.length > rowsPerPage) {
+    if (allRows.length > 0) {
       renderTable(1);
     }
   });
