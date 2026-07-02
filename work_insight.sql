@@ -126,10 +126,8 @@ CREATE TABLE `activity_logs` (
 -- ----------------------------
 -- Records of activity_logs
 -- ----------------------------
-INSERT INTO `activity_logs` VALUES ('1', '1', '1', '2026-07-01', 'Morning', '30', '3', 'เม้าใช้งานไม่ได้', null, '2026-07-01 12:59:53', '2026-07-01 13:18:32', '2026-07-01 13:18:32', null, null);
-INSERT INTO `activity_logs` VALUES ('2', '5', '3', '2026-07-01', 'Morning', '30', '2', 'vbvmvbmv', 'bmvb', '2026-07-01 14:38:48', '2026-07-01 14:40:53', '2026-07-01 14:40:53', null, null);
-INSERT INTO `activity_logs` VALUES ('3', '6', '6', '2026-07-01', 'Afternoon', '60', '6', null, null, '2026-07-01 15:36:37', '2026-07-01 15:36:37', null, null, null);
-INSERT INTO `activity_logs` VALUES ('4', '2', '7', '2026-07-01', 'Morning', '15', '1', null, null, '2026-07-01 16:13:37', '2026-07-01 16:13:37', null, null, null);
+-- Data omitted for clean installation
+
 
 -- ----------------------------
 -- Table structure for activity_master
