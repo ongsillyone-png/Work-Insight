@@ -298,14 +298,26 @@
     }
   });
 
-  function renderActivityList(items) {
+  let currentFilteredItems = [];
+  let currentPage = 1;
+  const itemsPerPage = 10;
+
+  function renderActivityList(items, page = 1) {
+    currentFilteredItems = items;
+    currentPage = page;
     const container = document.getElementById('activitiesListContainer');
+    
     if (items.length === 0) {
       container.innerHTML = `<div class="text-center py-4 text-secondary small">ไม่พบรายการกิจกรรม</div>`;
+      renderPagination(0, 1);
       return;
     }
 
-    container.innerHTML = items.map(act => `
+    const totalPages = Math.ceil(items.length / itemsPerPage);
+    const start = (page - 1) * itemsPerPage;
+    const paginatedItems = items.slice(start, start + itemsPerPage);
+
+    container.innerHTML = paginatedItems.map(act => `
       <div class="d-flex align-items-center justify-content-between p-2.5 rounded-card hover-bg-light-subtle cursor-pointer border" onclick="selectActivityQuick(${act.id}, '${act.name.replace(/'/g, "\\'")}')">
         <div class="d-flex align-items-center gap-3">
           <div class="bg-hospital-light text-teal rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
@@ -324,6 +336,42 @@
         </div>
       </div>
     `).join('');
+    
+    renderPagination(totalPages, page);
+  }
+
+  function renderPagination(totalPages, page) {
+    let pagWrap = document.getElementById('activityPaginationWrapper');
+    if (!pagWrap) {
+      pagWrap = document.createElement('div');
+      pagWrap.id = 'activityPaginationWrapper';
+      document.getElementById('activitiesListContainer').parentElement.appendChild(pagWrap);
+    }
+    
+    if (totalPages <= 1) {
+      pagWrap.innerHTML = '';
+      return;
+    }
+
+    let paginationHtml = `<ul class="pagination pagination-sm mb-0 mt-3 justify-content-center">`;
+    paginationHtml += `<li class="page-item ${page === 1 ? 'disabled' : ''}"><a class="page-link" href="#" onclick="changeActivityPage(${page - 1}); return false;">ก่อนหน้า</a></li>`;
+    
+    for (let i = 1; i <= totalPages; i++) {
+      if (i === 1 || i === totalPages || (i >= page - 1 && i <= page + 1)) {
+        paginationHtml += `<li class="page-item ${page === i ? 'active' : ''}"><a class="page-link" href="#" onclick="changeActivityPage(${i}); return false;">${i}</a></li>`;
+      } else if (i === page - 2 || i === page + 2) {
+        paginationHtml += `<li class="page-item disabled"><a class="page-link" href="#">...</a></li>`;
+      }
+    }
+    
+    paginationHtml += `<li class="page-item ${page === totalPages ? 'disabled' : ''}"><a class="page-link" href="#" onclick="changeActivityPage(${page + 1}); return false;">ถัดไป</a></li>`;
+    paginationHtml += `</ul>`;
+    
+    pagWrap.innerHTML = paginationHtml;
+  }
+
+  window.changeActivityPage = function(page) {
+    renderActivityList(currentFilteredItems, page);
   }
 
   function filterByCategory(category, element) {
