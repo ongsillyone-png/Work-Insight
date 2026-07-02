@@ -95,7 +95,7 @@ class UserRepository {
 
   async delete(id) {
     try {
-      await pool.query('UPDATE users SET deleted_at = NOW() WHERE id = ?', [id]);
+      await pool.query('UPDATE users SET deleted_at = NOW(), username = CONCAT(username, "_del_", id) WHERE id = ?', [id]);
       return true;
     } catch (err) {
       console.error(`Error in UserRepository.delete for ${id}:`, err);

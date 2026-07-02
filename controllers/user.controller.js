@@ -37,6 +37,9 @@ class UserController {
       return res.json({ success: true, message: 'User created successfully' });
     } catch (err) {
       console.error(err);
+      if (err.code === 'ER_DUP_ENTRY') {
+        return res.status(400).json({ success: false, message: 'มีชื่อผู้ใช้งาน (Username) นี้ในระบบแล้ว' });
+      }
       return res.status(500).json({ success: false, message: 'Failed to create user' });
     }
   }
@@ -58,6 +61,9 @@ class UserController {
       return res.json({ success: true, message: 'User updated successfully' });
     } catch (err) {
       console.error(err);
+      if (err.code === 'ER_DUP_ENTRY') {
+        return res.status(400).json({ success: false, message: 'มีชื่อผู้ใช้งาน (Username) นี้ในระบบแล้ว' });
+      }
       return res.status(500).json({ success: false, message: 'Failed to update user' });
     }
   }
