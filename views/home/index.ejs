@@ -265,6 +265,19 @@
             <input type="text" class="form-control rounded-3 bg-light border-0 fw-bold" id="homeQuickActivityName" readonly>
           </div>
 
+          <!-- Date Selection (วันนี้ / ย้อนหลัง 1 วัน / เลือกเอง) -->
+          <div class="mb-3">
+            <label class="form-label text-secondary small fw-semibold">วันที่ปฏิบัติงาน</label>
+            <div class="segmented-control mb-2" id="homeDateGroup">
+              <button type="button" class="chip-btn active" onclick="setHomeDateMode('today', this)">วันนี้</button>
+              <button type="button" class="chip-btn" onclick="setHomeDateMode('yesterday', this)">ย้อนหลัง 1 วัน</button>
+              <button type="button" class="chip-btn" onclick="setHomeDateMode('custom', this)">เลือกวันที่เอง</button>
+            </div>
+            <div id="homeLogDateContainer" class="d-none mt-2">
+              <input type="date" name="logDate" id="homeLogDate" class="form-control rounded-3">
+            </div>
+          </div>
+
           <!-- Session selection -->
           <div class="mb-3">
             <label class="form-label text-secondary small fw-semibold">ช่วงเวลาทำงาน</label>
@@ -438,11 +451,47 @@
     // Set defaults
     setHomeSession('Morning', document.querySelector('#homeSessionGroup .chip-btn:first-child'));
     setHomeDuration(30, document.querySelector('#homeDurationGroup .chip-btn:nth-child(2)'));
+    setHomeDateMode('today', document.querySelector('#homeDateGroup .chip-btn:first-child'));
     
     // Clear autocomplete list
     document.getElementById('homeAutocompleteList').classList.add('d-none');
     
     homeQuickModal.show();
+  }
+
+  function setHomeDateMode(mode, element) {
+    const btns = document.querySelectorAll('#homeDateGroup .chip-btn');
+    btns.forEach(btn => btn.classList.remove('active'));
+    element.classList.add('active');
+
+    const dateContainer = document.getElementById('homeLogDateContainer');
+    const dateInput = document.getElementById('homeLogDate');
+    
+    const today = new Date();
+    const getLocalDateString = () => {
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    if (mode === 'today') {
+      dateContainer.classList.add('d-none');
+      dateInput.value = getLocalDateString();
+    } else if (mode === 'yesterday') {
+      dateContainer.classList.add('d-none');
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yYear = yesterday.getFullYear();
+      const yMonth = String(yesterday.getMonth() + 1).padStart(2, '0');
+      const yDay = String(yesterday.getDate()).padStart(2, '0');
+      dateInput.value = `${yYear}-${yMonth}-${yDay}`;
+    } else if (mode === 'custom') {
+      dateContainer.classList.remove('d-none');
+      if (!dateInput.value) {
+        dateInput.value = getLocalDateString();
+      }
+    }
   }
 
   function triggerMobileQuickLog() {

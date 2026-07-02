@@ -14,6 +14,7 @@ class ActivityController {
       
       // Group by date to paginate by "days"
       const uniqueDates = [...new Set(allLogs.map(log => log.date))];
+      const latestDate = uniqueDates[0] || null;
       const limitDays = 10;
       const totalPages = Math.ceil(uniqueDates.length / limitDays) || 1;
       const currentPage = Math.min(page, totalPages);
@@ -28,6 +29,7 @@ class ActivityController {
         body: '../activity/index',
         title: 'Activity Logs | Work Insight',
         logs,
+        latestDate,
         query: req.query || {},
         pagination: {
           currentPage,

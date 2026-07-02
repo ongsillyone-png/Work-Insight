@@ -109,6 +109,19 @@
             <input type="text" class="form-control rounded-3 bg-light border-0 fw-semibold" id="modalActivityNameDisplay" readonly>
           </div>
 
+          <!-- Date Selection (วันนี้ / ย้อนหลัง 1 วัน / เลือกเอง) -->
+          <div class="mb-3">
+            <label class="form-label text-secondary small fw-semibold">วันที่ปฏิบัติงาน</label>
+            <div class="segmented-control mb-2" id="createDateGroup">
+              <button type="button" class="chip-btn active" onclick="setCreateDateMode('today', this)">วันนี้</button>
+              <button type="button" class="chip-btn" onclick="setCreateDateMode('yesterday', this)">ย้อนหลัง 1 วัน</button>
+              <button type="button" class="chip-btn" onclick="setCreateDateMode('custom', this)">เลือกวันที่เอง</button>
+            </div>
+            <div id="createLogDateContainer" class="d-none mt-2">
+              <input type="date" name="logDate" id="createLogDate" class="form-control rounded-3">
+            </div>
+          </div>
+
           <!-- Session selection (เช้า / บ่าย / ทั้งวัน) -->
           <div class="mb-3">
             <label class="form-label text-secondary small fw-semibold">ช่วงเวลาปฏิบัติงาน</label>
@@ -341,11 +354,47 @@
     // Reset values to defaults
     setFormSession('Morning', document.querySelector('#formSessionGroup .chip-btn:first-child'));
     setFormDuration(30, document.querySelector('#formDurationGroup .chip-btn:nth-child(2)'));
+    setCreateDateMode('today', document.querySelector('#createDateGroup .chip-btn:first-child'));
     
     // Hide autocomplete drop
     document.getElementById('searchAutocompleteList').classList.add('d-none');
     
     recordModal.show();
+  }
+
+  function setCreateDateMode(mode, element) {
+    const btns = document.querySelectorAll('#createDateGroup .chip-btn');
+    btns.forEach(btn => btn.classList.remove('active'));
+    element.classList.add('active');
+
+    const dateContainer = document.getElementById('createLogDateContainer');
+    const dateInput = document.getElementById('createLogDate');
+    
+    const today = new Date();
+    const getLocalDateString = () => {
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    if (mode === 'today') {
+      dateContainer.classList.add('d-none');
+      dateInput.value = getLocalDateString();
+    } else if (mode === 'yesterday') {
+      dateContainer.classList.add('d-none');
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yYear = yesterday.getFullYear();
+      const yMonth = String(yesterday.getMonth() + 1).padStart(2, '0');
+      const yDay = String(yesterday.getDate()).padStart(2, '0');
+      dateInput.value = `${yYear}-${yMonth}-${yDay}`;
+    } else if (mode === 'custom') {
+      dateContainer.classList.remove('d-none');
+      if (!dateInput.value) {
+        dateInput.value = getLocalDateString();
+      }
+    }
   }
 
   function setFormSession(value, element) {

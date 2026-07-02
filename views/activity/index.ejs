@@ -51,15 +51,16 @@
               <!-- Day Container -->
               <div class="day-group mb-4" id="group-<%= log.date %>">
                 <!-- Date Node Header (Clickable for collapse) -->
+                <% const isLatest = (latestDate && log.date === latestDate); %>
                 <div class="position-relative my-3" style="margin-left: -32px; cursor: pointer; user-select: none;" onclick="toggleDayCollapse('<%= log.date %>')">
                   <div class="bg-hospital-light text-teal border border-teal rounded-pill px-3 py-1 d-inline-flex align-items-center fw-bold shadow-sm" style="font-size: 0.85rem; border-color: var(--hospital-teal) !important;">
                     <i class="bi bi-calendar-check me-2"></i>
                     <span><%= log.date %></span>
-                    <i class="bi bi-chevron-down ms-2 collapse-icon" id="icon-<%= log.date %>"></i>
+                    <i class="bi bi-<%= isLatest ? 'chevron-down' : 'chevron-right' %> ms-2 collapse-icon" id="icon-<%= log.date %>"></i>
                   </div>
                 </div>
                 <!-- Day Content Wrapper -->
-                <div class="day-content" id="content-<%= log.date %>" style="transition: all 0.2s ease-in-out;">
+                <div class="day-content" id="content-<%= log.date %>" style="transition: all 0.2s ease-in-out; <%= isLatest ? '' : 'display: none;' %>">
         <% 
             } 
         %>
