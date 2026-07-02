@@ -1,7 +1,10 @@
 <div class="row mb-4">
   <div class="col-12 d-flex align-items-center justify-content-between flex-wrap gap-2">
     <div>
-      <h3 class="fw-bold text-dark mb-0">จัดการกิจกรรมย่อยหลัก (Master Activities)</h3>
+      <h3 class="fw-bold text-dark mb-0">
+        จัดการกิจกรรมย่อย (Master Activities) 
+        <span class="badge bg-hospital text-white ms-2 rounded-pill fs-6"><%= activities ? activities.length : 0 %> รายการ</span>
+      </h3>
       <p class="text-secondary small mb-0">เพิ่มหรือกำหนดค่ากิจกรรมย่อยสำหรับการบันทึกภาระงาน จัดกลุ่มตามหมวดหมู่และกลุ่มกิจกรรมย่อย</p>
     </div>
     <div>
@@ -20,7 +23,7 @@
           <thead class="table-light">
             <tr>
               <th class="ps-3" style="width: 10%;">รหัส</th>
-              <th style="width: 30%;">ชื่อกิจกรรมหลัก</th>
+              <th style="width: 30%;">ชื่อกิจกรรมย่อย</th>
               <th style="width: 15%;">หมวดหมู่หลัก</th>
               <th style="width: 15%;">กลุ่มย่อย</th>
               <th style="width: 12%;">เวลามาตรฐาน</th>
@@ -63,7 +66,7 @@
               <tr>
                 <td colspan="7" class="text-center py-5 text-muted">
                   <i class="bi bi-clipboard2-x fs-2 text-secondary d-block mb-2"></i>
-                  ยังไม่มีข้อมูลกิจกรรมหลักในระบบ
+                  ยังไม่มีข้อมูลกิจกรรมย่อยในระบบ
                 </td>
               </tr>
             <% } %>
@@ -90,7 +93,7 @@
               <input type="text" class="form-control rounded-3" id="newCode" name="code" required placeholder="เช่น ACT-009">
             </div>
             <div class="col-md-8">
-              <label for="newName" class="form-label text-secondary small fw-semibold">ชื่อกิจกรรมหลัก</label>
+              <label for="newName" class="form-label text-secondary small fw-semibold">ชื่อกิจกรรมย่อย</label>
               <input type="text" class="form-control rounded-3" id="newName" name="name" required placeholder="เช่น ซ่อมบำรุงเครือข่าย">
             </div>
             <div class="col-12">
@@ -158,7 +161,7 @@
               <input type="text" class="form-control rounded-3" id="editCode" required>
             </div>
             <div class="col-md-8">
-              <label for="editName" class="form-label text-secondary small fw-semibold">ชื่อกิจกรรมหลัก</label>
+              <label for="editName" class="form-label text-secondary small fw-semibold">ชื่อกิจกรรมย่อย</label>
               <input type="text" class="form-control rounded-3" id="editName" required>
             </div>
             <div class="col-12">
