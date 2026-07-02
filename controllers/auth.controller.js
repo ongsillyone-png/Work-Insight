@@ -33,7 +33,7 @@ class AuthController {
 
       const cookieOptions = {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production'
+        secure: process.env.USE_HTTPS === 'true' // Only set to true if running over HTTPS
       };
 
       if (isRememberMe) {
