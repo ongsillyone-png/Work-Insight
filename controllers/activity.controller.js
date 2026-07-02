@@ -46,9 +46,19 @@ class ActivityController {
   async renderCreate(req, res, next) {
     try {
       const userId = req.user?.id || 1;
-      const activities = await activityMasterService.getAllActivities();
+      let activities = await activityMasterService.getAllActivities();
       const locations = await locationService.getAllLocations();
-      const categories = await categoryService.getAllCategories();
+      let categories = await categoryService.getAllCategories();
+      
+      if (req.user && req.user.managed_categories) {
+        const managedIds = req.user.managed_categories.split(',').map(id => id.trim());
+        categories = categories.filter(c => managedIds.includes(c.id.toString()));
+        activities = activities.filter(a => a.category_id && managedIds.includes(a.category_id.toString()));
+      } else if (req.user && req.user.role_id !== 1) {
+        // If not Admin and no managed categories, they shouldn't see any
+        categories = [];
+        activities = [];
+      }
       
       const todayStr = getLocalDateString();
       const allUserLogs = await activityService.getLoggedActivities(userId);

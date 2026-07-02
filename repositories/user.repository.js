@@ -122,6 +122,16 @@ class UserRepository {
       throw err;
     }
   }
+
+  async updateManagedCategories(id, managed_categories) {
+    try {
+      await pool.query('UPDATE users SET managed_categories = ? WHERE id = ?', [managed_categories, id]);
+      return true;
+    } catch (err) {
+      console.error(`Error in UserRepository.updateManagedCategories for ${id}:`, err);
+      throw err;
+    }
+  }
 }
 
 module.exports = new UserRepository();

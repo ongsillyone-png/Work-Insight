@@ -59,10 +59,13 @@
                 <% } %>
               </td>
               <td class="pe-3 text-end">
-                <button class="btn btn-sm btn-light border rounded-2 p-1.5 me-1" onclick="openEditUserModal(<%= user.id %>, '<%= user.full_name %>', '<%= user.username %>', '<%= user.position || '' %>', <%= user.role_id %>, <%= user.is_active %>)">
+                <button class="btn btn-sm btn-light border rounded-2 p-1.5 me-1" onclick="openEditUserModal(<%= user.id %>, '<%= user.full_name %>', '<%= user.username %>', '<%= user.position || '' %>', <%= user.role_id %>, <%= user.is_active %>)" title="แก้ไขผู้ใช้งาน">
                   <i class="bi bi-pencil"></i>
                 </button>
-                <button class="btn btn-sm btn-light border rounded-2 p-1.5" onclick="deleteUser(<%= user.id %>)">
+                <button class="btn btn-sm btn-light border rounded-2 p-1.5 me-1" onclick="openManageCategoriesModal(<%= user.id %>, '<%= user.managed_categories || '' %>')" title="จัดการสิทธิ์หมวดหมู่">
+                  <i class="bi bi-folder-check text-primary"></i>
+                </button>
+                <button class="btn btn-sm btn-light border rounded-2 p-1.5" onclick="deleteUser(<%= user.id %>)" title="ลบผู้ใช้งาน">
                   <i class="bi bi-trash text-danger"></i>
                 </button>
               </td>
@@ -202,13 +205,52 @@
   </div>
 </div>
 
+<!-- Modal Manage Categories -->
+<div class="modal fade" id="manageCategoriesModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;">
+    <div class="modal-content border-0 rounded-card shadow-lg">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold text-dark">ตั้งค่าสิทธิ์จัดการหมวดหมู่</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="manageCategoriesForm" onsubmit="submitManageCategories(event)">
+        <div class="modal-body py-3">
+          <input type="hidden" id="manageUserId">
+          <p class="text-secondary small mb-3">เลือกหมวดหมู่ที่ผู้ใช้งานนี้มีสิทธิ์เพิ่ม/ลบ/แก้ไขกิจกรรมย่อย</p>
+          <div class="category-list d-flex flex-column gap-2">
+            <% if (categories && categories.length > 0) { %>
+              <% categories.forEach(function(cat) { %>
+                <label class="d-flex align-items-center p-3 border rounded-3 cursor-pointer hover-bg-light transition-base">
+                  <input class="form-check-input manage-category-checkbox me-3" type="checkbox" value="<%= cat.id %>" style="width: 1.25em; height: 1.25em;">
+                  <div>
+                    <span class="d-block fw-semibold text-dark"><%= cat.name %></span>
+                    <small class="text-secondary"><%= cat.description || '' %></small>
+                  </div>
+                </label>
+              <% }); %>
+            <% } else { %>
+              <div class="text-center py-3 text-muted">ยังไม่มีข้อมูลหมวดหมู่ในระบบ</div>
+            <% } %>
+          </div>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">ยกเลิก</button>
+          <button type="submit" class="btn btn-hospital rounded-3 px-4">บันทึกสิทธิ์</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <script>
   let editUserModal;
   let createUserModal;
+  let manageCategoriesModal;
 
   document.addEventListener('DOMContentLoaded', () => {
     editUserModal = new bootstrap.Modal(document.getElementById('editUserModal'));
     createUserModal = new bootstrap.Modal(document.getElementById('createUserModal'));
+    manageCategoriesModal = new bootstrap.Modal(document.getElementById('manageCategoriesModal'));
   });
 
   function togglePasswordVisibility(inputId, btn) {
@@ -301,6 +343,56 @@
       const result = await response.json();
       if (result.success) {
         editUserModal.hide();
+        Swal.fire({ title: 'สำเร็จ!', text: result.message, icon: 'success', timer: 1500, showConfirmButton: false }).then(() => window.location.reload());
+      } else {
+        Swal.fire('ผิดพลาด!', result.message, 'error');
+      }
+    } catch (err) {
+      Swal.fire('ผิดพลาด!', 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์', 'error');
+    }
+  }
+
+  function openManageCategoriesModal(id, managedCategoriesStr) {
+    document.getElementById('manageUserId').value = id;
+    
+    // Clear all checkboxes
+    document.querySelectorAll('.manage-category-checkbox').forEach(cb => {
+      cb.checked = false;
+    });
+
+    // Check the ones user has
+    if (managedCategoriesStr && managedCategoriesStr !== 'null') {
+      const categoryIds = managedCategoriesStr.split(',').map(s => s.trim());
+      document.querySelectorAll('.manage-category-checkbox').forEach(cb => {
+        if (categoryIds.includes(cb.value)) {
+          cb.checked = true;
+        }
+      });
+    }
+
+    manageCategoriesModal.show();
+  }
+
+  async function submitManageCategories(event) {
+    event.preventDefault();
+    const id = document.getElementById('manageUserId').value;
+    
+    const selectedIds = [];
+    document.querySelectorAll('.manage-category-checkbox:checked').forEach(cb => {
+      selectedIds.push(cb.value);
+    });
+    
+    const managed_categories = selectedIds.join(',');
+
+    try {
+      const response = await fetch(`/users/managed-categories/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ managed_categories })
+      });
+      const result = await response.json();
+      if (result.success) {
+        manageCategoriesModal.hide();
         Swal.fire({ title: 'สำเร็จ!', text: result.message, icon: 'success', timer: 1500, showConfirmButton: false }).then(() => window.location.reload());
       } else {
         Swal.fire('ผิดพลาด!', result.message, 'error');

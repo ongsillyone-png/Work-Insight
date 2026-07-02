@@ -5,9 +5,22 @@ const groupService = require('../services/group.service');
 class ActivityMasterController {
   async renderIndex(req, res, next) {
     try {
-      const activities = await activityMasterService.getAllActivities();
-      const categories = await categoryService.getAllCategories();
-      const groups = await groupService.getAllGroups();
+      let activities = await activityMasterService.getAllActivities();
+      let categories = await categoryService.getAllCategories();
+      let groups = await groupService.getAllGroups();
+      
+      if (req.user && req.user.role_id !== 1) { // Not Admin
+        if (req.user.managed_categories) {
+          const managedIds = req.user.managed_categories.split(',').map(id => id.trim());
+          categories = categories.filter(c => managedIds.includes(c.id.toString()));
+          groups = groups.filter(g => g.category_id && managedIds.includes(g.category_id.toString()));
+          activities = activities.filter(a => a.category_id && managedIds.includes(a.category_id.toString()));
+        } else {
+          categories = [];
+          groups = [];
+          activities = [];
+        }
+      }
       
       return res.render('layouts/main', {
         body: '../activity-master/index',

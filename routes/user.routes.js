@@ -10,6 +10,7 @@ router.get('/', authMiddleware, permissionMiddleware([ROLES.ADMIN]), userControl
 router.post('/create', authMiddleware, permissionMiddleware([ROLES.ADMIN]), userController.createUser);
 router.put('/update/:id', authMiddleware, permissionMiddleware([ROLES.ADMIN]), userController.updateUser);
 router.delete('/delete/:id', authMiddleware, permissionMiddleware([ROLES.ADMIN]), userController.deleteUser);
+router.put('/managed-categories/:id', authMiddleware, permissionMiddleware([ROLES.ADMIN]), userController.updateManagedCategories);
 
 // Any authenticated user can update their preferences
 router.post('/preferences', authMiddleware, userController.updatePreferences);

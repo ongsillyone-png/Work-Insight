@@ -337,6 +337,7 @@ CREATE TABLE `system_settings` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `app_name` varchar(100) NOT NULL DEFAULT 'Work Insight',
   `allow_registration` tinyint(1) NOT NULL DEFAULT 0,
+  `max_quick_actions` int(11) NOT NULL DEFAULT 6,
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -344,7 +345,7 @@ CREATE TABLE `system_settings` (
 -- ----------------------------
 -- Records of system_settings
 -- ----------------------------
-INSERT INTO `system_settings` VALUES ('1', 'Digital-Work Insight', '0', '2026-07-01 14:50:28');
+INSERT INTO `system_settings` VALUES ('1', 'Digital-Work Insight', '0', '6', '2026-07-01 14:50:28');
 
 -- ----------------------------
 -- Table structure for users
@@ -365,6 +366,7 @@ CREATE TABLE `users` (
   `created_by` bigint(20) unsigned DEFAULT NULL COMMENT 'User ID who created the user profile',
   `updated_by` bigint(20) unsigned DEFAULT NULL COMMENT 'User ID who last updated the user profile',
   `preferred_categories` varchar(255) DEFAULT NULL,
+  `managed_categories` varchar(255) DEFAULT NULL,
   `quick_actions` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_users_username` (`username`),

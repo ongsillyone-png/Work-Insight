@@ -42,6 +42,10 @@ class UserService {
   async updateQuickActions(id, quick_actions) {
     return userRepository.updateQuickActions(id, quick_actions);
   }
+
+  async updateManagedCategories(id, managed_categories) {
+    return userRepository.updateManagedCategories(id, managed_categories);
+  }
 }
 
 module.exports = new UserService();

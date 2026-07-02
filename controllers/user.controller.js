@@ -1,15 +1,18 @@
 const userService = require('../services/user.service');
+const categoryService = require('../services/category.service');
 
 class UserController {
   async renderIndex(req, res, next) {
     try {
       const users = await userService.getAllUsers();
       const roles = await userService.getAllRoles();
+      const categories = await categoryService.getAllCategories();
       return res.render('layouts/main', {
         body: '../user/index',
         title: 'Users Management | Work Insight',
         users,
         roles,
+        categories,
         activeMenu: 'user'
       });
     } catch (err) {
@@ -143,6 +146,17 @@ class UserController {
     } catch (err) {
       console.error('Error in updateProfileSettings:', err);
       next(err);
+    }
+  }
+  async updateManagedCategories(req, res, next) {
+    try {
+      const id = req.params.id;
+      const { managed_categories } = req.body;
+      await userService.updateManagedCategories(id, managed_categories);
+      return res.json({ success: true, message: 'บันทึกสิทธิ์การจัดการหมวดหมู่เรียบร้อยแล้ว' });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ success: false, message: 'ไม่สามารถบันทึกสิทธิ์ได้' });
     }
   }
 }

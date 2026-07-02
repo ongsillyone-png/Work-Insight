@@ -28,13 +28,26 @@ module.exports = async (req, res, next) => {
     if (dbUser) {
       req.user.preferred_categories = dbUser.preferred_categories;
       res.locals.user.preferred_categories = dbUser.preferred_categories;
+      req.user.managed_categories = dbUser.managed_categories;
+      res.locals.user.managed_categories = dbUser.managed_categories;
       req.user.quick_actions = dbUser.quick_actions;
       res.locals.user.quick_actions = dbUser.quick_actions;
+      req.user.role_id = dbUser.role_id; // ensure role_id is present
     }
     
     // Globally provide categories to all views for the settings modal
     const categoryService = require('../services/category.service');
-    res.locals.allCategories = await categoryService.getAllCategories();
+    let allCategories = await categoryService.getAllCategories();
+    
+    if (req.user.role_id !== 1) { // 1 is Admin
+      if (req.user.managed_categories) {
+        const managedIds = req.user.managed_categories.split(',').map(id => id.trim());
+        allCategories = allCategories.filter(c => managedIds.includes(c.id.toString()));
+      } else {
+        allCategories = [];
+      }
+    }
+    res.locals.allCategories = allCategories;
     
     next();
   } catch (err) {
