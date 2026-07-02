@@ -234,16 +234,7 @@
     createModalObj = new bootstrap.Modal(document.getElementById('createActivityMasterModal'));
 
     document.getElementById('createActivityMasterModal').addEventListener('show.bs.modal', function () {
-      let maxNum = 0;
-      existingCodes.forEach(code => {
-        const match = code.match(/^ACT-(\d+)$/);
-        if (match) {
-          const num = parseInt(match[1], 10);
-          if (num > maxNum) maxNum = num;
-        }
-      });
-      const nextNum = maxNum + 1;
-      document.getElementById('newCode').value = `ACT-${String(nextNum).padStart(3, '0')}`;
+      document.getElementById('newCode').value = '<%= nextCode %>';
       
       // Reset dropdowns
       document.getElementById('newCategory').value = '';

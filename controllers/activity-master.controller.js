@@ -9,6 +9,16 @@ class ActivityMasterController {
       let categories = await categoryService.getAllCategories();
       let groups = await groupService.getAllGroups();
       
+      let maxNum = 0;
+      activities.forEach(act => {
+        const match = act.code.match(/^ACT-(\d+)$/);
+        if (match) {
+          const num = parseInt(match[1], 10);
+          if (num > maxNum) maxNum = num;
+        }
+      });
+      const nextCode = `ACT-${String(maxNum + 1).padStart(3, '0')}`;
+      
       if (req.user && req.user.role_id !== 1) { // Not Admin
         if (req.user.managed_categories) {
           const managedIds = req.user.managed_categories.split(',').map(id => id.trim());
@@ -28,6 +38,7 @@ class ActivityMasterController {
         activities,
         categories,
         groups,
+        nextCode,
         activeMenu: 'activity_master'
       });
     } catch (err) {
