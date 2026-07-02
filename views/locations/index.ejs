@@ -146,6 +146,55 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     editModalObj = new bootstrap.Modal(document.getElementById('editLocationModal'));
+
+    // --- Simple Pagination (10 rows per page) ---
+    const rowsPerPage = 10;
+    const tbody = document.querySelector('.table-responsive tbody');
+    // Ensure we don't paginate the "no data" row
+    const rows = Array.from(tbody.querySelectorAll('tr')).filter(tr => !tr.querySelector('td[colspan="4"]'));
+    const pageCount = Math.ceil(rows.length / rowsPerPage);
+    let currentPage = 1;
+
+    function renderTable(page) {
+      const start = (page - 1) * rowsPerPage;
+      const end = start + rowsPerPage;
+      rows.forEach((row, index) => {
+        row.style.display = (index >= start && index < end) ? '' : 'none';
+      });
+      renderPagination();
+    }
+
+    function renderPagination() {
+      let paginationHtml = '';
+      if (pageCount > 1) {
+        paginationHtml += `<ul class="pagination pagination-sm mb-0 mt-3 justify-content-end">`;
+        paginationHtml += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}"><a class="page-link" href="#" onclick="changePage(${currentPage - 1}); return false;">ก่อนหน้า</a></li>`;
+        for (let i = 1; i <= pageCount; i++) {
+          paginationHtml += `<li class="page-item ${currentPage === i ? 'active' : ''}"><a class="page-link" href="#" onclick="changePage(${i}); return false;">${i}</a></li>`;
+        }
+        paginationHtml += `<li class="page-item ${currentPage === pageCount ? 'disabled' : ''}"><a class="page-link" href="#" onclick="changePage(${currentPage + 1}); return false;">ถัดไป</a></li>`;
+        paginationHtml += `</ul>`;
+      }
+      
+      let pagWrap = document.getElementById('paginationWrapper');
+      if (!pagWrap) {
+        pagWrap = document.createElement('div');
+        pagWrap.id = 'paginationWrapper';
+        document.querySelector('.table-responsive').parentElement.appendChild(pagWrap);
+      }
+      pagWrap.innerHTML = paginationHtml;
+    }
+
+    window.changePage = function(page) {
+      if (page >= 1 && page <= pageCount) {
+        currentPage = page;
+        renderTable(currentPage);
+      }
+    }
+
+    if (rows.length > rowsPerPage) {
+      renderTable(1);
+    }
   });
 
   function openEditModal(id, name, description, isActive) {
