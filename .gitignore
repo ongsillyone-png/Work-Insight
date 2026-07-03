@@ -9,3 +9,7 @@ yarn-debug.log*
 yarn-error.log*
 .idea/
 .vscode/
+
+# Ignore Mock Activity Generators
+scripts/mock-engine/
+scripts/generate_mock_activities*.js

@@ -289,12 +289,29 @@ class DashboardService {
     try {
       conn = await pool.getConnection();
 
-      // Get user's preferred categories
-      const [userRow] = await conn.query('SELECT preferred_categories FROM users WHERE id = ?', [userId]);
+      // Get user's preferred and managed categories
+      const [userRow] = await conn.query('SELECT preferred_categories, managed_categories FROM users WHERE id = ?', [userId]);
       const preferredCategories = userRow?.preferred_categories;
+      const managedCategories = userRow?.managed_categories;
+      
       let preferredCategoryIds = [];
+      let managedCategoryIds = [];
+
+      if (managedCategories) {
+        managedCategoryIds = managedCategories.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
+      }
+
       if (preferredCategories) {
         preferredCategoryIds = preferredCategories.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
+        // Intersect to ensure we only show what the user has permission to manage
+        if (managedCategoryIds.length > 0) {
+          preferredCategoryIds = preferredCategoryIds.filter(id => managedCategoryIds.includes(id));
+        } else {
+          preferredCategoryIds = [];
+        }
+      } else {
+        // Fallback: If no preferences are selected, show all managed categories (as stated in the UI)
+        preferredCategoryIds = managedCategoryIds;
       }
 
       if (preferredCategoryIds.length === 0) {
