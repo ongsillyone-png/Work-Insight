@@ -40,5 +40,6 @@ const permissionMiddleware = require('../middlewares/permission.middleware');
 const { ROLES } = require('../utils/constants');
 router.get('/system-settings', authMiddleware, permissionMiddleware([ROLES.ADMIN]), settingController.renderIndex);
 router.post('/system-settings/update', authMiddleware, permissionMiddleware([ROLES.ADMIN]), settingController.updateSettings);
+router.post('/system-settings/test-moph-notify', authMiddleware, permissionMiddleware([ROLES.ADMIN]), settingController.testMophNotify);
 
 module.exports = router;

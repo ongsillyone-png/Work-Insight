@@ -45,10 +45,44 @@
           <div class="form-text text-secondary text-xs mt-1">กำหนดจำนวนรายการปักหมุดบันทึกด่วนสูงสุดที่จะแสดงผลบนหน้าแรก (ไม่เกิน 10 รายการ)</div>
         </div>
 
+        <!-- MOPH Notify Section -->
+        <hr class="my-5">
+        <h5 class="fw-bold text-dark mb-4">การแจ้งเตือน (MOPH Notify Settings)</h5>
+
+        <div class="mb-4">
+          <label for="mophNotifyEnabled" class="form-label text-secondary small fw-semibold">สถานะการแจ้งเตือนสรุปผลรายวัน</label>
+          <select class="form-select rounded-3" id="mophNotifyEnabled">
+            <option value="false" <%= !settings.moph_notify_enabled ? 'selected' : '' %>>ปิดการแจ้งเตือน</option>
+            <option value="true" <%= settings.moph_notify_enabled ? 'selected' : '' %>>เปิดการแจ้งเตือน</option>
+          </select>
+        </div>
+
+        <div class="mb-4">
+          <label for="mophNotifyTime" class="form-label text-secondary small fw-semibold">เวลาที่แจ้งเตือน (Notification Time)</label>
+          <input type="time" class="form-control rounded-3" id="mophNotifyTime" value="<%= settings.moph_notify_time || '16:30' %>">
+        </div>
+
+        <div class="mb-4">
+          <label for="mophClientKey" class="form-label text-secondary small fw-semibold">Client Key (MOPH Notify)</label>
+          <input type="text" class="form-control rounded-3" id="mophClientKey" value="<%= settings.moph_client_key || '' %>">
+        </div>
+
+        <div class="mb-4">
+          <label for="mophSecretKey" class="form-label text-secondary small fw-semibold">Secret Key (MOPH Notify)</label>
+          <input type="text" class="form-control rounded-3" id="mophSecretKey" value="<%= settings.moph_secret_key || '' %>">
+        </div>
+
         <!-- Actions -->
-        <div class="d-flex align-items-center justify-content-end gap-2 mt-5">
-          <button type="button" class="btn btn-light border rounded-3 px-4 py-2" onclick="window.location.reload()">ยกเลิก</button>
-          <button type="submit" class="btn btn-hospital rounded-3 px-4 py-2">บันทึกการตั้งค่า</button>
+        <div class="d-flex align-items-center justify-content-between mt-5">
+          <div>
+            <button type="button" class="btn btn-outline-primary rounded-3 px-4 py-2" onclick="testMophNotify()">
+              <i class="bi bi-send me-1"></i> ทดสอบส่งแจ้งเตือน
+            </button>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-light border rounded-3 px-4 py-2" onclick="window.location.reload()">ยกเลิก</button>
+            <button type="submit" class="btn btn-hospital rounded-3 px-4 py-2">บันทึกการตั้งค่า</button>
+          </div>
         </div>
       </form>
     </div>
@@ -56,12 +90,50 @@
 </div>
 
 <script>
+  async function testMophNotify() {
+    const mophClientKey = document.getElementById('mophClientKey').value;
+    const mophSecretKey = document.getElementById('mophSecretKey').value;
+    
+    if (!mophClientKey || !mophSecretKey) {
+      Swal.fire('ข้อมูลไม่ครบ', 'กรุณากรอก Client Key และ Secret Key ก่อนทดสอบ', 'warning');
+      return;
+    }
+
+    Swal.fire({
+      title: 'กำลังส่งทดสอบ...',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
+    try {
+      const response = await fetch('/system-settings/test-moph-notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mophClientKey, mophSecretKey })
+      });
+      const result = await response.json();
+      if (result.success) {
+        Swal.fire('สำเร็จ!', result.message, 'success');
+      } else {
+        Swal.fire('ผิดพลาด!', result.message, 'error');
+      }
+    } catch (err) {
+      Swal.fire('ผิดพลาด!', 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์', 'error');
+    }
+  }
+
   async function saveSettings(event) {
     event.preventDefault();
     const data = {
       appName: document.getElementById('appName').value,
       allowRegistration: document.getElementById('allowRegistration').value,
-      maxQuickActions: document.getElementById('maxQuickActions').value
+      maxQuickActions: document.getElementById('maxQuickActions').value,
+      mophNotifyEnabled: document.getElementById('mophNotifyEnabled').value,
+      mophNotifyTime: document.getElementById('mophNotifyTime').value,
+      mophClientKey: document.getElementById('mophClientKey').value,
+      mophSecretKey: document.getElementById('mophSecretKey').value
     };
 
     try {

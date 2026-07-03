@@ -336,6 +336,10 @@ CREATE TABLE `system_settings` (
   `app_name` varchar(100) NOT NULL DEFAULT 'Work Insight',
   `allow_registration` tinyint(1) NOT NULL DEFAULT 0,
   `max_quick_actions` int(11) NOT NULL DEFAULT 6,
+  `moph_client_key` varchar(255) DEFAULT NULL,
+  `moph_secret_key` varchar(255) DEFAULT NULL,
+  `moph_notify_time` varchar(10) DEFAULT '16:30',
+  `moph_notify_enabled` tinyint(1) DEFAULT 0,
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
