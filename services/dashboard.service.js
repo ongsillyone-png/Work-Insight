@@ -288,6 +288,23 @@ class DashboardService {
     let conn;
     try {
       conn = await pool.getConnection();
+
+      // Get user's preferred categories
+      const [userRow] = await conn.query('SELECT preferred_categories FROM users WHERE id = ?', [userId]);
+      const preferredCategories = userRow?.preferred_categories;
+      let preferredCategoryIds = [];
+      if (preferredCategories) {
+        preferredCategoryIds = preferredCategories.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
+      }
+
+      if (preferredCategoryIds.length === 0) {
+        return []; // No preferred categories assigned, return empty array
+      }
+
+      // Create placeholders for the IN clause
+      const placeholders = preferredCategoryIds.map(() => '?').join(',');
+      const queryParams = [userId, startDate, endDate, ...preferredCategoryIds];
+
       const fullDistributionResult = await conn.query(
         `SELECT 
            ac.name AS categoryName,
@@ -298,9 +315,9 @@ class DashboardService {
          JOIN activity_master am ON ac.id = am.category_id AND am.deleted_at IS NULL
          JOIN activity_groups ag ON am.group_id = ag.id AND ag.deleted_at IS NULL
          LEFT JOIN activity_logs al ON am.id = al.activity_master_id AND al.user_id = ? AND al.log_date BETWEEN ? AND ? AND al.deleted_at IS NULL
-         WHERE ac.deleted_at IS NULL
+         WHERE ac.deleted_at IS NULL AND ac.id IN (${placeholders})
          GROUP BY ac.id, ac.name, ag.id, ag.name, am.id, am.name`,
-         [userId, startDate, endDate]
+         queryParams
       );
 
       // Build the nested tree map from master configuration
