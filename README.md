@@ -153,6 +153,8 @@ http://localhost:3000
 ```
 
 ---
+user: admin
+pass: admin1234
 
 # 💻 ความต้องการของระบบ
 
