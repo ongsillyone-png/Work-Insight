@@ -386,4 +386,4 @@ CREATE TABLE `users` (
 -- ----------------------------
 -- Records of users
 -- ----------------------------
-INSERT INTO `users` VALUES ('1', 'admin', '$2b$10$IfmYUolSch.GyuWcZl/xeO3Kr26S8zjl7HgfPX', 'System Admin', 'IT Administrator', '1', null, '0', '2026-07-01 12:06:21', '2026-07-01 14:05:36', null, null, null, null, null);
+INSERT INTO `users` VALUES ('1', 'admin', '$2b$10$k3zs11Tar7cpXztVKI8E3OGjsojclsBa7Bvn4Cwd/nf8gOoCWN1uS', 'System Admin', 'IT Administrator', '1', null, '0', '2026-07-01 12:06:21', '2026-07-01 14:05:36', null, null, null, null, null);
